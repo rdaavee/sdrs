@@ -1,4 +1,29 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Outfit:wght@100..900&display=swap");
 @import "tailwindcss";
+
+* {
+    font-family: "Open Sans", sans-serif;
+}
+
+::-webkit-scrollbar {
+    width: 1px;
+    border-radius: 0.5rem;
+    background-color: hsl(0, 100%, 0);
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 0.5rem;
+    background-color: hsl(0, 0%, 20%);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    border-radius: 0.5rem;
+    background-color: hsl(0, 0%, 50%);
+}
+
+.ReactModal__Body--open {
+    overflow: hidden;
+}
 
 .page-container {
     max-width: 1300px;
@@ -94,7 +119,7 @@
 .grid-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
+    gap: 10px;
     margin-left: 15px;
     margin-right: 15px;
 }
@@ -115,7 +140,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: url("../../assets/images/card-bg.jpg");
+    background: url("../src/assets/images/card-bg.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -200,7 +225,7 @@
 
 .pText {
     color: #8dcbd8;
-    font-weight: 100;
+    font-weight: 400;
     font-size: 14px;
     padding: 10px;
     margin-bottom: 10px;

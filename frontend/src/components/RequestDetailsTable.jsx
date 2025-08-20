@@ -69,7 +69,7 @@ const RequestDetailsTable = ({ copies, setCopies }) => {
                             <select
                                 value={selectedDoc}
                                 onChange={(e) => setSelectedDoc(e.target.value)}
-                                className="appearance-none border-0 text-center px-2 py-1 focus:outline-none focus:ring-0"
+                                className="appearance-auto border-0 text-center px-2 py-1 focus:outline-none focus:ring-0"
                             >
                                 {certificateOptions.map((option, index) => (
                                     <option key={index} value={option}>

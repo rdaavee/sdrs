@@ -1,4 +1,4 @@
-import { FaArrowAltCircleLeft, FaArrowAltCircleRight } from "react-icons/fa";
+import { IoArrowBackOutline, IoArrowForwardOutline } from "react-icons/io5";
 
 const StepperNavigation = ({ currentStep, handlePrevious, handleNext }) => {
     return (
@@ -6,10 +6,10 @@ const StepperNavigation = ({ currentStep, handlePrevious, handleNext }) => {
             {currentStep > 0 ? (
                 <button
                     onClick={handlePrevious}
-                    className="mb-5 mt-2 px-5 py-1 border rounded-full inline-flex items-center text-xs bg-gray-100"
+                    className="mb-5 mt-2 px-5 py-1 border border-gray-300 rounded-xs inline-flex items-center text-xs cursor-pointer hover:bg-green-600 hover:border-green-600 hover:text-white transition-all"
                 >
-                    <FaArrowAltCircleLeft className="mr-2 text-md" />
-                    Previous
+                    <IoArrowBackOutline className="mr-2 text-md" />
+                    Back
                 </button>
             ) : (
                 <div />
@@ -18,10 +18,10 @@ const StepperNavigation = ({ currentStep, handlePrevious, handleNext }) => {
             {currentStep < 2 && (
                 <button
                     onClick={handleNext}
-                    className="mb-5 mt-2 px-5 py-1 border rounded-full inline-flex items-center text-xs bg-gray-100"
+                    className="mb-5 mt-2 px-5 py-1 border border-gray-300 rounded-xs inline-flex items-center text-xs cursor-pointer hover:bg-green-600 hover:border-green-600 hover:text-white transition-all"
                 >
                     Next
-                    <FaArrowAltCircleRight className="ml-2 text-md" />
+                    <IoArrowForwardOutline className="ml-2 text-md" />
                 </button>
             )}
         </div>

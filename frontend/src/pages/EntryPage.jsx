@@ -45,11 +45,12 @@ const EntryPage = () => {
                         <h2 className="text-xl mb-4 text-gray-500">
                             Step 1 : REQUEST DETAILS
                         </h2>
+                        <hr className="m-7 text-gray-300" />
                         <RequestDetailsTable
                             copies={copies}
                             setCopies={setCopies}
                         />
-                        <hr className="mt-5 mb-5 text-gray-300" />
+                        <hr className="mt-7 mb-7 text-gray-300" />
                         <RequestDetailsForm />
                     </div>
                 );
@@ -57,8 +58,9 @@ const EntryPage = () => {
                 return (
                     <div className="m-10 p-6 border border-gray-300 rounded shadow-md bg-white">
                         <h2 className="text-xl mb-4 text-gray-500">
-                            Step 2 : SIGNATURE / SUBMIT
+                            Step 2 : PAYMENT / SUBMIT
                         </h2>
+                        <hr className="m-7 text-gray-300" />
                         <SubmitReview />
                     </div>
                 );
