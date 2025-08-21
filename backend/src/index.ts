@@ -1,10 +1,14 @@
+import dotenv from "dotenv";
+dotenv.config()
+
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import bodyParser from "body-parser";
 import cookieParser from 'cookie-parser';
-import dotenv from "dotenv";
-dotenv.config()
+
+import RequestRoutes from "./routes/request.routes"
+import VerifyRoutes from "./routes/verify.routes"
 
 const app = express();
 
@@ -36,6 +40,8 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
+app.use("/request", RequestRoutes)
+app.use("/verify", VerifyRoutes)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello from your Node.js Express server!');
