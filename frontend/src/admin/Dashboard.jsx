@@ -45,7 +45,6 @@ const Dashboard = () => {
         { name: "Add Admin", icon1: profile1, icon2: profile2 },
         { name: "Request List", icon1: note1, icon2: note2 },
         { name: "Saved Admins", icon1: save1, icon2: save2 },
-        { name: "Account Settings", icon1: setting1, icon2: setting2 },
     ];
 
     const [showModal, setShowModal] = useState(false);
@@ -74,7 +73,7 @@ const Dashboard = () => {
                         onClick={closeSidebar}
                         className="w-[30px] h-[30px] absolute right-0 top-0 m-5 cursor-pointer z-20 flex lg:hidden"
                     />
-                    <div className="logo w-full text-center mb-5 pb-5">
+                    <div className="logo w-full text-start ml-3 mb-5 pb-5">
                         <a href="#">
                             <h2 className="text-4xl font-[600] tracking-wide">
                                 SDRS
@@ -82,11 +81,11 @@ const Dashboard = () => {
                         </a>
                     </div>
 
-                    <div className="admin-info text-center mb-10">
+                    {/* <div className="admin-info text-center mb-10">
                         <img
                             src={user}
                             alt="user-img"
-                            className="w-[110px] h-[110px] mx-auto rounded-[50%]"
+                            className="w-[90px] h-[90px] mx-auto rounded-[50%]"
                         />
                         <div className="">
                             <button
@@ -151,7 +150,7 @@ const Dashboard = () => {
                                 </ul>
                             </button>
                         </div>
-                    </div>
+                    </div> */}
 
                     <ul className="dashboard-main-nav">
                         <li>
@@ -240,11 +239,6 @@ const Dashboard = () => {
                         </li>
                     </ul>
 
-                    <div className="profile-complete-status py-8 px-5">
-                        <h4 className="text-xl font-normal">87%</h4>
-                        <div className="process-line"></div>
-                        <p>Profile Complete</p>
-                    </div>
                     <button
                         onClick={() => setShowLogoutModal(true)}
                         className="flex items-center w-full hover:text-red-500 duration-300 transition-colors gap-2 p-5 rounded-2xl cursor-pointer"
@@ -254,7 +248,7 @@ const Dashboard = () => {
                             alt="logout-icon"
                             className="w-[18px]"
                         />
-                        <span className="text-lg">Logout</span>
+                        <span className="text-lg ps-2 font-[500]">Logout</span>
                     </button>
 
                     {/* delete modal */}
@@ -332,114 +326,158 @@ const Dashboard = () => {
 
                 {/* main */}
                 <div className="main bg-[#f0f5f3] min-h-full h-full w-full ml-[350px] overflow-y-scroll">
-                    <div className="nav-main bg-[#f0f5f3] w-full h-[90px] flex items-center justify-end gap-4 z-[9]">
-                        <img
-                            src={menuOpen}
-                            alt="open-menu"
-                            className="mr-auto w-[30px] h-[30px] cursor-pointer flex lg:hidden"
-                            onClick={toggleSidebar}
-                        />
-                        <form className="search-form w-[300px] mr-6 relative border-none hidden lg:flex ">
-                            <i className="fa-solid fa-magnifying-glass absolute top-[15px] left-4 text-black"></i>
+                    <div className="nav-main bg-[#f0f5f3] w-full h-[100px] flex items-center justify-between px-5 z-[9] border-b-1 border-gray-300 shadow-4xl">
+                        <div className="flex items-center gap-4">
+                            <img
+                                src={menuOpen}
+                                alt="open-menu"
+                                className="w-[30px] h-[30px] cursor-pointer lg:hidden"
+                                onClick={toggleSidebar}
+                            />
+                        </div>
+
+                        <form className="search-form hidden lg:flex w-[300px] relative">
+                            <i className="fa-solid fa-magnifying-glass absolute top-1/2 left-4 -translate-y-1/2 text-gray-500"></i>
                             <input
                                 type="text"
                                 placeholder="Search here..."
-                                className="w-full px-10 rounded-full font-[300] bg-[rgba(0,0,0,.05)] text-[rgba(0,0,0,.05)] border-none shadow-none focus:outline-none pl-[45px] pr-[15px] h-[45px] text-base"
+                                className="w-full h-[45px] rounded-full bg-[rgba(0,0,0,.05)] text-gray-700 font-[300] pl-[45px] pr-[15px] text-base focus:outline-none"
                             />
                         </form>
-                        <button
-                            type="button"
-                            className="nav-notification relative cursor-pointer"
-                            onClick={() => setIsNotification(!isNotification)}
-                        >
-                            <img
-                                src={notification}
-                                alt="notification-icon"
-                                className="h-[25px] w-[25px]"
-                            />
-                            <div className="notification-badge">
+
+                        <div className="flex items-center gap-6">
+                            {/* Notification */}
+                            <button
+                                type="button"
+                                className="nav-notification relative cursor-pointer"
+                                onClick={() =>
+                                    setIsNotification(!isNotification)
+                                }
+                            >
+                                <img
+                                    src={notification}
+                                    alt="notification-icon"
+                                    className="h-[25px] w-[25px]"
+                                />
+                                {/* notification dd */}
                                 <div
-                                    className={`absolute left-[-150px] top-[40px] text-start mt-2 w-[250px] bg-white rounded-xl shadow-md p-5 space-y-4 z-10 transition-all duration-300 ease-in-out ${
+                                    className={`absolute right-0 top-[50px] text-start w-[250px] bg-white rounded-xl shadow-md p-5 space-y-4 z-10 transition-all duration-300 ease-in-out ${
                                         isNotification
                                             ? "opacity-100 visible translate-y-0"
                                             : "opacity-0 invisible -translate-y-2"
                                     }`}
                                 >
-                                    <h3 className="font-semibold text-xl">
+                                    <h3 className="font-semibold text-lg">
                                         Notification
                                     </h3>
-                                    <ul className="list-none space-y-2">
-                                        <li className="flex items-start relative notification-item">
+                                    <ul className="list-none space-y-3">
+                                        <li className="flex items-start gap-2">
                                             <img
                                                 src={notification1}
-                                                alt="notification-icon"
+                                                alt=""
                                                 className="w-10 h-10"
                                             />
-                                            <div className="ps-2">
-                                                <h6 className="text-md text-black font-[500]">
+                                            <div>
+                                                <h6 className="text-sm font-[500] text-black">
                                                     You have 3 new mails
                                                 </h6>
-                                                <span className="text-sm text-gray-500 font-[300]">
+                                                <span className="text-xs text-gray-500 font-[300]">
                                                     1 hour ago
                                                 </span>
                                             </div>
-                                            <div
-                                                className="notification-badge"
-                                                style={{ top: "8px" }}
-                                            ></div>
                                         </li>
-
-                                        <li className="flex items-start relative notification-item">
+                                        <li className="flex items-start gap-2">
                                             <img
                                                 src={notification2}
-                                                alt="notification-icon"
+                                                alt=""
                                                 className="w-10 h-10"
                                             />
-                                            <div className="ps-2">
-                                                <h6 className="text-md text-black font-[500]">
-                                                    You have 1 new mails
+                                            <div>
+                                                <h6 className="text-sm font-[500] text-black">
+                                                    You have 1 new mail
                                                 </h6>
-                                                <span className="text-sm text-gray-500 font-[300]">
+                                                <span className="text-xs text-gray-500 font-[300]">
                                                     3 hours ago
                                                 </span>
                                             </div>
-                                            <div
-                                                className="notification-badge"
-                                                style={{ top: "8px" }}
-                                            ></div>
                                         </li>
-
-                                        <li className="flex items-start relative notification-item">
+                                        <li className="flex items-start gap-2">
                                             <img
                                                 src={notification3}
-                                                alt="notification-icon"
+                                                alt=""
                                                 className="w-10 h-10"
                                             />
-                                            <div className="ps-2">
-                                                <h6 className="text-md text-black font-[500]">
+                                            <div>
+                                                <h6 className="text-sm font-[500] text-black">
                                                     You have 2 new mails
                                                 </h6>
-                                                <span className="text-sm text-gray-500 font-[300]">
-                                                    20 hour ago
+                                                <span className="text-xs text-gray-500 font-[300]">
+                                                    20 hours ago
                                                 </span>
                                             </div>
-                                            <div
-                                                className="notification-badge"
-                                                style={{ top: "8px" }}
-                                            ></div>
                                         </li>
                                     </ul>
                                 </div>
+                            </button>
+
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsOpen(!isOpen)}
+                                    className="flex items-center gap-2"
+                                >
+                                    <img
+                                        src={user}
+                                        alt="user-img"
+                                        className="w-[40px] h-[40px] rounded-full"
+                                    />
+                                    <span className="text-sm font-[500]">
+                                        Super Admin
+                                    </span>
+                                </button>
+
+                                {/* user dd */}
+                                <ul
+                                    className={`absolute right-0 mt-3 w-[220px] bg-white rounded-md shadow-md p-4 space-y-3 transition-all duration-300 ease-in-out z-10 ${
+                                        isOpen
+                                            ? "opacity-100 visible translate-y-0"
+                                            : "opacity-0 invisible -translate-y-2"
+                                    }`}
+                                >
+                                    <li>
+                                        <a
+                                            href="#"
+                                            className="flex items-center gap-2 text-gray-700 hover:text-[#3c8968] transition"
+                                        >
+                                            <img
+                                                src={profile1}
+                                                alt=""
+                                                className="w-[18px]"
+                                            />
+                                            <span className="text-sm">
+                                                Profile
+                                            </span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a
+                                            href="#"
+                                            className="flex items-center gap-2 text-gray-700 hover:text-[#3c8968] transition"
+                                        >
+                                            <img
+                                                src={setting1}
+                                                alt=""
+                                                className="w-[18px]"
+                                            />
+                                            <span className="text-sm">
+                                                Account Settings
+                                            </span>
+                                        </a>
+                                    </li>
+                                </ul>
                             </div>
-                        </button>
-                        <Link
-                            to="pages/AccountSettings"
-                            className="bg-[#03b335] hover:bg-[#218838] text-white py-3 px-6 text-md font-[500] rounded-full transition duration-300 ml-3"
-                            type="button"
-                        >
-                            Announcements
-                        </Link>
+                        </div>
                     </div>
+
                     <div className="content w-full flex flex-col justify-between min-h-full">
                         <Outlet />
                     </div>
