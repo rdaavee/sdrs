@@ -13,6 +13,20 @@ import RequestDetailsForm from "../components/RequestDetailsForm";
 import TrackRequestContent from "../components/TrackRequestContent";
 
 const EntryPage = () => {
+    const [dataForm, setDataForm] = useState({
+        student_number: "",
+        full_name: "",
+        current_address: "",
+        course: "",
+        contact_number: "",
+        email_address: "",
+        purpose_of_request: "",
+        requested_documents: [],
+        isValidEmail: false,
+        verification_code: "",
+        payment_method: "",
+        paid: false,
+    });
     const [activeTab, setActiveTab] = useState("newRequest");
     const [currentStep, setCurrentStep] = useState(0);
     const steps = ["Welcome", "Request Details", "Submit"];
@@ -25,6 +39,30 @@ const EntryPage = () => {
         registrationForm: 1,
         tor: 2,
     });
+
+    const validateForm = () => {
+        if (currentStep === 1) {
+            if (
+                dataForm.student_number.length <= 0 ||
+                dataForm.full_name.length <= 0 ||
+                dataForm.current_address.length <= 0 ||
+                dataForm.course.length <= 0 ||
+                dataForm.contact_number.length <= 0 ||
+                dataForm.email_address.length <= 0 ||
+                dataForm.purpose_of_request.length <= 0 ||
+                !dataForm.isValidEmail
+            ) {
+                // TODO: show error ig to tell user that field is required
+                return false;
+            }
+            return true;
+        }
+        return true;
+    };
+
+    const handleInputChange = (key, value) => {
+        setDataForm((prev) => ({ ...prev, [key]: value }));
+    };
 
     const renderContent = () => {
         if (activeTab === "requestTracker") {
@@ -51,7 +89,11 @@ const EntryPage = () => {
                             setCopies={setCopies}
                         />
                         <hr className="mt-7 mb-7 text-gray-300" />
-                        <RequestDetailsForm />
+                        <RequestDetailsForm
+                            dataForm={dataForm}
+                            setDataForm={setDataForm}
+                            handleInputChange={handleInputChange}
+                        />
                     </div>
                 );
             case 2:
@@ -61,14 +103,20 @@ const EntryPage = () => {
                             Step 2 : PAYMENT / SUBMIT
                         </h2>
                         <hr className="m-7 text-gray-300" />
-                        <SubmitReview />
+                        <SubmitReview dataForm={dataForm} copies={copies} />
                     </div>
                 );
             default:
                 return null;
         }
     };
-
+    const handleNext = () => {
+        const tate = validateForm();
+        console.log(tate);
+        if (tate) {
+            setCurrentStep((s) => s + 1);
+        }
+    };
     return (
         <div className="page-container shadow-xl">
             <div className="d-flex flex-column text-white text-center entry-header">
@@ -147,7 +195,8 @@ const EntryPage = () => {
                 <StepperNavigation
                     currentStep={currentStep}
                     handlePrevious={() => setCurrentStep((s) => s - 1)}
-                    handleNext={() => setCurrentStep((s) => s + 1)}
+                    handleNext={handleNext}
+                    dataForm={dataForm}
                 />
             )}
         </div>

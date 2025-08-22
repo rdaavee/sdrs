@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 
-const RequestDetailsForm = () => {
-    const [email, setEmail] = useState("");
+const RequestDetailsForm = ({ dataForm, handleInputChange, setDataForm }) => {
     const [error, setError] = useState("");
+    const [showCodeField, setShowCodeField] = useState(false);
+    const [codeMessage, setCodeMessage] = useState("");
 
     const validateEmail = (value) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -10,12 +11,26 @@ const RequestDetailsForm = () => {
     };
 
     const handleRequestCode = () => {
-        if (!validateEmail(email)) {
+        if (!validateEmail(dataForm.email_address)) {
             setError("Please enter a valid email address.");
             return;
         }
         setError("");
-        alert(`Code has been requested for: ${email}`);
+        setShowCodeField(true);
+        // TODO: call api to send email
+        handleInputChange("isValidEmail", true);
+    };
+
+    const handleVerifyCode = () => {
+        const isSixDigits = /^\d{6}$/.test(dataForm.verification_code);
+        if (isSixDigits) {
+            // TODO: create checker in backend
+            setCodeMessage("Code verified.");
+            setDataForm((prev) => ({ ...prev, ["isValidEmail"]: true }));
+        } else {
+            setCodeMessage("Invalid code. Enter 6 digits.");
+            setDataForm((prev) => ({ ...prev, ["isValidEmail"]: false }));
+        }
     };
 
     return (
@@ -33,7 +48,14 @@ const RequestDetailsForm = () => {
                             Student No.
                         </label>
                         <input
-                            type="number"
+                            type="text"
+                            onChange={(e) =>
+                                handleInputChange(
+                                    "student_number",
+                                    e.target.value
+                                )
+                            }
+                            value={dataForm.student_number}
                             className="w-full border border-gray-300 rounded px-3 py-2"
                         />
                     </div>
@@ -44,6 +66,10 @@ const RequestDetailsForm = () => {
                         </label>
                         <input
                             type="text"
+                            onChange={(e) =>
+                                handleInputChange("full_name", e.target.value)
+                            }
+                            value={dataForm.full_name}
                             className="w-full border border-gray-300 rounded px-3 py-2"
                         />
                     </div>
@@ -54,6 +80,13 @@ const RequestDetailsForm = () => {
                         </label>
                         <input
                             type="text"
+                            onChange={(e) =>
+                                handleInputChange(
+                                    "current_address",
+                                    e.target.value
+                                )
+                            }
+                            value={dataForm.current_address}
                             className="w-full border border-gray-300 rounded px-3 py-2"
                         />
                     </div>
@@ -64,6 +97,10 @@ const RequestDetailsForm = () => {
                         </label>
                         <input
                             type="text"
+                            onChange={(e) =>
+                                handleInputChange("course", e.target.value)
+                            }
+                            value={dataForm.course}
                             className="w-full border border-gray-300 rounded px-3 py-2"
                         />
                     </div>
@@ -74,6 +111,13 @@ const RequestDetailsForm = () => {
                         </label>
                         <input
                             type="number"
+                            onChange={(e) =>
+                                handleInputChange(
+                                    "contact_number",
+                                    e.target.value
+                                )
+                            }
+                            value={dataForm.contact_number}
                             className="w-full border border-gray-300 rounded px-3 py-2"
                         />
                     </div>
@@ -86,8 +130,13 @@ const RequestDetailsForm = () => {
                         <div className="flex gap-2">
                             <input
                                 type="text"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                onChange={(e) =>
+                                    handleInputChange(
+                                        "email_address",
+                                        e.target.value
+                                    )
+                                }
+                                value={dataForm.email_address}
                                 className={`w-full border rounded px-3 py-2 ${
                                     error ? "border-red-500" : "border-gray-300"
                                 }`}
@@ -95,7 +144,7 @@ const RequestDetailsForm = () => {
                             <button
                                 type="button"
                                 onClick={handleRequestCode}
-                                disabled={!email}
+                                disabled={!dataForm.email_address}
                                 className="bg-[#04882a] text-white text-xs px-1 py-1 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Request Code
@@ -109,6 +158,57 @@ const RequestDetailsForm = () => {
                             No. for request tracking will be sent to this email
                             address.
                         </p>
+                        {(showCodeField || dataForm.isValidEmail) && (
+                            <div className="mt-3">
+                                <label className="block text-gray-700 mb-1">
+                                    Enter 6-digit Code
+                                </label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="password"
+                                        maxLength={6}
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
+                                        onKeyPress={(e) => {
+                                            if (!/[0-9]/.test(e.key)) {
+                                                e.preventDefault();
+                                            }
+                                        }}
+                                        onChange={(e) => {
+                                            const value =
+                                                e.target.value.replace(
+                                                    /\D/g,
+                                                    ""
+                                                );
+                                            handleInputChange(
+                                                "verification_code",
+                                                value
+                                            );
+                                        }}
+                                        value={dataForm.verification_code}
+                                        className="w-full border border-gray-300 rounded px-3 py-2"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleVerifyCode}
+                                        className="bg-[#04882a] text-white text-xs px-2 py-1 rounded cursor-pointer"
+                                    >
+                                        Verify Code
+                                    </button>
+                                </div>
+                                {codeMessage && (
+                                    <p
+                                        className={`text-xs mt-1 ${
+                                            dataForm.code_is_valid
+                                                ? "text-green-600"
+                                                : "text-red-500"
+                                        }`}
+                                    >
+                                        {codeMessage}
+                                    </p>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div>
@@ -118,6 +218,13 @@ const RequestDetailsForm = () => {
                         <textarea
                             className="w-full border border-gray-300 rounded px-3 py-2"
                             rows={3}
+                            onChange={(e) =>
+                                handleInputChange(
+                                    "purpose_of_request",
+                                    e.target.value
+                                )
+                            }
+                            value={dataForm.purpose_of_request}
                         />
                     </div>
                 </form>
