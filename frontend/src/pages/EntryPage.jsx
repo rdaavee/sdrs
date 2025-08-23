@@ -42,15 +42,26 @@ const EntryPage = () => {
 
     const validateForm = () => {
         if (currentStep === 1) {
+            const {
+                student_number,
+                full_name,
+                current_address,
+                course,
+                contact_number,
+                email_address,
+                purpose_of_request,
+                isValidEmail,
+            } = dataForm;
+
             if (
-                dataForm.student_number.length <= 0 ||
-                dataForm.full_name.length <= 0 ||
-                dataForm.current_address.length <= 0 ||
-                dataForm.course.length <= 0 ||
-                dataForm.contact_number.length <= 0 ||
-                dataForm.email_address.length <= 0 ||
-                dataForm.purpose_of_request.length <= 0 ||
-                !dataForm.isValidEmail
+                !student_number.trim() ||
+                !full_name.trim() ||
+                !current_address.trim() ||
+                !course.trim() ||
+                !contact_number.trim() ||
+                !email_address.trim() ||
+                !purpose_of_request.trim() ||
+                !isValidEmail
             ) {
                 // TODO: show error ig to tell user that field is required
                 return false;
