@@ -1,6 +1,7 @@
 import React, { useState } from "react";
+import { requestCode, verifyCode } from "../services/verify";
 
-const RequestDetailsForm = ({ dataForm, handleInputChange, setDataForm }) => {
+const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
     const [error, setError] = useState("");
     const [showCodeField, setShowCodeField] = useState(false);
     const [codeMessage, setCodeMessage] = useState("");
@@ -17,19 +18,23 @@ const RequestDetailsForm = ({ dataForm, handleInputChange, setDataForm }) => {
         }
         setError("");
         setShowCodeField(true);
-        // TODO: call api to send email
-        handleInputChange("isValidEmail", true);
+        requestCode(dataForm.email_address);
     };
 
-    const handleVerifyCode = () => {
+    const handleVerifyCode = async () => {
         const isSixDigits = /^\d{6}$/.test(dataForm.verification_code);
         if (isSixDigits) {
-            // TODO: create checker in backend
-            setCodeMessage("Code verified.");
-            setDataForm((prev) => ({ ...prev, ["isValidEmail"]: true }));
+            const result = await verifyCode(dataForm.verification_code);
+            if (result) {
+                handleInputChange("isValidEmail", true);
+                setCodeMessage("Code verified.");
+            } else {
+                setCodeMessage("Invalid code. Enter 6 digits.");
+                handleInputChange("isValidEmail", false);
+            }
         } else {
             setCodeMessage("Invalid code. Enter 6 digits.");
-            setDataForm((prev) => ({ ...prev, ["isValidEmail"]: false }));
+            handleInputChange("isValidEmail", false);
         }
     };
 
@@ -130,6 +135,7 @@ const RequestDetailsForm = ({ dataForm, handleInputChange, setDataForm }) => {
                         <div className="flex gap-2">
                             <input
                                 type="text"
+                                disabled={dataForm.isValidEmail}
                                 onChange={(e) =>
                                     handleInputChange(
                                         "email_address",
@@ -167,6 +173,7 @@ const RequestDetailsForm = ({ dataForm, handleInputChange, setDataForm }) => {
                                     <input
                                         type="password"
                                         maxLength={6}
+                                        disabled={dataForm.isValidEmail}
                                         inputMode="numeric"
                                         pattern="[0-9]*"
                                         onKeyPress={(e) => {
