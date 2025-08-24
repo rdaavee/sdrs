@@ -39,7 +39,7 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
     };
 
     return (
-        <div className="border border-gray-500 rounded-xs overflow-hidden">
+        <div className="border border-gray-300 rounded-md overflow-hidden">
             <div className="bg-[#04882a] text-white px-4 py-2">
                 <p className="font-semibold text-sm uppercase">
                     Student Information

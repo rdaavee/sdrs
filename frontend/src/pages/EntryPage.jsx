@@ -93,7 +93,7 @@ const EntryPage = () => {
                 );
             case 1:
                 return (
-                    <div className="m-10 p-6 border border-gray-300 rounded shadow-md bg-white">
+                    <div className="m-10 p-6 border border-gray-300 rounded shadow-xs bg-white">
                         <h2 className="text-xl mb-4 text-gray-500">
                             Step 1 : REQUEST DETAILS
                         </h2>
@@ -112,7 +112,7 @@ const EntryPage = () => {
                 );
             case 2:
                 return (
-                    <div className="m-10 p-6 border border-gray-300 rounded shadow-md bg-white">
+                    <div className="m-10 p-6 border border-gray-300 rounded shadow-xs bg-white">
                         <h2 className="text-xl mb-4 text-gray-500">
                             Step 2 : PAYMENT / SUBMIT
                         </h2>
@@ -139,8 +139,8 @@ const EntryPage = () => {
         console.log(dataForm);
     }, [dataForm]);
     return (
-        <div className="page-container shadow-xl">
-            <div className="d-flex flex-column text-white text-center entry-header">
+        <div className="page-container shadow-lg">
+            <div className="flex flex-column text-white text-center entry-header">
                 <div className="mb-5">
                     <h1 className="font-bold text-3xl">
                         PHINMA - University of Pangasinan

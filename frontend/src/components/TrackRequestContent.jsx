@@ -47,7 +47,7 @@ const TrackRequestContent = () => {
     return (
         <div className="space-y-6 m-5">
             {/* Info grid */}
-            <div className="grid-item grid-container border border-gray-300 rounded shadow-md p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid-item grid-container border border-gray-300 rounded shadow-xs p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                     <h3 className="font-semibold mb-2">Office Hours</h3>
                     <hr className="mb-2" />
@@ -74,7 +74,7 @@ const TrackRequestContent = () => {
                 </div>
             </div>
             {/* Track Form */}
-            <div className="border m-4 border-gray-300 rounded shadow-md p-6">
+            <div className="border m-4 border-gray-300 rounded shadow-xs p-6">
                 <p className="mb-2 text-gray-700 pText">
                     Track the status of your document request, please enter the{" "}
                     <strong className="font-bold">REFERENCE NUMBER</strong> and{" "}
