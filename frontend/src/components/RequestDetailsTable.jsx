@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-const RequestDetailsTable = ({ copies, setCopies }) => {
+const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
     const certificateOptions = [
         "Certificates",
         "Certificate of Transfer Credentials",
@@ -30,9 +30,52 @@ const RequestDetailsTable = ({ copies, setCopies }) => {
     };
 
     const [selectedDoc, setSelectedDoc] = useState(certificateOptions[0]);
+    const [selectedDocuments, setSelectedDocuments] = useState({
+        certification: false,
+        diploma: false,
+        form137: false,
+        registrationForm: false,
+        tor: false,
+    });
 
     const certificationFee =
         certificateFees[selectedDoc] * copies.certification;
+
+    useEffect(() => {
+        const requestedDocs = [];
+
+        if (selectedDocuments.certification && copies.certification > 0) {
+            requestedDocs.push([selectedDoc, copies.certification]);
+        }
+
+        if (selectedDocuments.diploma && copies.diploma > 0) {
+            requestedDocs.push(["Diploma", copies.diploma]);
+        }
+
+        if (selectedDocuments.form137 && copies.form137 > 0) {
+            requestedDocs.push(["Form 137", copies.form137]);
+        }
+
+        if (selectedDocuments.registrationForm && copies.registrationForm > 0) {
+            requestedDocs.push(["Copy of Grades", copies.registrationForm]);
+        }
+
+        if (selectedDocuments.tor && copies.tor > 0) {
+            requestedDocs.push(["Transcript of Records", copies.tor]);
+        }
+
+        setDataForm((prev) => ({
+            ...prev,
+            requested_documents: requestedDocs,
+        }));
+    }, [selectedDocuments, copies, selectedDoc, setDataForm]);
+
+    const handleCheckboxChange = (documentType) => {
+        setSelectedDocuments((prev) => ({
+            ...prev,
+            [documentType]: !prev[documentType],
+        }));
+    };
 
     return (
         <div className="overflow-x-auto">
@@ -49,7 +92,13 @@ const RequestDetailsTable = ({ copies, setCopies }) => {
                     {/* Certification Row */}
                     <tr>
                         <td className="border p-2">
-                            <input type="checkbox" />
+                            <input
+                                type="checkbox"
+                                checked={selectedDocuments.certification}
+                                onChange={() =>
+                                    handleCheckboxChange("certification")
+                                }
+                            />
                         </td>
                         <td className="border p-2">
                             <input
@@ -86,7 +135,11 @@ const RequestDetailsTable = ({ copies, setCopies }) => {
                     {/* Diploma Row */}
                     <tr>
                         <td className="border p-2">
-                            <input type="checkbox" />
+                            <input
+                                type="checkbox"
+                                checked={selectedDocuments.diploma}
+                                onChange={() => handleCheckboxChange("diploma")}
+                            />
                         </td>
                         <td className="border p-2">
                             <input
@@ -109,7 +162,11 @@ const RequestDetailsTable = ({ copies, setCopies }) => {
                     {/* Form 137 Row */}
                     <tr>
                         <td className="border p-2">
-                            <input type="checkbox" />
+                            <input
+                                type="checkbox"
+                                checked={selectedDocuments.form137}
+                                onChange={() => handleCheckboxChange("form137")}
+                            />
                         </td>
                         <td className="border p-2">
                             <input
@@ -132,7 +189,13 @@ const RequestDetailsTable = ({ copies, setCopies }) => {
                     {/* Copy of Grades Row */}
                     <tr>
                         <td className="border p-2">
-                            <input type="checkbox" />
+                            <input
+                                type="checkbox"
+                                checked={selectedDocuments.registrationForm}
+                                onChange={() =>
+                                    handleCheckboxChange("registrationForm")
+                                }
+                            />
                         </td>
                         <td className="border p-2">
                             <input
@@ -159,7 +222,11 @@ const RequestDetailsTable = ({ copies, setCopies }) => {
                     {/* Transcript of Records Row */}
                     <tr>
                         <td className="border p-2">
-                            <input type="checkbox" />
+                            <input
+                                type="checkbox"
+                                checked={selectedDocuments.tor}
+                                onChange={() => handleCheckboxChange("tor")}
+                            />
                         </td>
                         <td className="border p-2">
                             <input

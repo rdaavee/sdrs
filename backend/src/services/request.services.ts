@@ -9,7 +9,7 @@ interface RequestData {
     contact_number: string,
     email_address: string,
     purpose_of_request: string,
-    requested_documents: string[],
+    requested_documents: string,
     payment_method: string,
     paid: boolean,
 }
@@ -38,11 +38,12 @@ export const saveRequestReceipt = async (data: RequestData) => {
             increment = isNaN(last_increment) ? 1 : last_increment + 1;
         }
 
-        const reference_number = `${today}SDRS-${String(increment).padStart(
+        const reference_number = `${formatted}SDRS-${String(increment).padStart(
             5,
             "0"
         )}`;
-
+        data.requested_documents = JSON.stringify(data.requested_documents)
+        console.log("saved")
         await new RequestReceipt({
             reference_number,
             code,
@@ -56,6 +57,7 @@ export const saveRequestReceipt = async (data: RequestData) => {
     } catch (error) {
         await session.abortTransaction();
         session.endSession();
+        console.log(error)
         return { error: "Internal Server Error", httpCode: 500 };
     }
 }

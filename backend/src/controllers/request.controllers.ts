@@ -2,8 +2,7 @@ import { Request, Response } from 'express';
 import { getRequestReceipt, saveRequestReceipt } from '../services/request.services';
 
 export const saveRequestReceiptController = async (req: Request, res: Response) => {
-    const { data } = req.body;
-
+    const data = req.body;
     try {
         const field_name: { [key: string]: string } = {
             student_number: "Student Number",
@@ -21,8 +20,10 @@ export const saveRequestReceiptController = async (req: Request, res: Response) 
         const email_address = data.email_address.toLowerCase();
 
         for (const [key, value] of Object.entries({ email_address, ...data })) {
-            if (!value) {
-                return res.status(400).json({ error: `${field_name[key]} is required and cannot be null or undefined.` })
+            if (key !== "paid") {
+                if (!value) {
+                    return res.status(400).json({ error: `${field_name[key]} is required and cannot be null or undefined.` })
+                }
             }
         }
 

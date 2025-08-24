@@ -156,38 +156,42 @@ const SubmitReview = ({ dataForm, handleInputChange }) => {
                         </div>
                     </div>
 
-                <div>
-                    <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center">
-                        Select Payment Method
-                    </h2>
-                    <div className="grid grid-cols-1 gap-3 mb-6">
-                        <button
-                            onClick={() => handlePaymentMethodSelect("online")}
-                            className={`w-full px-4 py-3 cursor-pointer rounded-lg border transition-all duration-200 font-medium ${
-                                selectedPaymentMethod === "online"
-                                    ? "border-green-600 bg-green-50 text-green-700 shadow-md"
-                                    : "border-gray-300 hover:border-green-600 hover:bg-green-50 text-gray-700"
-                            }`}
-                        >
-                            <span className="inline-flex items-center gap-2">
-                                <IoCardOutline className="text-xl" />
-                                Online Pay
-                            </span>
-                        </button>
-                        <button
-                            onClick={() => handlePaymentMethodSelect("cashier")}
-                            className={`w-full px-4 py-3 cursor-pointer rounded-lg border transition-all duration-200 font-medium ${
-                                selectedPaymentMethod === "cashier"
-                                    ? "border-green-600 bg-green-50 text-green-700 shadow-md"
-                                    : "border-gray-300 hover:border-green-600 hover:bg-green-50 text-gray-700"
-                            }`}
-                        >
-                            <span className="inline-flex items-center gap-2">
-                                <IoCashOutline className="text-xl" />
-                                Cash (Pay at Registrar)
-                            </span>
-                        </button>
-                    </div>
+                    <div>
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+                            Select Payment Method
+                        </h2>
+                        <div className="grid grid-cols-1 gap-3 mb-6">
+                            <button
+                                onClick={() =>
+                                    handlePaymentMethodSelect("online")
+                                }
+                                className={`w-full px-4 py-3 cursor-pointer rounded-lg border transition-all duration-200 font-medium ${
+                                    selectedPaymentMethod === "online"
+                                        ? "border-green-600 bg-green-50 text-green-700 shadow-md"
+                                        : "border-gray-300 hover:border-green-600 hover:bg-green-50 text-gray-700"
+                                }`}
+                            >
+                                <span className="inline-flex items-center gap-2">
+                                    <IoCardOutline className="text-xl" />
+                                    Online Pay
+                                </span>
+                            </button>
+                            <button
+                                onClick={() =>
+                                    handlePaymentMethodSelect("cashier")
+                                }
+                                className={`w-full px-4 py-3 cursor-pointer rounded-lg border transition-all duration-200 font-medium ${
+                                    selectedPaymentMethod === "cashier"
+                                        ? "border-green-600 bg-green-50 text-green-700 shadow-md"
+                                        : "border-gray-300 hover:border-green-600 hover:bg-green-50 text-gray-700"
+                                }`}
+                            >
+                                <span className="inline-flex items-center gap-2">
+                                    <IoCashOutline className="text-xl" />
+                                    Cash (Pay at Registrar)
+                                </span>
+                            </button>
+                        </div>
 
                         <div className="flex items-center gap-2 mb-6">
                             <input
@@ -206,26 +210,28 @@ const SubmitReview = ({ dataForm, handleInputChange }) => {
                             </label>
                         </div>
 
-                    <button
-                        disabled={
-                            !confirmed ||
-                            documents.length === 0 ||
-                            !selectedPaymentMethod
-                        }
-                        className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
-                            confirmed &&
-                            documents.length > 0 &&
-                            selectedPaymentMethod
-                                ? "bg-green-600 hover:bg-green-700 text-white"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        }`}
-                        onClick={submitRequest}
-                    >
-                        Submit
-                    </button>
+                        <button
+                            disabled={
+                                !confirmed ||
+                                documents.length === 0 ||
+                                !selectedPaymentMethod ||
+                                loading
+                            }
+                            className={`w-full px-4 py-2 rounded-lg font-medium transition-colors ${
+                                confirmed &&
+                                documents.length > 0 &&
+                                selectedPaymentMethod &&
+                                !loading
+                                    ? "bg-green-600 hover:bg-green-700 text-white"
+                                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            }`}
+                            onClick={submitRequest}
+                        >
+                            {loading ? "Processing..." : "Submit"}
+                        </button>
+                    </div>
                 </div>
             ) : (
-                // results after modal and submitting
                 <div className="p-6 rounded-lg border border-gray-300 bg-white text-black">
                     <h3 className="text-lg font-semibold mb-2">
                         Submission Result
@@ -258,10 +264,8 @@ const SubmitReview = ({ dataForm, handleInputChange }) => {
                     <p className="text-sm text-gray-500">
                         You will be notified via email or SMS once your
                         documents are ready. <br />
-                        You can track the status of your request at{" "}
-                        <span className="font-semibold">
-                            Track Request
-                        </span>{" "}
+                        You can track the status of your request at
+                        <span className="font-semibold">Track Request</span>
                         using the Reference No. and Code above.
                     </p>
                 </div>

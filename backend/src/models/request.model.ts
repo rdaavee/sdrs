@@ -10,7 +10,7 @@ export interface RequestReceiptSchemaInterface extends Document {
     contact_number: string,
     email_address: string,
     purpose_of_request: string,
-    requested_documents: string[],
+    requested_documents: string,
     payment_method: string,
     paid: boolean,
     code: string,
@@ -52,10 +52,10 @@ const RequestReceiptSchema = new Schema({
         type: String,
         required: true
     },
-    requested_documents: [{
+    requested_documents: {
         type: String,
         required: true
-    }],
+    },
     payment_method: {
         type: String,
         enum: ["online", "cashier"],
