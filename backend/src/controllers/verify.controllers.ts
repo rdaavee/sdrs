@@ -38,7 +38,12 @@ export const verifyCodeController = async (req: Request, res: Response) => {
         const result = await verifyCode(code, identifier);
 
         if (result.httpCode === 200) {
-            // TODO: remove cookie
+            res.clearCookie("identifier", {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+            });
+
             res.status(result.httpCode).json({ message: result.message });
             return;
         }
