@@ -1,6 +1,6 @@
-import { useState } from "react";
-// eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+
+import { AnimatePresence } from "framer-motion";
 import { FaRegFile, FaSearch } from "react-icons/fa";
 
 import OfficeHours from "../components/OfficeHours";
@@ -37,7 +37,7 @@ const EntryPage = () => {
         diploma: 1,
         form137: 1,
         registrationForm: 1,
-        tor: 2,
+        tor: 1,
     });
 
     const validateForm = () => {
@@ -51,6 +51,7 @@ const EntryPage = () => {
                 email_address,
                 purpose_of_request,
                 isValidEmail,
+                requested_documents,
             } = dataForm;
 
             if (
@@ -61,7 +62,9 @@ const EntryPage = () => {
                 !contact_number.trim() ||
                 !email_address.trim() ||
                 !purpose_of_request.trim() ||
-                !isValidEmail
+                !isValidEmail ||
+                !requested_documents ||
+                requested_documents.length === 0
             ) {
                 // TODO: show error ig to tell user that field is required
                 return false;
@@ -97,12 +100,12 @@ const EntryPage = () => {
                         <hr className="m-7 text-gray-300" />
                         <RequestDetailsTable
                             copies={copies}
+                            setDataForm={setDataForm}
                             setCopies={setCopies}
                         />
                         <hr className="mt-7 mb-7 text-gray-300" />
                         <RequestDetailsForm
                             dataForm={dataForm}
-                            setDataForm={setDataForm}
                             handleInputChange={handleInputChange}
                         />
                     </div>
@@ -114,7 +117,10 @@ const EntryPage = () => {
                             Step 2 : PAYMENT / SUBMIT
                         </h2>
                         <hr className="m-7 text-gray-300" />
-                        <SubmitReview dataForm={dataForm} copies={copies} />
+                        <SubmitReview
+                            dataForm={dataForm}
+                            handleInputChange={handleInputChange}
+                        />
                     </div>
                 );
             default:
@@ -128,6 +134,10 @@ const EntryPage = () => {
             setCurrentStep((s) => s + 1);
         }
     };
+
+    useEffect(() => {
+        console.log(dataForm);
+    }, [dataForm]);
     return (
         <div className="page-container shadow-xl">
             <div className="d-flex flex-column text-white text-center entry-header">
