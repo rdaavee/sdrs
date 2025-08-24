@@ -1,19 +1,17 @@
 import nodemailer from "nodemailer"
 
 const transporter = nodemailer.createTransport({
-    host: 'live.smtp.mailtrap.io',
-    port: 587,
-    secure: false,
+    service: "gmail",
     auth: {
-        user: '1a2b3c4d5e6f7g',
-        pass: '1a2b3c4d5e6f7g',
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
     }
 });
 
 export const sendEmail = (receiver: string, code: string) => {
 
     const mailOptions = {
-        from: 'yourusername@email.com',
+        from: process.env.EMAIL_USER,
         to: receiver,
         subject: '#TODO: create subject and text',
         text: `#TODO: create subject and text ${code}`
