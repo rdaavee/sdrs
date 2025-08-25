@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+import { IoEye, IoEyeOff } from "react-icons/io5";
 import { requestCode, verifyCode } from "../services/verify";
 
 const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
     const [error, setError] = useState("");
     const [showCodeField, setShowCodeField] = useState(false);
-    const [codeMessage, setCodeMessage] = useState("");
+    const [showCode, setShowCode] = useState(false);
 
     const validateEmail = (value) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -13,12 +15,14 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
 
     const handleRequestCode = () => {
         if (!validateEmail(dataForm.email_address)) {
-            setError("Please enter a valid email address.");
+            toast.error("Please enter a valid email address.");
             return;
         }
         setError("");
         setShowCodeField(true);
         requestCode(dataForm.email_address);
+
+        toast.success("Verification code successfully sent to your email.");
     };
 
     const handleVerifyCode = async () => {
@@ -27,13 +31,13 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
             const result = await verifyCode(dataForm.verification_code);
             if (result) {
                 handleInputChange("isValidEmail", true);
-                setCodeMessage("Code verified.");
+                toast.success("Code Verified.");
             } else {
-                setCodeMessage("Invalid code. Enter 6 digits.");
+                toast.error("Invalid code. Enter 6 digits.");
                 handleInputChange("isValidEmail", false);
             }
         } else {
-            setCodeMessage("Invalid code. Enter 6 digits.");
+            toast.error("Invalid code. Enter 6 digits.");
             handleInputChange("isValidEmail", false);
         }
     };
@@ -169,51 +173,57 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                                 <label className="block text-gray-700 mb-1">
                                     Enter 6-digit Code
                                 </label>
-                                <div className="flex gap-2">
-                                    <input
-                                        type="password"
-                                        maxLength={6}
-                                        disabled={dataForm.isValidEmail}
-                                        inputMode="numeric"
-                                        pattern="[0-9]*"
-                                        onKeyPress={(e) => {
-                                            if (!/[0-9]/.test(e.key)) {
-                                                e.preventDefault();
+                                <div className="flex w-full gap-2">
+                                    <div className="relative flex-1">
+                                        <input
+                                            type={
+                                                showCode ? "text" : "password"
                                             }
-                                        }}
-                                        onChange={(e) => {
-                                            const value =
-                                                e.target.value.replace(
-                                                    /\D/g,
-                                                    ""
+                                            maxLength={6}
+                                            disabled={dataForm.isValidEmail}
+                                            inputMode="numeric"
+                                            pattern="[0-9]*"
+                                            onKeyPress={(e) => {
+                                                if (!/[0-9]/.test(e.key)) {
+                                                    e.preventDefault();
+                                                }
+                                            }}
+                                            onChange={(e) => {
+                                                const value =
+                                                    e.target.value.replace(
+                                                        /\D/g,
+                                                        ""
+                                                    );
+                                                handleInputChange(
+                                                    "verification_code",
+                                                    value
                                                 );
-                                            handleInputChange(
-                                                "verification_code",
-                                                value
-                                            );
-                                        }}
-                                        value={dataForm.verification_code}
-                                        className="w-full border border-gray-300 rounded px-3 py-2"
-                                    />
+                                            }}
+                                            value={dataForm.verification_code}
+                                            className="w-full border border-gray-300 rounded px-3 py-2"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setShowCode(!showCode)
+                                            }
+                                            className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                                        >
+                                            {showCode ? (
+                                                <IoEyeOff size={20} />
+                                            ) : (
+                                                <IoEye size={20} />
+                                            )}
+                                        </button>
+                                    </div>
                                     <button
                                         type="button"
                                         onClick={handleVerifyCode}
-                                        className="bg-[#04882a] text-white text-xs px-2 py-1 rounded cursor-pointer"
+                                        className="bg-[#04882a] text-white text-xs px-3 py-2 rounded cursor-pointer"
                                     >
-                                        Verify Code
+                                        Verify
                                     </button>
                                 </div>
-                                {codeMessage && (
-                                    <p
-                                        className={`text-xs mt-1 ${
-                                            dataForm.code_is_valid
-                                                ? "text-green-600"
-                                                : "text-red-500"
-                                        }`}
-                                    >
-                                        {codeMessage}
-                                    </p>
-                                )}
                             </div>
                         )}
                     </div>
