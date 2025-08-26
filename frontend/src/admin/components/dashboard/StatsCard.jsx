@@ -6,7 +6,7 @@ const StatsCards = ({ stats }) => {
             {stats.map((item, index) => (
                 <div
                     key={index}
-                    className="dashboard-item shadow-[0_6px_6px_rgba(0,0,0,.02)] bg-white p-6 rounded-[30px] total-request flex items-start justify-between relative"
+                    className="dashboard-item shadow-[0_6px_6px_rgba(0,0,0,.02)] bg-white rounded-[30px] total-request flex items-start justify-between relative"
                 >
                     <div className="flex flex-col items-start z-[9]">
                         <div className="text-5xl mb-1 font-semibold text-[#244034]">
