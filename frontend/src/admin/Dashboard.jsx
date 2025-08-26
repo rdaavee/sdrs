@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, Outlet } from "react-router-dom";
 
 import user from "../assets/images/user-img.png";
@@ -49,6 +49,26 @@ const Dashboard = () => {
 
     const [showModal, setShowModal] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+    const notifRef = useRef(null);
+    const userRef = useRef(null);
+
+    // close dropdowns on outside click
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (notifRef.current && !notifRef.current.contains(event.target)) {
+                setIsNotification(false);
+            }
+            if (userRef.current && !userRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     const handleDelete = () => {
         setShowModal(true);
@@ -276,19 +296,21 @@ const Dashboard = () => {
 
                         <div className="flex items-center gap-6">
                             {/* Notification */}
-                            <button
-                                type="button"
-                                className="nav-notification relative cursor-pointer"
-                                onClick={() =>
-                                    setIsNotification(!isNotification)
-                                }
-                            >
-                                <img
-                                    src={notification}
-                                    alt="notification-icon"
-                                    className="h-[25px] w-[25px]"
-                                />
-                                {/* notification dd */}
+                            <div ref={notifRef} className="relative">
+                                <button
+                                    type="button"
+                                    className="nav-notification relative cursor-pointer"
+                                    onClick={() =>
+                                        setIsNotification(!isNotification)
+                                    }
+                                >
+                                    <img
+                                        src={notification}
+                                        alt="notification-icon"
+                                        className="h-[25px] w-[25px] mt-2"
+                                    />
+                                </button>
+
                                 <div
                                     className={`absolute right-0 top-[50px] text-start w-[250px] bg-white rounded-xl shadow-md p-5 space-y-4 z-10 transition-all duration-300 ease-in-out ${
                                         isNotification
@@ -300,7 +322,12 @@ const Dashboard = () => {
                                         Notification
                                     </h3>
                                     <ul className="list-none space-y-3">
-                                        <li className="flex items-start gap-2">
+                                        <li
+                                            className="flex items-start gap-2 cursor-pointer"
+                                            onClick={() =>
+                                                setIsNotification(false)
+                                            }
+                                        >
                                             <img
                                                 src={notification1}
                                                 alt=""
@@ -315,7 +342,12 @@ const Dashboard = () => {
                                                 </span>
                                             </div>
                                         </li>
-                                        <li className="flex items-start gap-2">
+                                        <li
+                                            className="flex items-start gap-2 cursor-pointer"
+                                            onClick={() =>
+                                                setIsNotification(false)
+                                            }
+                                        >
                                             <img
                                                 src={notification2}
                                                 alt=""
@@ -330,7 +362,12 @@ const Dashboard = () => {
                                                 </span>
                                             </div>
                                         </li>
-                                        <li className="flex items-start gap-2">
+                                        <li
+                                            className="flex items-start gap-2 cursor-pointer"
+                                            onClick={() =>
+                                                setIsNotification(false)
+                                            }
+                                        >
                                             <img
                                                 src={notification3}
                                                 alt=""
@@ -347,9 +384,10 @@ const Dashboard = () => {
                                         </li>
                                     </ul>
                                 </div>
-                            </button>
+                            </div>
 
-                            <div className="relative">
+                            {/* User dropdown */}
+                            <div ref={userRef} className="relative">
                                 <button
                                     onClick={() => setIsOpen(!isOpen)}
                                     className="flex items-center gap-2"
@@ -364,7 +402,6 @@ const Dashboard = () => {
                                     </span>
                                 </button>
 
-                                {/* user dd */}
                                 <ul
                                     className={`absolute right-0 mt-3 w-[220px] bg-white rounded-md shadow-md p-4 space-y-3 transition-all duration-300 ease-in-out z-10 ${
                                         isOpen
@@ -372,7 +409,7 @@ const Dashboard = () => {
                                             : "opacity-0 invisible -translate-y-2"
                                     }`}
                                 >
-                                    <li>
+                                    <li onClick={() => setIsOpen(false)}>
                                         <Link
                                             to="/pages/MyProfile"
                                             className="flex items-center gap-2 text-gray-700 hover:text-[#3c8968] transition"
@@ -387,7 +424,7 @@ const Dashboard = () => {
                                             </span>
                                         </Link>
                                     </li>
-                                    <li>
+                                    <li onClick={() => setIsOpen(false)}>
                                         <a
                                             href="#"
                                             className="flex items-center gap-2 text-gray-700 hover:text-[#3c8968] transition"
@@ -406,7 +443,6 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-
                     <div className="content w-full flex flex-col justify-between min-h-full">
                         <Outlet />
                     </div>
