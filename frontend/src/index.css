@@ -443,7 +443,7 @@
 }
 
 .dashboard-item::after {
-    content: '';
+    content: "";
     position: absolute;
     top: 12px;
     left: 12px;
@@ -465,6 +465,21 @@
 
 .content::-webkit-scrollbar {
     display: none;
+}
+
+.profile-container input {
+    width: 100% !important;
+    height: 55px !important;
+    letter-spacing: -0.16px !important;
+    border: 1px solid #e5e5e5 !important;
+    border-radius: 7px !important;
+    font-size: 1.1rem;
+    padding: 0 20px !important;
+    outline: none !important;
+
+    &::placeholder {
+        font-weight: 200 !important;
+    }
 }
 
 /* responsive */

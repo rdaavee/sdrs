@@ -22,7 +22,7 @@ const MainContent = () => {
 
     return (
         <div>
-            <h1 className="text-3xl font-[500] text-[#244034] pb-5">
+            <h1 className="text-3xl font-[500] text-[#244034] py-2">
                 Dashboard
             </h1>
 

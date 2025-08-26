@@ -81,77 +81,6 @@ const Dashboard = () => {
                         </a>
                     </div>
 
-                    {/* <div className="admin-info text-center mb-10">
-                        <img
-                            src={user}
-                            alt="user-img"
-                            className="w-[90px] h-[90px] mx-auto rounded-[50%]"
-                        />
-                        <div className="">
-                            <button
-                                onClick={() => setIsOpen(!isOpen)}
-                                className="user-name text-xl relative font-[500] py-3 w-full"
-                            >
-                                Super Admin
-                                <ul
-                                    className={`dropdown-menu absolute left-1/2 -translate-x-1/2 mt-2 w-[240px] bg-white rounded-md shadow-md p-5 space-y-3 transition-all duration-300 ease-in-out z-10 ${
-                                        isOpen
-                                            ? "opacity-100 visible translate-y-0"
-                                            : "opacity-0 invisible -translate-y-2"
-                                    }`}
-                                >
-                                    <li>
-                                        <a
-                                            href="#"
-                                            className="flex group items-center w-full gap-2"
-                                        >
-                                            <img
-                                                src={profile1}
-                                                alt="profile-icon"
-                                                className="w-[18px]"
-                                            />
-                                            <span className="text-lg group-hover:text-[#3c8968] transition-all duration-300">
-                                                Profile
-                                            </span>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a
-                                            href="#"
-                                            className="flex group items-center w-full gap-2"
-                                        >
-                                            <img
-                                                src={setting1}
-                                                alt="profile-icon"
-                                                className="w-[18px]"
-                                            />
-                                            <span className="text-lg group-hover:text-[#3c8968] transition-all duration-300">
-                                                Account Settings
-                                            </span>
-                                        </a>
-                                    </li>
-
-                                    <li>
-                                        <a
-                                            href="#"
-                                            className="flex group items-center w-full gap-2"
-                                        >
-                                            <img
-                                                src={notification}
-                                                alt="profile-icon"
-                                                className="w-[18px]"
-                                            />
-                                            <span className="text-lg group-hover:text-[#3c8968] transition-all duration-300">
-                                                Notification
-                                            </span>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </button>
-                        </div>
-                    </div> */}
-
                     <ul className="dashboard-main-nav">
                         <li>
                             <Link
@@ -444,19 +373,19 @@ const Dashboard = () => {
                                     }`}
                                 >
                                     <li>
-                                        <a
-                                            href="#"
+                                        <Link
+                                            to="/pages/MyProfile"
                                             className="flex items-center gap-2 text-gray-700 hover:text-[#3c8968] transition"
                                         >
                                             <img
                                                 src={profile1}
-                                                alt=""
+                                                alt="Profile Icon"
                                                 className="w-[18px]"
                                             />
                                             <span className="text-sm">
                                                 Profile
                                             </span>
-                                        </a>
+                                        </Link>
                                     </li>
                                     <li>
                                         <a
