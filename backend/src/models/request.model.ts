@@ -78,4 +78,4 @@ const RequestReceiptSchema = new Schema({
     timestamps: true
 });
 
-export const RequestReceipt = model<RequestReceiptSchemaInterface>("User", RequestReceiptSchema)
+export const RequestReceipt = model<RequestReceiptSchemaInterface>("RequestReceipt", RequestReceiptSchema)
