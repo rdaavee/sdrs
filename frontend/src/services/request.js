@@ -1,13 +1,14 @@
 import axios from "axios";
 
 const ROUTE = `${import.meta.env.VITE_API_URL}/request`;
-export const getRequestReceipt = async () => {
+export const getRequestReceipt = async (reference_number, code) => {
     try {
         const response = await axios.get(`${ROUTE}/get-request-receipt`, {
             withCredentials: true,
             headers: {
                 "Content-Type": "application/json",
             },
+            params: { reference_number, code },
         });
         const data = response.data;
         return data.message;
@@ -30,7 +31,8 @@ export const saveRequestReceipt = async (dataForm) => {
             }
         );
 
-        return response;
+        const data = response.data;
+        return data.message;
     } catch (error) {
         const axiosError = error;
         const errMsg = axiosError.response?.data?.error || "Unknown error";
