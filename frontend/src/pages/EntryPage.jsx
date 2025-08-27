@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { FaRegFile, FaSearch } from "react-icons/fa";
 
 import OfficeHours from "../components/OfficeHours";
@@ -119,6 +119,7 @@ const EntryPage = () => {
                         <hr className="m-7 text-gray-300" />
                         <SubmitReview
                             dataForm={dataForm}
+                            setDataForm={setDataForm}
                             handleInputChange={handleInputChange}
                         />
                     </div>
@@ -135,9 +136,6 @@ const EntryPage = () => {
         }
     };
 
-    useEffect(() => {
-        console.log(dataForm);
-    }, [dataForm]);
     return (
         <div className="page-container shadow-lg">
             <div className="flex flex-column text-white text-center entry-header">
@@ -172,7 +170,10 @@ const EntryPage = () => {
                     className={`tab-button ${
                         activeTab === "requestTracker" ? "active" : ""
                     }`}
-                    onClick={() => setActiveTab("requestTracker")}
+                    onClick={() => {
+                        setActiveTab("requestTracker");
+                        setCurrentStep(0);
+                    }}
                 >
                     <FaSearch className="icon" /> Track Request
                 </button>
