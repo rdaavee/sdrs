@@ -66,7 +66,7 @@ export const getRequestReceipt = async (reference_number: string, code: string) 
     session.startTransaction();
 
     try {
-        const result = RequestReceipt.findOne({
+        const result = await RequestReceipt.findOne({
             reference_number,
             code,
         }).session(session);

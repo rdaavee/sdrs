@@ -38,7 +38,7 @@ export const saveRequestReceiptController = async (req: Request, res: Response) 
     }
 }
 export const getRequestReceiptController = async (req: Request, res: Response) => {
-    const { reference_number, code } = req.body;
+    const { reference_number, code } = req.query;
 
     if (!reference_number || !code) {
         res.status(400).json({ error: 'Bad Request' });
@@ -50,12 +50,12 @@ export const getRequestReceiptController = async (req: Request, res: Response) =
         return;
     }
     const reference_regex = /^\d{6}SDRS-\d{5}$/;
-    if (!reference_regex.test(reference_number)) {
+    if (!reference_regex.test(reference_number as string)) {
         return res.status(400).json({ error: "Invalid reference number format" });
     }
 
     try {
-        const result = await getRequestReceipt(reference_number, code)
+        const result = await getRequestReceipt(reference_number as string, code as string)
         if (result.httpCode === 200) {
             return res.status(result.httpCode).json({ message: result.message });
         }
