@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRegFile, FaSearch } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
 
 import OfficeHours from "../components/OfficeHours";
 import Reminders from "../components/Reminders";
@@ -66,7 +67,7 @@ const EntryPage = () => {
                 !requested_documents ||
                 requested_documents.length === 0
             ) {
-                // TODO: show error ig to tell user that field is required
+                toast.error("Please fill out all required fields.")
                 return false;
             }
             return true;
@@ -108,6 +109,7 @@ const EntryPage = () => {
                             dataForm={dataForm}
                             handleInputChange={handleInputChange}
                         />
+                        <ToastContainer position="top-right" autoClose={2500} />
                     </div>
                 );
             case 2:

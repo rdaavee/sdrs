@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import EntryPage from "./pages/EntryPage";
 import Dashboard from "./admin/Dashboard";
 import MainContent from "./admin/components/dashboard/MainContent";
+import AddAdmin from "./admin/components/members/AddMembers";
+import MyProfile from "./admin/components/profile/MyProfile";
 
 function App() {
     return (
@@ -10,11 +12,9 @@ function App() {
             <Routes>
                 <Route path="/" element={<Dashboard />}>
                     <Route index element={<MainContent />} />
+                    <Route path="pages/MyProfile" element={<MyProfile />} />
 
-                    <Route
-                        path="pages/AddAdmin"
-                        element={<div>Add Admin Page</div>}
-                    />
+                    <Route path="pages/AddAdmin" element={<AddAdmin />} />
                     <Route
                         path="pages/RequestList"
                         element={<div>Request List Page</div>}
