@@ -6,6 +6,7 @@ import AddMembers from "./admin/members/pages/AddMembers";
 import MyProfile from "./admin/profile/pages/MyProfile";
 import MainContent from "./admin/dashboard/pages/MainContent";
 import RequestList from "./admin/request/RequestList";
+import LoginPage from "./pages/LoginPage";
 
 function App() {
     return (
@@ -23,6 +24,7 @@ function App() {
                 </Route>
 
                 <Route path="/entry-page" element={<EntryPage />} />
+                <Route path="/login" element={<LoginPage />} />
             </Routes>
         </Router>
     );
