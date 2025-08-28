@@ -5,6 +5,7 @@ import Dashboard from "./admin/Dashboard";
 import AddMembers from "./admin/members/pages/AddMembers";
 import MyProfile from "./admin/profile/pages/MyProfile";
 import MainContent from "./admin/dashboard/pages/MainContent";
+import RequestList from "./admin/request/RequestList";
 
 function App() {
     return (
@@ -14,15 +15,11 @@ function App() {
                     <Route index element={<MainContent />} />
                     <Route path="pages/MyProfile" element={<MyProfile />} />
 
-                    <Route path="pages/AddAdmin" element={<AddMembers />} />
                     <Route
-                        path="pages/RequestList"
-                        element={<div>Request List Page</div>}
+                        path="pages/StaffManagement"
+                        element={<AddMembers />}
                     />
-                    <Route
-                        path="pages/SavedAdmins"
-                        element={<div>Saved Admins Page</div>}
-                    />
+                    <Route path="pages/RequestList" element={<RequestList />} />
                 </Route>
 
                 <Route path="/entry-page" element={<EntryPage />} />

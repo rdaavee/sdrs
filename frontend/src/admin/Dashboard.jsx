@@ -56,22 +56,16 @@ const Dashboard = () => {
 
     const navItems = [
         {
-            name: "Add Admin",
-            path: "/pages/AddAdmin",
-            icon1: profile1,
-            icon2: profile2,
-        },
-        {
             name: "Request List",
             path: "/pages/RequestList",
             icon1: note1,
             icon2: note2,
         },
         {
-            name: "Saved Admins",
-            path: "/pages/SavedAdmins",
-            icon1: save1,
-            icon2: save2,
+            name: "Staff Management",
+            path: "/pages/staff-management",
+            icon1: profile1,
+            icon2: profile2,
         },
     ];
 
@@ -96,10 +90,6 @@ const Dashboard = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
-
-    const handleDelete = () => {
-        setShowModal(true);
-    };
 
     const confirmLogout = () => {
         setShowModal(false);
@@ -197,22 +187,6 @@ const Dashboard = () => {
                                 </Link>
                             </li>
                         ))}
-
-                        <li>
-                            <button
-                                onClick={handleDelete}
-                                className="flex items-center w-full p-5 rounded-2xl gap-2"
-                            >
-                                <img
-                                    src={deleteIcon}
-                                    alt="delete-icon"
-                                    className="w-[18px]"
-                                />
-                                <span className="text-lg ps-2 font-[500]">
-                                    Delete
-                                </span>
-                            </button>
-                        </li>
                     </ul>
 
                     <button
