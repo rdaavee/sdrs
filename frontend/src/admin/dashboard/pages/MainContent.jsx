@@ -1,8 +1,8 @@
-import StatsCards from "./StatsCard";
-import RequestDocuments from "./RequestDocuments";
-import PendingRequests from "./PendingRequests";
 import userIcon from "../../../assets/svgs/usericon.svg";
 import file from "../../../assets/svgs/file.svg";
+import StatsCards from "../components/StatsCard";
+import RequestDocuments from "../components/RequestDocuments";
+import PendingRequests from "../components/PendingRequests";
 
 const MainContent = () => {
     const stats = [

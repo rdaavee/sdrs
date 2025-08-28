@@ -2,9 +2,9 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import EntryPage from "./pages/EntryPage";
 import Dashboard from "./admin/Dashboard";
-import MainContent from "./admin/components/dashboard/MainContent";
-import AddAdmin from "./admin/components/members/AddMembers";
-import MyProfile from "./admin/components/profile/MyProfile";
+import AddMembers from "./admin/members/pages/AddMembers";
+import MyProfile from "./admin/profile/pages/MyProfile";
+import MainContent from "./admin/dashboard/pages/MainContent";
 
 function App() {
     return (
@@ -14,7 +14,7 @@ function App() {
                     <Route index element={<MainContent />} />
                     <Route path="pages/MyProfile" element={<MyProfile />} />
 
-                    <Route path="pages/AddAdmin" element={<AddAdmin />} />
+                    <Route path="pages/AddAdmin" element={<AddMembers />} />
                     <Route
                         path="pages/RequestList"
                         element={<div>Request List Page</div>}
