@@ -285,7 +285,7 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
                         You will be notified via email or SMS once your
                         documents are ready. <br />
                         You can track the status of your request at
-                        <span className="font-semibold">Track Request</span>
+                        <span className="font-semibold"> Track Request </span>
                         using the Reference No. and Code above.
                     </p>
                 </div>

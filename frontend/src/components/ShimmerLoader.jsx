@@ -12,9 +12,9 @@ const ShimmerLoader = () => {
                 <div className="h-32 bg-gray-200 rounded-3xl hidden xl:block"></div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 md:gap-6 gap-10 pt-5">
-                <div className="h-150 bg-gray-200 rounded-2xl"></div>
-                <div className="h-150 bg-gray-200 rounded-2xl hidden lg:block"></div>
+            <div className="grid grid-cols-1 md:gap-6 gap-10 pt-5">
+                <div className="h-100 bg-gray-200 rounded-2xl"></div>
+                {/* <div className="h-150 bg-gray-200 rounded-2xl hidden lg:block"></div> */}
             </div>
         </div>
     );

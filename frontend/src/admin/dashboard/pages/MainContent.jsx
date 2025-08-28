@@ -20,7 +20,7 @@ const MainContent = () => {
 
             <StatsCards />
 
-            <div className="w-full mt-5">
+            <div className="w-full mt-10">
                 <RequestDocuments />
 
                 {/* <PendingRequests requests={pendingRequests} /> */}

@@ -2,9 +2,16 @@ import React, { useState, useEffect } from "react";
 import getStatusStyle from "../utils/getStatusStyle";
 import { getAllRequestReceipt } from "../../../services/request";
 
+const getPaymentStyle = (paymentMethod, paid) => {
+    if (paymentMethod === "cashier") {
+        return paid ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700";
+    } else {
+        return "bg-blue-100 text-blue-700";
+    }
+};
+
 const RequestDocuments = () => {
     const [receipts, setReceipts] = useState([]);
-
     const [search, setSearch] = useState("");
     const [sortConfig, setSortConfig] = useState({
         key: "name",
@@ -23,25 +30,22 @@ const RequestDocuments = () => {
         const fetchData = async () => {
             setReceipts(await getAllRequestReceipt());
         };
-
         fetchData();
     }, []);
 
     return (
         <div className="bg-white rounded-xl shadow-sm w-full card-item flex flex-col">
             <h2 className="font-semibold header-text border-b border-[#e3f0eb]">
-                Request Documents
+                Request List
             </h2>
             <div className="header-body-content p-4 flex flex-col h-full">
                 {/* Search */}
                 <input
                     type="text"
-                    placeholder="Search documents..."
+                    placeholder="Search here..."
                     className="border px-3 py-2 rounded-lg w-full mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                     value={search}
-                    onChange={(e) => {
-                        setSearch(e.target.value);
-                    }}
+                    onChange={(e) => setSearch(e.target.value)}
                 />
 
                 {/* Table */}
@@ -83,35 +87,49 @@ const RequestDocuments = () => {
                         </thead>
                         <tbody>
                             {receipts.length > 0 ? (
-                                receipts.map((doc, idx) => (
-                                    <tr
-                                        key={idx}
-                                        className="hover:bg-[#f9fafb] transition duration-300"
-                                    >
-                                        <td className="px-4 py-2">
-                                            {doc.full_name}
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            <span
-                                                className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
-                                                    doc.status
-                                                )}`}
-                                            >
-                                                {doc.status
-                                                    .charAt(0)
-                                                    .toUpperCase() +
-                                                    doc.status.slice(1)}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            {doc.payment_method === "cashier"
-                                                ? doc.paid
-                                                    ? "Cash"
-                                                    : "Not yet Paid"
-                                                : "Online"}
-                                        </td>
-                                    </tr>
-                                ))
+                                receipts
+                                    .filter((doc) =>
+                                        doc.full_name
+                                            .toLowerCase()
+                                            .includes(search.toLowerCase())
+                                    )
+                                    .map((doc, idx) => (
+                                        <tr
+                                            key={idx}
+                                            className="hover:bg-[#f9fafb] transition duration-300"
+                                        >
+                                            <td className="px-4 py-2">
+                                                {doc.full_name}
+                                            </td>
+                                            <td className="px-4 py-2">
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getPaymentStyle(
+                                                        doc.payment_method,
+                                                        doc.paid
+                                                    )}`}
+                                                >
+                                                    {doc.payment_method ===
+                                                    "cashier"
+                                                        ? doc.paid
+                                                            ? "Cash"
+                                                            : "Not yet paid"
+                                                        : "Online"}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-2">
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
+                                                        doc.status
+                                                    )}`}
+                                                >
+                                                    {doc.status
+                                                        .charAt(0)
+                                                        .toUpperCase() +
+                                                        doc.status.slice(1)}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
                             ) : (
                                 <tr>
                                     <td
@@ -124,37 +142,6 @@ const RequestDocuments = () => {
                             )}
                         </tbody>
                     </table>
-                </div>
-
-                {/* Pagination */}
-                <div className="flex justify-between items-center mt-6 text-sm">
-                    {/* <span>
-                        Page {currentPage} of {totalPages || 1}
-                    </span>
-                    <div className="space-x-2">
-                        <button
-                            onClick={() =>
-                                setCurrentPage((p) => Math.max(p - 1, 1))
-                            }
-                            disabled={currentPage === 1}
-                            className="px-3 py-1 border rounded-lg disabled:opacity-50"
-                        >
-                            Prev
-                        </button>
-                        <button
-                            onClick={() =>
-                                setCurrentPage((p) =>
-                                    Math.min(p + 1, totalPages)
-                                )
-                            }
-                            disabled={
-                                currentPage === totalPages || totalPages === 0
-                            }
-                            className="px-3 py-1 border rounded-lg disabled:opacity-50"
-                        >
-                            Next
-                        </button>
-                    </div> */}
                 </div>
             </div>
         </div>
