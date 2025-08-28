@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 import user from "../assets/images/user-img.png";
 import dashboard1 from "../assets/svgs/dashbord-icon-01.svg";
@@ -25,6 +25,7 @@ import menuClose from "../assets/svgs/menu-close.png";
 import deleteIcon from "../assets/svgs/delete-icon-01.svg";
 import logout from "../assets/svgs/logout-icon-01.svg";
 import logoutDelete from "../assets/svgs/logout-delete.svg";
+import ShimmerLoader from "../components/ShimmerLoader";
 
 const Dashboard = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -32,6 +33,18 @@ const Dashboard = () => {
 
     const [activeItem, setActiveItem] = useState("Dashboard");
     const [isSidebarActive, setIsSidebarActive] = useState(false);
+
+    const location = useLocation();
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setLoading(true);
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [location]);
 
     const toggleSidebar = () => {
         setIsSidebarActive(!isSidebarActive);
@@ -42,9 +55,24 @@ const Dashboard = () => {
     };
 
     const navItems = [
-        { name: "Add Admin", icon1: profile1, icon2: profile2 },
-        { name: "Request List", icon1: note1, icon2: note2 },
-        { name: "Saved Admins", icon1: save1, icon2: save2 },
+        {
+            name: "Add Admin",
+            path: "/pages/AddAdmin",
+            icon1: profile1,
+            icon2: profile2,
+        },
+        {
+            name: "Request List",
+            path: "/pages/RequestList",
+            icon1: note1,
+            icon2: note2,
+        },
+        {
+            name: "Saved Admins",
+            path: "/pages/SavedAdmins",
+            icon1: save1,
+            icon2: save2,
+        },
     ];
 
     const [showModal, setShowModal] = useState(false);
@@ -53,7 +81,6 @@ const Dashboard = () => {
     const notifRef = useRef(null);
     const userRef = useRef(null);
 
-    // close dropdowns on outside click
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (notifRef.current && !notifRef.current.contains(event.target)) {
@@ -435,7 +462,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                     <div className="content w-full flex flex-col justify-between min-h-0 overflow-y-auto">
-                        <Outlet />
+                        {loading ? <ShimmerLoader /> : <Outlet />}
                     </div>
                 </div>
             </div>
