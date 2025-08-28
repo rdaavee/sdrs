@@ -1,100 +1,15 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import getStatusStyle from "../utils/getStatusStyle";
+import { getAllRequestReceipt } from "../../../services/request";
 
 const RequestDocuments = () => {
-    const documents = ["Certification", "Form 137", "Diploma", "Transcript"];
+    const [receipts, setReceipts] = useState([]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const documentStatuses = {
-        Certification: [
-            {
-                name: "Certificate of Enrollment",
-                status: "Processing",
-                payments: "Paid Online",
-            },
-            {
-                name: "Certificate of Enrollment",
-                status: "Waiting",
-                payments: "Cash",
-            },
-            {
-                name: "Certificate of Enrollment",
-                status: "Ready",
-                payments: "Cash",
-            },
-            {
-                name: "Certificate of Enrollment",
-                status: "Processing",
-                payments: "Paid Online",
-            },
-            {
-                name: "Transcript of Records",
-                status: "Ready",
-                payments: "Paid Online",
-            },
-            {
-                name: "Certificate of Good Moral",
-                status: "Waiting",
-                payments: "Cash",
-            },
-            {
-                name: "Certificate of Good Moral",
-                status: "Waiting",
-                payments: "Cash",
-            },
-        ],
-        "Form 137": [
-            { name: "Form 137-A", status: "Processing", payments: "Cash" },
-        ],
-        Diploma: [
-            {
-                name: "College Diploma",
-                status: "Ready",
-                payments: "Pay Online",
-            },
-        ],
-        Transcript: [
-            { name: "TOR - Full Copy", status: "Waiting", payments: "Cash" },
-        ],
-    };
-
-    const [selectedType, setSelectedType] = useState(documents[0]);
-    const [isOpen, setIsOpen] = useState(false);
     const [search, setSearch] = useState("");
     const [sortConfig, setSortConfig] = useState({
         key: "name",
         direction: "asc",
     });
-    const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 7;
-
-    // Filtering
-    const filteredDocs = useMemo(() => {
-        return (
-            documentStatuses[selectedType]?.filter((doc) =>
-                doc.name.toLowerCase().includes(search.toLowerCase())
-            ) || []
-        );
-    }, [documentStatuses, selectedType, search]);
-
-    // Sorting
-    const sortedDocs = useMemo(() => {
-        if (!sortConfig.key) return filteredDocs;
-        return [...filteredDocs].sort((a, b) => {
-            const valueA = a[sortConfig.key];
-            const valueB = b[sortConfig.key];
-            if (valueA < valueB) return sortConfig.direction === "asc" ? -1 : 1;
-            if (valueA > valueB) return sortConfig.direction === "asc" ? 1 : -1;
-            return 0;
-        });
-    }, [filteredDocs, sortConfig]);
-
-    // Pagination
-    const totalPages = Math.ceil(sortedDocs.length / rowsPerPage);
-    const paginatedDocs = sortedDocs.slice(
-        (currentPage - 1) * rowsPerPage,
-        currentPage * rowsPerPage
-    );
 
     const handleSort = (key) => {
         setSortConfig((prev) => ({
@@ -104,61 +19,20 @@ const RequestDocuments = () => {
         }));
     };
 
+    useEffect(() => {
+        const fetchData = async () => {
+            setReceipts(await getAllRequestReceipt());
+        };
+
+        fetchData();
+    }, []);
+
     return (
         <div className="bg-white rounded-xl shadow-sm w-full card-item flex flex-col">
             <h2 className="font-semibold header-text border-b border-[#e3f0eb]">
                 Request Documents
             </h2>
             <div className="header-body-content p-4 flex flex-col h-full">
-                {/* Dropdown */}
-                <div className="w-full mb-4 relative">
-                    <div
-                        className="border-1 border-[#3f634d] px-4 py-2 rounded-md cursor-pointer flex justify-between items-center"
-                        onClick={() => setIsOpen(!isOpen)}
-                    >
-                        <span className="text-md text-[#183b56] font-[300]">
-                            {selectedType}
-                        </span>
-                        <svg
-                            className={`w-4 h-4 ml-2 transform duration-300 ${
-                                isOpen ? "rotate-180" : ""
-                            }`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                d="M19 9l-7 7-7-7"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                        </svg>
-                    </div>
-                    {isOpen && (
-                        <ul className="absolute z-10 w-full mt-2 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                            {documents.map((doc, idx) => (
-                                <li
-                                    key={idx}
-                                    className={`px-4 py-3 cursor-pointer hover:bg-[#f4f4f4] ${
-                                        selectedType === doc
-                                            ? "text-green-500 bg-[rgba(36,64,52,.03)]"
-                                            : "text-[#183b56]"
-                                    }`}
-                                    onClick={() => {
-                                        setSelectedType(doc);
-                                        setIsOpen(false);
-                                        setSearch("");
-                                        setCurrentPage(1);
-                                    }}
-                                >
-                                    {doc}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </div>
-
                 {/* Search */}
                 <input
                     type="text"
@@ -167,7 +41,6 @@ const RequestDocuments = () => {
                     value={search}
                     onChange={(e) => {
                         setSearch(e.target.value);
-                        setCurrentPage(1);
                     }}
                 />
 
@@ -180,7 +53,7 @@ const RequestDocuments = () => {
                                     className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
                                     onClick={() => handleSort("name")}
                                 >
-                                    Document{" "}
+                                    Full Name
                                     {sortConfig.key === "name" &&
                                         (sortConfig.direction === "asc"
                                             ? "▲"
@@ -190,7 +63,7 @@ const RequestDocuments = () => {
                                     className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
                                     onClick={() => handleSort("status")}
                                 >
-                                    Status{" "}
+                                    Status
                                     {sortConfig.key === "status" &&
                                         (sortConfig.direction === "asc"
                                             ? "▲"
@@ -200,7 +73,7 @@ const RequestDocuments = () => {
                                     className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
                                     onClick={() => handleSort("payments")}
                                 >
-                                    Payment{" "}
+                                    Payment
                                     {sortConfig.key === "payments" &&
                                         (sortConfig.direction === "asc"
                                             ? "▲"
@@ -209,14 +82,14 @@ const RequestDocuments = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {paginatedDocs.length > 0 ? (
-                                paginatedDocs.map((doc, idx) => (
+                            {receipts.length > 0 ? (
+                                receipts.map((doc, idx) => (
                                     <tr
                                         key={idx}
                                         className="hover:bg-[#f9fafb] transition duration-300"
                                     >
                                         <td className="px-4 py-2">
-                                            {doc.name}
+                                            {doc.full_name}
                                         </td>
                                         <td className="px-4 py-2">
                                             <span
@@ -224,11 +97,18 @@ const RequestDocuments = () => {
                                                     doc.status
                                                 )}`}
                                             >
-                                                {doc.status}
+                                                {doc.status
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    doc.status.slice(1)}
                                             </span>
                                         </td>
                                         <td className="px-4 py-2">
-                                            {doc.payments}
+                                            {doc.payment_method === "cashier"
+                                                ? doc.paid
+                                                    ? "Cash"
+                                                    : "Not yet Paid"
+                                                : "Online"}
                                         </td>
                                     </tr>
                                 ))
@@ -248,7 +128,7 @@ const RequestDocuments = () => {
 
                 {/* Pagination */}
                 <div className="flex justify-between items-center mt-6 text-sm">
-                    <span>
+                    {/* <span>
                         Page {currentPage} of {totalPages || 1}
                     </span>
                     <div className="space-x-2">
@@ -274,7 +154,7 @@ const RequestDocuments = () => {
                         >
                             Next
                         </button>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

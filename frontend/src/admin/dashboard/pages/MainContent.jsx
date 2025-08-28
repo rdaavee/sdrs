@@ -1,24 +1,16 @@
-import userIcon from "../../../assets/svgs/usericon.svg";
 import file from "../../../assets/svgs/file.svg";
 import StatsCards from "../components/StatsCard";
 import RequestDocuments from "../components/RequestDocuments";
 import PendingRequests from "../components/PendingRequests";
 
 const MainContent = () => {
-    const stats = [
-        { value: "10", label: "Requests", icon: userIcon },
-        { value: "10", label: "Pending", icon: userIcon },
-        { value: "10", label: "Processing", icon: userIcon },
-        { value: "10", label: "Ready", icon: userIcon },
-    ];
-
-    const pendingRequests = [
-        { icon: file, title: "Transcript", student_id: "03-2223-044501" },
-        { icon: file, title: "Transcript", student_id: "03-2223-044501" },
-        { icon: file, title: "Transcript", student_id: "03-2223-044501" },
-        { icon: file, title: "Transcript", student_id: "03-2223-044501" },
-        { icon: file, title: "Transcript", student_id: "03-2223-044501" },
-    ];
+    // const pendingRequests = [
+    //     { icon: file, title: "Transcript", student_id: "03-2223-044501" },
+    //     { icon: file, title: "Transcript", student_id: "03-2223-044501" },
+    //     { icon: file, title: "Transcript", student_id: "03-2223-044501" },
+    //     { icon: file, title: "Transcript", student_id: "03-2223-044501" },
+    //     { icon: file, title: "Transcript", student_id: "03-2223-044501" },
+    // ];
 
     return (
         <div>
@@ -26,12 +18,12 @@ const MainContent = () => {
                 Dashboard
             </h1>
 
-            <StatsCards stats={stats} />
+            <StatsCards />
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 md:gap-6 gap-10 pt-10">
+            <div className="w-full mt-5">
                 <RequestDocuments />
 
-                <PendingRequests requests={pendingRequests} />
+                {/* <PendingRequests requests={pendingRequests} /> */}
             </div>
         </div>
     );

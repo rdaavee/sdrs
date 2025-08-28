@@ -1,6 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import userIcon from "../../../assets/svgs/usericon.svg";
+import { getAllRequestReceiptStats } from "../../../services/request";
 
-const StatsCards = ({ stats }) => {
+const BASE_STATS_ICON = [
+    { value: 0, label: "Requests", icon: userIcon },
+    { value: 0, label: "Pending", icon: userIcon },
+    { value: 0, label: "Processing", icon: userIcon },
+    { value: 0, label: "Ready", icon: userIcon },
+];
+
+const StatsCards = () => {
+    const [stats, setStats] = useState(BASE_STATS_ICON);
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await getAllRequestReceiptStats();
+            if (data && typeof data === "object") {
+                const updated = BASE_STATS_ICON.map((item) => {
+                    let value = 0;
+                    if (item.label === "Requests") value = data.active ?? 0;
+                    if (item.label === "Pending") value = data.waiting ?? 0;
+                    if (item.label === "Processing")
+                        value = data.processing ?? 0;
+                    if (item.label === "Ready") value = data.ready ?? 0;
+                    return { ...item, value };
+                });
+                setStats(updated);
+            }
+        };
+
+        fetchData();
+    }, []);
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 md:gap-6 gap-10 py-4">
             {stats.map((item, index) => (
