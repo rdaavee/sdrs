@@ -11,7 +11,9 @@ import {
 } from "react-icons/io5";
 import { saveRequestReceipt } from "../services/request";
 
-const SubmitReview = ({ dataForm, handleInputChange }) => {
+const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
+    const [referenceNumber, setReferenceNumber] = useState("");
+    const [code, setCode] = useState("");
     const [confirmed, setConfirmed] = useState(false);
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -79,16 +81,34 @@ const SubmitReview = ({ dataForm, handleInputChange }) => {
             setLoading(false);
             return;
         }
-        setTimeout(() => {
-            setLoading(false);
+        try {
+            const result = await saveRequestReceipt(dataForm);
             setShowModal(true);
-
             setTimeout(() => {
                 setShowModal(false);
                 setSubmitted(true);
             }, 2500);
-        }, 1500);
-        await saveRequestReceipt(dataForm);
+            setReferenceNumber(result.reference_number);
+            setCode(result.code);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+            setDataForm({
+                student_number: "",
+                full_name: "",
+                current_address: "",
+                course: "",
+                contact_number: "",
+                email_address: "",
+                purpose_of_request: "",
+                requested_documents: [],
+                isValidEmail: false,
+                verification_code: "",
+                payment_method: "",
+                paid: false,
+            });
+        }
     };
     useEffect(() => {
         const updatedRequestedDocuments = documents.map((doc) => [
@@ -249,13 +269,13 @@ const SubmitReview = ({ dataForm, handleInputChange }) => {
                                     Reference No.
                                 </td>
                                 <td className="p-3 text-green-500 font-bold">
-                                    0428SDRS-00001
+                                    {referenceNumber}
                                 </td>
                             </tr>
                             <tr className="border border-gray-300">
                                 <td className="p-3 font-semibold">Code</td>
                                 <td className="p-3 text-green-500 font-bold">
-                                    4321
+                                    {code}
                                 </td>
                             </tr>
                         </tbody>

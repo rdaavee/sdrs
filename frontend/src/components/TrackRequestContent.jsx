@@ -8,6 +8,7 @@ import {
     IoInformation,
     IoSchoolOutline,
 } from "react-icons/io5";
+import { getRequestReceipt } from "../services/request";
 
 Modal.setAppElement("#root");
 
@@ -18,19 +19,19 @@ const TrackRequestContent = () => {
     const [error, setError] = useState("");
     const [activeStep, setActiveStep] = useState(0);
     const [showModal, setShowModal] = useState(false);
+    const [requestReceipt, setRequestReceipt] = useState({});
 
-    const validRef = "REF1234";
-    const validCode = "4321";
-
-    const handleTrack = () => {
-        if (reference === validRef && code === validCode) {
-            setIsValid(true);
-            setError("");
-            setActiveStep(1);
-            setShowModal(true);
-        } else {
+    const handleTrack = async () => {
+        const result = await getRequestReceipt(reference, code);
+        if (typeof result === "string") {
             setIsValid(false);
             setError("Invalid reference number and code");
+        } else {
+            setRequestReceipt(result);
+            setIsValid(true);
+            setError("");
+            setActiveStep(0);
+            setShowModal(true);
         }
     };
 
@@ -65,7 +66,7 @@ const TrackRequestContent = () => {
                     <h3 className="font-semibold mb-2">Advisory</h3>
                     <hr className="mb-2" />
                     <p>
-                        Your document request PIN (4 digit) together with the
+                        Your document request PIN (6 digit) together with the
                         REFERENCE NO. is now required for tracking. You can find
                         the PIN on the confirmation email sent to you. You can
                         ask the assistance of the Registration Services office
@@ -175,25 +176,25 @@ const TrackRequestContent = () => {
                             <p className="text-gray-600 text-sm">
                                 Request Timestamp :
                                 <span className="ml-2 text-gray-900 font-medium">
-                                    08/20/2025
+                                    {requestReceipt.createdAt}
                                 </span>
                             </p>
                             <p className="text-gray-600 text-sm">
                                 Reference No. :
                                 <span className="ml-2 text-gray-900 font-medium">
-                                    REF1234
+                                    {requestReceipt.reference_number}
                                 </span>
                             </p>
                             <p className="text-gray-600 text-sm">
                                 Student Name :
                                 <span className="ml-2 text-gray-900 font-medium">
-                                    Ranier Tan
+                                    {requestReceipt.full_name}
                                 </span>
                             </p>
                             <p className="text-gray-600 text-sm">
                                 Request Status :
                                 <span className="ml-2 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                    Processing
+                                    {requestReceipt.status}
                                 </span>
                             </p>
                         </div>
@@ -226,46 +227,35 @@ const TrackRequestContent = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200">
-                                        <tr>
-                                            <td className="px-4 py-2 text-sm text-gray-800">
-                                                Certificate of Enrollment
-                                            </td>
-                                            <td className="px-4 py-2">
-                                                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-                                                    Processing
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-2 text-sm text-gray-600">
-                                                Expected release: Aug 25, 2025
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="px-4 py-2 text-sm text-gray-800">
-                                                Transcript of Records
-                                            </td>
-                                            <td className="px-4 py-2">
-                                                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                                    Ready
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-2 text-sm text-gray-600">
-                                                Please claim at the Registrar’s
-                                                Office
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td className="px-4 py-2 text-sm text-gray-800">
-                                                Certificate of Good Moral
-                                            </td>
-                                            <td className="px-4 py-2">
-                                                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-600">
-                                                    Waiting
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-2 text-sm text-gray-600">
-                                                Pending approval
-                                            </td>
-                                        </tr>
+                                        {requestReceipt.requested_documents &&
+                                            JSON.parse(
+                                                requestReceipt.requested_documents
+                                            ).map((req) => (
+                                                <tr>
+                                                    <td className="px-4 py-2 text-sm text-gray-800">
+                                                        {req[0]}
+                                                    </td>
+                                                    <td className="px-4 py-2">
+                                                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
+                                                            {
+                                                                requestReceipt.status
+                                                            }
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-4 py-2 text-sm text-gray-600">
+                                                        {requestReceipt.status ===
+                                                        "waiting"
+                                                            ? "Pending approval"
+                                                            : requestReceipt.status ===
+                                                              "processing"
+                                                            ? "Expected release: Aug 25, 2025"
+                                                            : requestReceipt.status ===
+                                                              "ready"
+                                                            ? "Please claim at the Registrar’s Office"
+                                                            : "Released"}
+                                                    </td>
+                                                </tr>
+                                            ))}
                                     </tbody>
                                 </table>
                             </div>

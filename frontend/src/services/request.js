@@ -39,3 +39,40 @@ export const saveRequestReceipt = async (dataForm) => {
         return errMsg;
     }
 };
+
+export const getAllRequestReceipt = async () => {
+    try {
+        const response = await axios.get(`${ROUTE}/get-all-request-receipt`, {
+            withCredentials: true,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        const data = response.data;
+        return data.message;
+    } catch (error) {
+        const axiosError = error;
+        const errMsg = axiosError.response?.data?.error || "Unknown error";
+        return errMsg;
+    }
+};
+
+export const getAllRequestReceiptStats = async () => {
+    try {
+        const response = await axios.get(
+            `${ROUTE}/get-all-request-receipt-stats`,
+            {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        const data = response.data;
+        return data.message;
+    } catch (error) {
+        const axiosError = error;
+        const errMsg = axiosError.response?.data?.error || "Unknown error";
+        return errMsg;
+    }
+};
