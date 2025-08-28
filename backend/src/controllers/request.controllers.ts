@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { getRequestReceipt, saveRequestReceipt } from '../services/request.services';
+import { getAllRequestReceipt, getAllRequestReceiptStats, getRequestReceipt, saveRequestReceipt } from '../services/request.services';
 
 export const saveRequestReceiptController = async (req: Request, res: Response) => {
     const data = req.body;
@@ -56,6 +56,28 @@ export const getRequestReceiptController = async (req: Request, res: Response) =
 
     try {
         const result = await getRequestReceipt(reference_number as string, code as string)
+        if (result.httpCode === 200) {
+            return res.status(result.httpCode).json({ message: result.message });
+        }
+        return res.status(result.httpCode).json({ error: result.error });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+export const getAllRequestReceiptController = async (req: Request, res: Response) => {
+    try {
+        const result = await getAllRequestReceipt()
+        if (result.httpCode === 200) {
+            return res.status(result.httpCode).json({ message: result.message });
+        }
+        return res.status(result.httpCode).json({ error: result.error });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+export const getAllRequestReceiptStatsController = async (req: Request, res: Response) => {
+    try {
+        const result = await getAllRequestReceiptStats()
         if (result.httpCode === 200) {
             return res.status(result.httpCode).json({ message: result.message });
         }

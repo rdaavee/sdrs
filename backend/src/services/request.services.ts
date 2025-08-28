@@ -85,3 +85,53 @@ export const getRequestReceipt = async (reference_number: string, code: string) 
         return { error: "Internal Server Error", httpCode: 500 };
     }
 }
+export const getAllRequestReceipt = async () => {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+        const result = await RequestReceipt.find().session(session);
+
+        if (!result) {
+            return { error: "No Request found.", httpCode: 404 }
+        }
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return { message: result, httpCode: 200 };
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+}
+export const getAllRequestReceiptStats = async () => {
+    const session = await startSession();
+    session.startTransaction();
+
+    try {
+        const aggregation = await RequestReceipt.aggregate([
+            { $group: { _id: "$status", count: { $sum: 1 } } }
+        ]).session(session);
+
+        const counts: { [key: string]: number } = {};
+        for (const item of aggregation) {
+            counts[item._id] = item.count;
+        }
+
+        const waiting = counts["waiting"] || 0;
+        const processing = counts["processing"] || 0;
+        const ready = counts["ready"] || 0;
+        const active = waiting + processing;
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return { message: { active, waiting, processing, ready }, httpCode: 200 };
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+}
