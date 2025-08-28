@@ -1,11 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const PendingRequests = ({ requests }) => {
     const [selectedRequest, setSelectedRequest] = useState(requests[0]);
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
+    const menuRef = useRef(null);
 
     const toggleMenu = (index) => {
         setOpenMenuIndex(openMenuIndex === index ? null : index);
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setOpenMenuIndex(null);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleMenuAction = (action, request) => {
+        alert(`${action}: ${request.title}`);
+        setOpenMenuIndex(null);
     };
 
     return (
@@ -46,7 +63,7 @@ const PendingRequests = ({ requests }) => {
                             <div
                                 className="text-gray-400 hover:text-gray-600"
                                 onClick={(e) => {
-                                    e.stopPropagation(); // prevent selecting row
+                                    e.stopPropagation();
                                     toggleMenu(index);
                                 }}
                             >
@@ -67,12 +84,19 @@ const PendingRequests = ({ requests }) => {
                             </div>
 
                             {openMenuIndex === index && (
-                                <div className="absolute right-4 top-12 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20">
+                                <div
+                                    ref={menuRef}
+                                    className="absolute right-4 top-12 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-20"
+                                >
                                     <ul className="py-1 text-sm text-gray-700">
                                         <li
-                                            onClick={() =>
-                                                alert(`View: ${request.title}`)
-                                            }
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleMenuAction(
+                                                    "View",
+                                                    request
+                                                );
+                                            }}
                                             className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                         >
                                             <svg
@@ -98,11 +122,13 @@ const PendingRequests = ({ requests }) => {
                                             View
                                         </li>
                                         <li
-                                            onClick={() =>
-                                                alert(
-                                                    `Accept: ${request.title}`
-                                                )
-                                            }
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleMenuAction(
+                                                    "Accept",
+                                                    request
+                                                );
+                                            }}
                                             className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                         >
                                             <svg
@@ -122,11 +148,13 @@ const PendingRequests = ({ requests }) => {
                                             Accept
                                         </li>
                                         <li
-                                            onClick={() =>
-                                                alert(
-                                                    `Reject: ${request.title}`
-                                                )
-                                            }
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleMenuAction(
+                                                    "Reject",
+                                                    request
+                                                );
+                                            }}
                                             className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                         >
                                             <svg

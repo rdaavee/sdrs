@@ -333,6 +333,12 @@
 }
 
 /* =============== ADMIN DASHBOARD STYLES ================ */
+.dashboard-wrapper {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
 .sidebar {
     overflow-y: auto;
     min-width: 350px;
@@ -340,7 +346,8 @@
     height: 100vh;
     min-height: 100vh;
     position: absolute;
-    overflow-y: scroll;
+    overflow-y: auto;
+    flex-shrink: 0;
     z-index: 999;
     scrollbar-width: none;
     scrollbar-color: #ccc transparent;
@@ -404,18 +411,20 @@
 
 /* dashboard main */
 .main {
-    padding: 0 55px 50px;
-    min-height: 100vh;
-    overflow-y: auto;
-    border: 50px 0 0 50px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
 }
 
 .nav-main {
+    flex-shrink: 0;
     position: sticky;
     top: 0;
     right: 0;
     padding: 10px 40px;
-    background: #f0f5f3;
+    background-color: white;
     z-index: 10;
 }
 
@@ -461,6 +470,13 @@
 
 .header-body-content {
     padding: 25px 25px 25px 30px;
+}
+
+.content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 20px 40px;
 }
 
 .content::-webkit-scrollbar {

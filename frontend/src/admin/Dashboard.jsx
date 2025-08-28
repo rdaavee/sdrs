@@ -275,7 +275,7 @@ const Dashboard = () => {
 
                 {/* main */}
                 <div className="main bg-[#f0f5f3] min-h-full h-full w-full ml-[350px] overflow-y-scroll">
-                    <div className="nav-main bg-[#f0f5f3] w-full h-[100px] flex items-center justify-between px-5 z-[9] border-b-1 border-gray-300 shadow-4xl">
+                    <div className="nav-main w-full h-[100px] flex items-center justify-between px-5 z-[9] border-b-1 border-gray-300 shadow-sm">
                         <div className="flex items-center gap-4">
                             <img
                                 src={menuOpen}
@@ -284,15 +284,6 @@ const Dashboard = () => {
                                 onClick={toggleSidebar}
                             />
                         </div>
-
-                        <form className="search-form hidden lg:flex w-[300px] relative">
-                            <i className="fa-solid fa-magnifying-glass absolute top-1/2 left-4 -translate-y-1/2 text-gray-500"></i>
-                            <input
-                                type="text"
-                                placeholder="Search here..."
-                                className="w-full h-[45px] rounded-full bg-[rgba(0,0,0,.05)] text-gray-700 font-[300] pl-[45px] pr-[15px] text-base focus:outline-none"
-                            />
-                        </form>
 
                         <div className="flex items-center gap-6">
                             {/* Notification */}
@@ -443,7 +434,7 @@ const Dashboard = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="content w-full flex flex-col justify-between min-h-full">
+                    <div className="content w-full flex flex-col justify-between min-h-0 overflow-y-auto">
                         <Outlet />
                     </div>
                 </div>
