@@ -49,6 +49,7 @@ export const getAllRequestReceipt = async () => {
             },
         });
         const data = response.data;
+        console.log(data.message);
         return data.message;
     } catch (error) {
         const axiosError = error;

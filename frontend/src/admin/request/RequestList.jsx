@@ -1,12 +1,13 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
+import { getAllRequestReceipt } from "../../services/request";
 
 const getStatusStyle = (status) => {
     switch (status) {
-        case "Processing":
+        case "processing":
             return "bg-yellow-100 text-yellow-700";
-        case "Ready":
+        case "ready":
             return "bg-green-100 text-green-700";
-        case "Waiting":
+        case "waiting":
             return "bg-gray-200 text-gray-600";
         default:
             return "bg-gray-100 text-gray-600";
@@ -16,49 +17,9 @@ const getStatusStyle = (status) => {
 const RequestList = () => {
     const [expandedRows, setExpandedRows] = useState({});
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const requests = [
-        {
-            name: "John Doe",
-            email: "john@example.com",
-            document: ["Transcript", "Diploma"],
-            status: "Processing",
-            payments: "Paid Online",
-            quantity: 2,
-        },
-        {
-            name: "Jane Smith",
-            email: "jane@example.com",
-            document: ["Diploma"],
-            status: "Ready",
-            payments: "Cash",
-            quantity: 1,
-        },
-        {
-            name: "Alex Johnson",
-            email: "alex@example.com",
-            document: ["Form 137", "Certification", "Diploma"],
-            status: "Waiting",
-            payments: "Cash",
-            quantity: 3,
-        },
-        {
-            name: "Emily Brown",
-            email: "emily@example.com",
-            document: ["Certification"],
-            status: "Ready",
-            payments: "Paid Online",
-            quantity: 1,
-        },
-        {
-            name: "Michael Lee",
-            email: "michael@example.com",
-            document: ["Transcript", "Form 137"],
-            status: "Processing",
-            payments: "Cash",
-            quantity: 2,
-        },
-    ];
+    //
+
+    const [receipts, setReceipts] = useState([]);
 
     const toggleExpand = (index) => {
         setExpandedRows((prev) => ({
@@ -72,35 +33,35 @@ const RequestList = () => {
         key: "name",
         direction: "asc",
     });
-    const [currentPage, setCurrentPage] = useState(1);
-    const rowsPerPage = 13;
+    // const [currentPage, setCurrentPage] = useState(1);
+    // const rowsPerPage = 13;
 
-    const filteredRequests = useMemo(() => {
-        return requests.filter(
-            (req) =>
-                req.name.toLowerCase().includes(search.toLowerCase()) ||
-                req.email.toLowerCase().includes(search.toLowerCase()) ||
-                req.document.toLowerCase().includes(search.toLowerCase()) ||
-                req.payments.toLowerCase().includes(search.toLowerCase())
-        );
-    }, [requests, search]);
+    // const filteredRequests = useMemo(() => {
+    //     return requests.filter(
+    //         (req) =>
+    //             req.name.toLowerCase().includes(search.toLowerCase()) ||
+    //             req.email.toLowerCase().includes(search.toLowerCase()) ||
+    //             req.document.toLowerCase().includes(search.toLowerCase()) ||
+    //             req.payments.toLowerCase().includes(search.toLowerCase())
+    //     );
+    // }, [requests, search]);
 
-    const sortedRequests = useMemo(() => {
-        if (!sortConfig.key) return filteredRequests;
-        return [...filteredRequests].sort((a, b) => {
-            const valueA = a[sortConfig.key];
-            const valueB = b[sortConfig.key];
-            if (valueA < valueB) return sortConfig.direction === "asc" ? -1 : 1;
-            if (valueA > valueB) return sortConfig.direction === "asc" ? 1 : -1;
-            return 0;
-        });
-    }, [filteredRequests, sortConfig]);
+    // const sortedRequests = useMemo(() => {
+    //     if (!sortConfig.key) return filteredRequests;
+    //     return [...filteredRequests].sort((a, b) => {
+    //         const valueA = a[sortConfig.key];
+    //         const valueB = b[sortConfig.key];
+    //         if (valueA < valueB) return sortConfig.direction === "asc" ? -1 : 1;
+    //         if (valueA > valueB) return sortConfig.direction === "asc" ? 1 : -1;
+    //         return 0;
+    //     });
+    // }, [filteredRequests, sortConfig]);
 
-    const totalPages = Math.ceil(sortedRequests.length / rowsPerPage);
-    const paginatedRequests = sortedRequests.slice(
-        (currentPage - 1) * rowsPerPage,
-        currentPage * rowsPerPage
-    );
+    // const totalPages = Math.ceil(sortedRequests.length / rowsPerPage);
+    // const paginatedRequests = sortedRequests.slice(
+    //     (currentPage - 1) * rowsPerPage,
+    //     currentPage * rowsPerPage
+    // );
 
     const handleSort = (key) => {
         setSortConfig((prev) => ({
@@ -109,7 +70,48 @@ const RequestList = () => {
                 prev.key === key && prev.direction === "asc" ? "desc" : "asc",
         }));
     };
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await getAllRequestReceipt();
+            const normalized = Array.isArray(data)
+                ? data.map((item) => {
+                      let documentsArray = [];
+                      const documents = item.requested_documents;
 
+                      if (Array.isArray(documents)) {
+                          documentsArray = documents;
+                      } else if (typeof documents === "string") {
+                          const str = documents.trim();
+                          try {
+                              const parsed = JSON.parse(str);
+                              if (Array.isArray(parsed)) {
+                                  documentsArray = parsed;
+                              } else if (typeof parsed === "string") {
+                                  documentsArray = [parsed];
+                              }
+                          } catch {
+                              if (str.includes(",")) {
+                                  documentsArray = str
+                                      .split(",")
+                                      .map((s) => s.trim())
+                                      .filter(Boolean);
+                              } else if (str.length > 0) {
+                                  documentsArray = [str];
+                              }
+                          }
+                      }
+
+                      return {
+                          ...item,
+                          requested_documents: documentsArray,
+                      };
+                  })
+                : [];
+
+            setReceipts(normalized);
+        };
+        fetchData();
+    }, []);
     return (
         <div className="w-full flex flex-col gap-4">
             <h2 className="text-3xl font-[500] text-[#244034] py-2">
@@ -126,7 +128,7 @@ const RequestList = () => {
                         value={search}
                         onChange={(e) => {
                             setSearch(e.target.value);
-                            setCurrentPage(1);
+                            // setCurrentPage(1);
                         }}
                     />
 
@@ -198,24 +200,29 @@ const RequestList = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {paginatedRequests.length > 0 ? (
-                                    paginatedRequests.map((req, idx) => (
+                                {receipts.length > 0 ? (
+                                    receipts.map((req, idx) => (
                                         <tr
                                             key={idx}
                                             className="hover:bg-[#f9fafb] transition duration-300"
                                         >
                                             <td className="px-4 py-2">
-                                                {req.name}
+                                                {req.full_name}
                                             </td>
                                             <td className="px-4 py-2">
-                                                {req.email}
+                                                {req.email_address}
                                             </td>
                                             <td className="px-4 py-2">
-                                                {Array.isArray(req.document) ? (
+                                                {Array.isArray(
+                                                    req.requested_documents
+                                                ) ? (
                                                     <div className="flex flex-wrap gap-2">
                                                         {(expandedRows[idx]
-                                                            ? req.document
-                                                            : req.document.slice(0,2)
+                                                            ? req.requested_documents
+                                                            : req.requested_documents.slice(
+                                                                  0,
+                                                                  2
+                                                              )
                                                         ).map((doc, i) => (
                                                             <span
                                                                 key={i}
@@ -224,8 +231,8 @@ const RequestList = () => {
                                                                 {doc}
                                                             </span>
                                                         ))}
-                                                        {req.document.length >
-                                                            2 && (
+                                                        {req.requested_documents
+                                                            .length > 2 && (
                                                             <span
                                                                 onClick={() =>
                                                                     toggleExpand(
@@ -234,24 +241,32 @@ const RequestList = () => {
                                                                 }
                                                                 className="text-blue-600 text-xs cursor-pointer"
                                                             >
-                                                                {
-                                                                expandedRows[idx]
+                                                                {expandedRows[
+                                                                    idx
+                                                                ]
                                                                     ? "Show less"
-                                                                    : `+${req.document.length - 2} more`
-                                                                }
+                                                                    : `+${
+                                                                          req
+                                                                              .requested_documents
+                                                                              .length -
+                                                                          2
+                                                                      } more`}
                                                             </span>
                                                         )}
                                                     </div>
                                                 ) : (
-                                                    req.document
+                                                    req.requested_documents
                                                 )}
                                             </td>
 
                                             <td className="px-4 py-2">
-                                                {req.quantity}
+                                                {req.requested_documents.length}
                                             </td>
                                             <td className="px-4 py-2">
-                                                {req.payments}
+                                                {req.payment_method
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    req.payment_method.slice(1)}
                                             </td>
                                             <td className="px-4 py-2">
                                                 <span
@@ -259,7 +274,10 @@ const RequestList = () => {
                                                         req.status
                                                     )}`}
                                                 >
-                                                    {req.status}
+                                                    {req.status
+                                                        .charAt(0)
+                                                        .toUpperCase() +
+                                                        req.status.slice(1)}
                                                 </span>
                                             </td>
                                         </tr>
@@ -279,7 +297,7 @@ const RequestList = () => {
                     </div>
 
                     {/* Pagination */}
-                    <div className="flex justify-between items-center mt-6 text-sm">
+                    {/* <div className="flex justify-between items-center mt-6 text-sm">
                         <span>
                             Page {currentPage} of {totalPages || 1}
                         </span>
@@ -308,7 +326,7 @@ const RequestList = () => {
                                 Next
                             </button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
