@@ -18,6 +18,9 @@ const RequestDocuments = () => {
         direction: "asc",
     });
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
+
     const handleSort = (key) => {
         setSortConfig((prev) => ({
             key,
@@ -33,6 +36,17 @@ const RequestDocuments = () => {
         fetchData();
     }, []);
 
+    const filteredReceipts = receipts.filter((doc) =>
+        doc.full_name.toLowerCase().includes(search.toLowerCase())
+    );
+
+    const totalPages = Math.ceil(filteredReceipts.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedReceipts = filteredReceipts.slice(
+        startIndex,
+        startIndex + itemsPerPage
+    );
+
     return (
         <div className="bg-white rounded-xl shadow-sm w-full card-item flex flex-col">
             <h2 className="font-semibold header-text border-b border-[#e3f0eb]">
@@ -45,7 +59,10 @@ const RequestDocuments = () => {
                     placeholder="Search here..."
                     className="border px-3 py-2 rounded-lg w-full mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+                        setCurrentPage(1);
+                    }}
                 />
 
                 {/* Table */}
@@ -86,50 +103,44 @@ const RequestDocuments = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {receipts.length > 0 ? (
-                                receipts
-                                    .filter((doc) =>
-                                        doc.full_name
-                                            .toLowerCase()
-                                            .includes(search.toLowerCase())
-                                    )
-                                    .map((doc, idx) => (
-                                        <tr
-                                            key={idx}
-                                            className="hover:bg-[#f9fafb] transition duration-300"
-                                        >
-                                            <td className="px-4 py-2">
-                                                {doc.full_name}
-                                            </td>
-                                            <td className="px-4 py-2">
-                                                <span
-                                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getPaymentStyle(
-                                                        doc.payment_method,
-                                                        doc.paid
-                                                    )}`}
-                                                >
-                                                    {doc.payment_method ===
-                                                    "cashier"
-                                                        ? doc.paid
-                                                            ? "Cash"
-                                                            : "Not yet paid"
-                                                        : "Online"}
-                                                </span>
-                                            </td>
-                                            <td className="px-4 py-2">
-                                                <span
-                                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
-                                                        doc.status
-                                                    )}`}
-                                                >
-                                                    {doc.status
-                                                        .charAt(0)
-                                                        .toUpperCase() +
-                                                        doc.status.slice(1)}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    ))
+                            {paginatedReceipts.length > 0 ? (
+                                paginatedReceipts.map((doc, idx) => (
+                                    <tr
+                                        key={idx}
+                                        className="hover:bg-[#f9fafb] transition duration-300"
+                                    >
+                                        <td className="px-4 py-2">
+                                            {doc.full_name}
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            <span
+                                                className={`px-3 py-1 rounded-full text-xs font-semibold ${getPaymentStyle(
+                                                    doc.payment_method,
+                                                    doc.paid
+                                                )}`}
+                                            >
+                                                {doc.payment_method ===
+                                                "cashier"
+                                                    ? doc.paid
+                                                        ? "Cash"
+                                                        : "Not yet paid"
+                                                    : "Online"}
+                                            </span>
+                                        </td>
+                                        <td className="px-4 py-2">
+                                            <span
+                                                className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
+                                                    doc.status
+                                                )}`}
+                                            >
+                                                {doc.status
+                                                    .charAt(0)
+                                                    .toUpperCase() +
+                                                    doc.status.slice(1)}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                ))
                             ) : (
                                 <tr>
                                     <td
@@ -142,6 +153,40 @@ const RequestDocuments = () => {
                             )}
                         </tbody>
                     </table>
+
+                    {totalPages > 1 && (
+                        <div className="flex justify-end items-end mt-4 space-x-2">
+                            <button
+                                className="px-3 py-1 border rounded-md text-sm disabled:opacity-50"
+                                disabled={currentPage === 1}
+                                onClick={() => setCurrentPage((p) => p - 1)}
+                            >
+                                Previous
+                            </button>
+
+                            {[...Array(totalPages)].map((_, i) => (
+                                <button
+                                    key={i}
+                                    className={`px-3 py-1 border rounded-md text-sm ${
+                                        currentPage === i + 1
+                                            ? "bg-green-500 text-white"
+                                            : "bg-white"
+                                    }`}
+                                    onClick={() => setCurrentPage(i + 1)}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+
+                            <button
+                                className="px-3 py-1 border rounded-md text-sm disabled:opacity-50"
+                                disabled={currentPage === totalPages}
+                                onClick={() => setCurrentPage((p) => p + 1)}
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

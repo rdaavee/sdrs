@@ -3,6 +3,9 @@ import { toast } from "react-toastify";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { requestCode, verifyCode } from "../services/verify";
 
+import locations from "../constants/locations";
+import courses from "../constants/courses";
+
 const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
     const [error, setError] = useState("");
     const [showCodeField, setShowCodeField] = useState(false);
@@ -87,8 +90,7 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                         <label className="block text-gray-700 mb-1">
                             Current Address
                         </label>
-                        <input
-                            type="text"
+                        <select
                             onChange={(e) =>
                                 handleInputChange(
                                     "current_address",
@@ -97,21 +99,34 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                             }
                             value={dataForm.current_address}
                             className="w-full border border-gray-300 rounded px-3 py-2"
-                        />
+                        >
+                            <option value="">Select</option>
+                            {locations.map((address, index) => (
+                                <option key={index} value={address}>
+                                    {address}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div>
                         <label className="block text-gray-700 mb-1">
-                            Program/Course
+                            Courses
                         </label>
-                        <input
-                            type="text"
+                        <select
                             onChange={(e) =>
                                 handleInputChange("course", e.target.value)
                             }
                             value={dataForm.course}
                             className="w-full border border-gray-300 rounded px-3 py-2"
-                        />
+                        >
+                            <option value="">Select</option>
+                            {courses.map((course, index) => (
+                                <option key={index} value={course}>
+                                    {course}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div>
@@ -119,13 +134,13 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                             Contact Number
                         </label>
                         <input
-                            type="number"
-                            onChange={(e) =>
-                                handleInputChange(
-                                    "contact_number",
-                                    e.target.value
-                                )
-                            }
+                            type="text"
+                            pattern="^[0-9]{11}$"
+                            maxLength={11}
+                            onChange={(e) => {
+                                const value = e.target.value.replace(/\D/g, "");
+                                handleInputChange("contact_number", value);
+                            }}
                             value={dataForm.contact_number}
                             className="w-full border border-gray-300 rounded px-3 py-2"
                         />

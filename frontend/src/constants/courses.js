@@ -1,0 +1,28 @@
+const courses = [
+    "Bachelor of Elementary Education",
+    "Bachelor of Secondary Education (Biology)",
+    "Bachelor of Secondary Education (English)",
+    "Bachelor of Secondary Education (Filipino)",
+    "Bachelor of Secondary Education (Mathematics)",
+    "BS Accountancy",
+    "BS Accounting Technology",
+    "BS Business Administration (Finance)",
+    "BS Business Administration (HRDM)",
+    "BS Business Administration (Marketing Management)",
+    "BS Civil Engineering",
+    "BS Computer Engineering",
+    "BS Electrical Engineering",
+    "BS Electronics Communication Engineering",
+    "BS Medical Laboratory Science",
+    "BS Nursing",
+    "BS Physical Therapy",
+    "BS Information Technology",
+    "BS Hotel and Restaurant Management",
+    "BS Tourism Management",
+    "BS Architecture",
+    "AB Mass Communication",
+    "AB Political Science",
+    "BS Criminology",
+];
+
+export default courses;
