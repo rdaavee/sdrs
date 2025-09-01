@@ -1,33 +1,31 @@
 import React, { useState, useEffect } from "react";
-import getStatusStyle from "../utils/getStatusStyle";
+import { Line, Bar } from "react-chartjs-2";
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+} from "chart.js";
 import { getAllRequestReceipt } from "../../../services/request";
 
-const getPaymentStyle = (paymentMethod, paid) => {
-    if (paymentMethod === "cashier") {
-        return paid ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700";
-    } else {
-        return "bg-blue-100 text-blue-700";
-    }
-};
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend
+);
 
-const RequestDocuments = () => {
+const RequestDocumentsChart = () => {
     const [receipts, setReceipts] = useState([]);
-    const [search, setSearch] = useState("");
-    const [sortConfig, setSortConfig] = useState({
-        key: "name",
-        direction: "asc",
-    });
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 6;
-
-    const handleSort = (key) => {
-        setSortConfig((prev) => ({
-            key,
-            direction:
-                prev.key === key && prev.direction === "asc" ? "desc" : "asc",
-        }));
-    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -36,161 +34,86 @@ const RequestDocuments = () => {
         fetchData();
     }, []);
 
-    const filteredReceipts = receipts.filter((doc) =>
-        doc.full_name.toLowerCase().includes(search.toLowerCase())
-    );
+    const requestsByDate = receipts.reduce((acc, doc) => {
+        const date = new Date(doc.createdAt).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+        });
+        acc[date] = (acc[date] || 0) + 1;
+        return acc;
+    }, {});
 
-    const totalPages = Math.ceil(filteredReceipts.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const paginatedReceipts = filteredReceipts.slice(
-        startIndex,
-        startIndex + itemsPerPage
-    );
+    const lineData = {
+        labels: Object.keys(requestsByDate),
+        datasets: [
+            {
+                label: "Requests",
+                data: Object.values(requestsByDate),
+                borderColor: "#10b981",
+                backgroundColor: "rgba(16, 185, 129, 0.2)",
+                tension: 0.4,
+                fill: true,
+                borderWidth: 3,
+                pointBackgroundColor: "#10b981",
+            },
+        ],
+    };
+
+    const lineOptions = {
+        responsive: true,
+        plugins: {
+            legend: { display: true, position: "bottom" },
+            title: { display: true, text: "Incoming Requests Over Time" },
+        },
+    };
+
+    const paymentCounts = receipts.reduce((acc, doc) => {
+        const key =
+            doc.payment_method === "cashier"
+                ? doc.paid
+                    ? "Cash"
+                    : "Not yet paid"
+                : "Online";
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
+
+    const barData = {
+        labels: Object.keys(paymentCounts),
+        datasets: [
+            {
+                label: "Payments",
+                data: Object.values(paymentCounts),
+                backgroundColor: "#3b82f6",
+                borderRadius: 8,
+            },
+        ],
+    };
+
+    const barOptions = {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            title: { display: true, text: "Requests by Payment" },
+        },
+    };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm w-full card-item flex flex-col">
-            <h2 className="font-semibold header-text border-b border-[#e3f0eb]">
-                Request List
+        <div className="bg-white rounded-xl shadow-sm w-full card-item flex flex-col p-6">
+            <h2 className="font-semibold text-lg text-[#244034] mb-6">
+                Request Documents Overview
             </h2>
-            <div className="header-body-content p-4 flex flex-col h-full">
-                {/* Search */}
-                <input
-                    type="text"
-                    placeholder="Search here..."
-                    className="border px-3 py-2 rounded-lg w-full mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
-                    value={search}
-                    onChange={(e) => {
-                        setSearch(e.target.value);
-                        setCurrentPage(1);
-                    }}
-                />
-
-                {/* Table */}
-                <div className="flex-1">
-                    <table className="min-w-full border border-gray-200 divide-y divide-gray-100 rounded-lg bg-white shadow-xs">
-                        <thead className="bg-gray-100">
-                            <tr>
-                                <th
-                                    className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
-                                    onClick={() => handleSort("name")}
-                                >
-                                    Full Name
-                                    {sortConfig.key === "name" &&
-                                        (sortConfig.direction === "asc"
-                                            ? "▲"
-                                            : "▼")}
-                                </th>
-                                <th
-                                    className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
-                                    onClick={() => handleSort("status")}
-                                >
-                                    Status
-                                    {sortConfig.key === "status" &&
-                                        (sortConfig.direction === "asc"
-                                            ? "▲"
-                                            : "▼")}
-                                </th>
-                                <th
-                                    className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
-                                    onClick={() => handleSort("payments")}
-                                >
-                                    Payment
-                                    {sortConfig.key === "payments" &&
-                                        (sortConfig.direction === "asc"
-                                            ? "▲"
-                                            : "▼")}
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {paginatedReceipts.length > 0 ? (
-                                paginatedReceipts.map((doc, idx) => (
-                                    <tr
-                                        key={idx}
-                                        className="hover:bg-[#f9fafb] transition duration-300"
-                                    >
-                                        <td className="px-4 py-2">
-                                            {doc.full_name}
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            <span
-                                                className={`px-3 py-1 rounded-full text-xs font-semibold ${getPaymentStyle(
-                                                    doc.payment_method,
-                                                    doc.paid
-                                                )}`}
-                                            >
-                                                {doc.payment_method ===
-                                                "cashier"
-                                                    ? doc.paid
-                                                        ? "Cash"
-                                                        : "Not yet paid"
-                                                    : "Online"}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-2">
-                                            <span
-                                                className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
-                                                    doc.status
-                                                )}`}
-                                            >
-                                                {doc.status
-                                                    .charAt(0)
-                                                    .toUpperCase() +
-                                                    doc.status.slice(1)}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td
-                                        colSpan="3"
-                                        className="px-4 py-6 text-center text-gray-500"
-                                    >
-                                        No documents found.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-
-                    {totalPages > 1 && (
-                        <div className="flex justify-end items-end mt-4 space-x-2">
-                            <button
-                                className="px-3 py-1 border rounded-md text-sm disabled:opacity-50"
-                                disabled={currentPage === 1}
-                                onClick={() => setCurrentPage((p) => p - 1)}
-                            >
-                                Previous
-                            </button>
-
-                            {[...Array(totalPages)].map((_, i) => (
-                                <button
-                                    key={i}
-                                    className={`px-3 py-1 border rounded-md text-sm ${
-                                        currentPage === i + 1
-                                            ? "bg-green-500 text-white"
-                                            : "bg-white"
-                                    }`}
-                                    onClick={() => setCurrentPage(i + 1)}
-                                >
-                                    {i + 1}
-                                </button>
-                            ))}
-
-                            <button
-                                className="px-3 py-1 border rounded-md text-sm disabled:opacity-50"
-                                disabled={currentPage === totalPages}
-                                onClick={() => setCurrentPage((p) => p + 1)}
-                            >
-                                Next
-                            </button>
-                        </div>
-                    )}
+            <hr className="h-1 text-gray-300" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div className="bg-white rounded-xl shadow p-4">
+                    <Line data={lineData} options={lineOptions} />
+                </div>
+                <div className="bg-white rounded-xl shadow p-4">
+                    <Bar data={barData} options={barOptions} />
                 </div>
             </div>
         </div>
     );
 };
 
-export default RequestDocuments;
+export default RequestDocumentsChart;
