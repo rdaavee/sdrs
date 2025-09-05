@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { getAllRequestReceipt, getAllRequestReceiptStats, getRequestReceipt, saveRequestReceipt } from '../services/request.services';
+import { sendEmailRequestReceipt } from '../utils/send_email';
 
 export const saveRequestReceiptController = async (req: Request, res: Response) => {
     const data = req.body;
@@ -28,8 +29,12 @@ export const saveRequestReceiptController = async (req: Request, res: Response) 
         }
 
         const result = await saveRequestReceipt(data)
-        if (result.httpCode === 200) {
-            // TODO: SEND EMAIL 
+        if (result.httpCode === 200 && result.message) {
+            sendEmailRequestReceipt(
+                data.email_address,
+                String(result.message.reference_number),
+                String(result.message.code)
+            );
             return res.status(result.httpCode).json({ message: result.message });
         }
         return res.status(result.httpCode).json({ error: result.error });
