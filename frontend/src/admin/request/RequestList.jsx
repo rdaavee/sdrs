@@ -40,7 +40,7 @@ const RequestList = () => {
 
     //pagination
     const [page, setPage] = useState(1);
-    const rowsPerPage = 13;
+    const rowsPerPage = 12;
 
     //filters
     const [statusFilter, setStatusFilter] = useState("");
@@ -321,19 +321,38 @@ const RequestList = () => {
                                                 )}
                                             </td>
                                             <td className="px-4 py-2">
-                                                <span
-                                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
+                                                <select
+                                                    value={req.status}
+                                                    onChange={() => {}} // placeholder only, no function yet
+                                                    className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
                                                         req.status
                                                     )}`}
                                                 >
-                                                    {highlightMatch(
-                                                        req.status
-                                                            .charAt(0)
-                                                            .toUpperCase() +
-                                                            req.status.slice(1),
-                                                        search
-                                                    )}
-                                                </span>
+                                                    <option
+                                                        value="processing"
+                                                        className={getStatusStyle(
+                                                            "processing"
+                                                        )}
+                                                    >
+                                                        Processing
+                                                    </option>
+                                                    <option
+                                                        value="ready"
+                                                        className={getStatusStyle(
+                                                            "ready"
+                                                        )}
+                                                    >
+                                                        Ready
+                                                    </option>
+                                                    <option
+                                                        value="waiting"
+                                                        className={getStatusStyle(
+                                                            "waiting"
+                                                        )}
+                                                    >
+                                                        Waiting
+                                                    </option>
+                                                </select>
                                             </td>
                                         </tr>
                                     ))
