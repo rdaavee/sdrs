@@ -37,6 +37,7 @@ const RequestList = () => {
         key: "name",
         direction: "asc",
     });
+    const [userRole, setUserRole] = useState("staff");
 
     //pagination
     const [page, setPage] = useState(1);
@@ -84,6 +85,16 @@ const RequestList = () => {
 
             return { key, direction: dir };
         });
+    };
+
+    const handleAction = (id, action) => {
+        console.log(`Request ${id} ${action}ed`);
+        //TODO: API for accept/reject request
+    };
+
+    const handleStatusChange = (id, newStatus) => {
+        console.log(`Request ${id} status updated to: ${newStatus}`);
+        //TODO: API for update status
     };
 
     useEffect(() => {
@@ -204,7 +215,6 @@ const RequestList = () => {
                             <option value="online">Online</option>
                         </select>
                     </div>
-
                     {/* Table */}
                     <div className="flex-1">
                         <table className="min-w-full border border-gray-200 divide-y divide-gray-100 rounded-lg bg-white shadow-xs">
@@ -321,38 +331,103 @@ const RequestList = () => {
                                                 )}
                                             </td>
                                             <td className="px-4 py-2">
-                                                <select
-                                                    value={req.status}
-                                                    onChange={() => {}} // placeholder only, no function yet
-                                                    className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
-                                                        req.status
-                                                    )}`}
-                                                >
-                                                    <option
-                                                        value="processing"
-                                                        className={getStatusStyle(
-                                                            "processing"
-                                                        )}
+                                                {userRole === "staff" ? (
+                                                    req.status === "waiting" ? (
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleAction(
+                                                                        req.id,
+                                                                        "accepted"
+                                                                    )
+                                                                }
+                                                                className="px-3 py-1 rounded bg-green-100 text-green-700 text-xs cursor-pointer"
+                                                            >
+                                                                Accept
+                                                            </button>
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleAction(
+                                                                        req.id,
+                                                                        "rejected"
+                                                                    )
+                                                                }
+                                                                className="px-3 py-1 rounded bg-red-100 text-red-700 text-xs cursor-pointer"
+                                                            >
+                                                                Reject
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <span
+                                                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
+                                                                req.status
+                                                            )}`}
+                                                        >
+                                                            {req.status
+                                                                .charAt(0)
+                                                                .toUpperCase() +
+                                                                req.status.slice(
+                                                                    1
+                                                                )}
+                                                        </span>
+                                                    )
+                                                ) : (
+                                                    <select
+                                                        value={req.status}
+                                                        onChange={(e) =>
+                                                            handleStatusChange(
+                                                                req.id,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
+                                                            req.status
+                                                        )}`}
                                                     >
-                                                        Processing
-                                                    </option>
-                                                    <option
-                                                        value="ready"
-                                                        className={getStatusStyle(
-                                                            "ready"
+                                                        {userRole ===
+                                                            "middle_moderator" && (
+                                                            <>
+                                                                <option value="waiting">
+                                                                    Waiting
+                                                                </option>
+                                                                <option value="processing">
+                                                                    Processing
+                                                                </option>
+                                                            </>
                                                         )}
-                                                    >
-                                                        Ready
-                                                    </option>
-                                                    <option
-                                                        value="waiting"
-                                                        className={getStatusStyle(
-                                                            "waiting"
+                                                        {userRole ===
+                                                            "moderator" && (
+                                                            <>
+                                                                <option value="processing">
+                                                                    Processing
+                                                                </option>
+                                                                <option value="ready">
+                                                                    Ready
+                                                                </option>
+                                                                <option value="released">
+                                                                    Released
+                                                                </option>
+                                                            </>
                                                         )}
-                                                    >
-                                                        Waiting
-                                                    </option>
-                                                </select>
+                                                        {userRole ===
+                                                            "admin" && (
+                                                            <>
+                                                                <option value="waiting">
+                                                                    Waiting
+                                                                </option>
+                                                                <option value="processing">
+                                                                    Processing
+                                                                </option>
+                                                                <option value="ready">
+                                                                    Ready
+                                                                </option>
+                                                                <option value="released">
+                                                                    Released
+                                                                </option>
+                                                            </>
+                                                        )}
+                                                    </select>
+                                                )}
                                             </td>
                                         </tr>
                                     ))
@@ -369,8 +444,6 @@ const RequestList = () => {
                             </tbody>
                         </table>
                     </div>
-
-                    {/* Pagination */}
                     {totalPages > 1 && (
                         <div className="flex justify-end mt-4 gap-2">
                             <button
