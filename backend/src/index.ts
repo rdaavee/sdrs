@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 
 import RequestRoutes from "./routes/request.routes"
 import VerifyRoutes from "./routes/verify.routes"
+import AdminRoutes from "./routes/admin.routes"
 
 const app = express();
 
@@ -42,6 +43,7 @@ app.use(express.json());
 
 app.use("/request", RequestRoutes)
 app.use("/verify", VerifyRoutes)
+app.use("/admin", AdminRoutes)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello from your Node.js Express server!');
