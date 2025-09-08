@@ -25,7 +25,7 @@ export const loginUsertoDatabase = async (user_identifier: string, password: str
         }
         return { 'error': 'Sorry, looks like that\'s the wrong credentials.', "httpCode": 404 };
     } catch (e) {
-        console.log(e)
+        console.log("irys", e)
         return { 'error': 'Internal Server Error.', "httpCode": 500 };
     }
 };

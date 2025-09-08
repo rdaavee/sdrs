@@ -1,13 +1,71 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash, FaEdit, FaTrash } from "react-icons/fa";
+import { createAdminAccount, getAllUsers } from "../../../services/admin";
 
 const roles = ["Super Admin", "Middle Admin", "Staff Admin"];
 const statuses = ["Active", "Inactive"];
 
 const AddAdmin = () => {
+    const [users, setUsers] = useState([]);
+    const [dataForm, setDataForm] = useState({
+        full_name: "",
+        email_address: "",
+        password_hash: "",
+        role: "",
+        status: true,
+    });
     const [showPassword, setShowPassword] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
 
+    const handleInputChange = (key, value) => {
+        setDataForm((prev) => ({ ...prev, [key]: value }));
+    };
+
+    const createAccount = async () => {
+        setLoading(true);
+        if (
+            !dataForm.full_name ||
+            !dataForm.email_address ||
+            !dataForm.password_hash ||
+            !dataForm.role
+        ) {
+            setLoading(false);
+            return;
+        }
+        try {
+            const result = await createAdminAccount(dataForm);
+            if (result.message !== "Success") {
+                return;
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+            setUsers((prev) => [
+                ...prev,
+                { ...dataForm, createdAt: new Date().toISOString() },
+            ]);
+            setDataForm({
+                full_name: "",
+                email_address: "",
+                password_hash: "",
+                role: "",
+                status: true,
+            });
+        }
+    };
+    useEffect(() => {
+        const fetchData = async () => {
+            setUsers(await getAllUsers());
+        };
+        fetchData();
+    }, []);
+    useEffect(() => {
+        console.log(users);
+    }, [users]);
+
+    if (loading) return <div>Loading</div>;
     return (
         <div className="w-full flex flex-col gap-4">
             <h2 className="text-3xl font-[500] text-[#244034] py-2">
@@ -20,15 +78,29 @@ const AddAdmin = () => {
                         type="text"
                         placeholder="Enter Full Name"
                         className="border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                        onChange={(e) =>
+                            handleInputChange("full_name", e.target.value)
+                        }
+                        value={dataForm.full_name}
                     />
 
                     <input
                         type="email"
                         placeholder="Enter Email"
                         className="border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                        onChange={(e) =>
+                            handleInputChange("email_address", e.target.value)
+                        }
+                        value={dataForm.email_address}
                     />
 
-                    <select className="border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400">
+                    <select
+                        className="border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                        value={dataForm.role}
+                        onChange={(e) =>
+                            handleInputChange("role", e.target.value)
+                        }
+                    >
                         <option value="">Select Role</option>
                         {roles.map((role, index) => (
                             <option key={index} value={role}>
@@ -42,6 +114,13 @@ const AddAdmin = () => {
                             type={showPassword ? "text" : "password"}
                             placeholder="Enter Password"
                             className="border px-3 py-2 rounded-lg w-full text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                            onChange={(e) =>
+                                handleInputChange(
+                                    "password_hash",
+                                    e.target.value
+                                )
+                            }
+                            value={dataForm.password_hash}
                         />
                         <button
                             type="button"
@@ -56,7 +135,16 @@ const AddAdmin = () => {
                         </button>
                     </div>
 
-                    <select className="border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400">
+                    <select
+                        className="border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                        value={dataForm.status ? "Active" : "Inactive"}
+                        onChange={(e) =>
+                            handleInputChange(
+                                "status",
+                                e.target.value === "Active"
+                            )
+                        }
+                    >
                         {statuses.map((status, index) => (
                             <option key={index} value={status}>
                                 {status}
@@ -64,7 +152,10 @@ const AddAdmin = () => {
                         ))}
                     </select>
 
-                    <button className="col-span-1 md:col-span-3 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition">
+                    <button
+                        className="col-span-1 md:col-span-3 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition"
+                        onClick={createAccount}
+                    >
                         Add Admin
                     </button>
                 </div>
@@ -102,40 +193,62 @@ const AddAdmin = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr className="bg-white hover:bg-gray-100 transition">
-                                    <td className="px-4 py-2">Ranier Tantan</td>
-                                    <td className="px-4 py-2">
-                                        rata.arcega.up@phinmaed.com
-                                    </td>
-                                    <td className="px-4 py-2">
-                                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                                            Super Admin
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-2">
-                                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                            Active
-                                        </span>
-                                    </td>
-                                    <td className="px-4 py-2">09/01/2025</td>
-                                    <td className="px-4 py-2 space-x-3">
-                                        <button
-                                            className="text-blue-500 hover:text-blue-700"
-                                            onClick={() => setIsEditOpen(true)}
-                                        >
-                                            <FaEdit size={16} />
-                                        </button>
-                                        <button className="text-red-500 hover:text-red-700">
-                                            <FaTrash size={16} />
-                                        </button>
-                                    </td>
-                                </tr>
+                                {users &&
+                                    users.map((user) => (
+                                        <tr className="bg-white hover:bg-gray-100 transition">
+                                            <td className="px-4 py-2">
+                                                {user.full_name}
+                                            </td>
+                                            <td className="px-4 py-2">
+                                                {user.email_address}
+                                            </td>
+                                            <td className="px-4 py-2">
+                                                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                                                    {user.role}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-2">
+                                                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                                    {user.status
+                                                        ? "Active"
+                                                        : "Inactive"}
+                                                </span>
+                                            </td>
+                                            <td className="px-4 py-2">
+                                                {user.createdAt
+                                                    ? new Date(
+                                                          user.createdAt
+                                                      ).toLocaleDateString(
+                                                          "en-US",
+                                                          {
+                                                              year: "numeric",
+                                                              month: "2-digit",
+                                                              day: "2-digit",
+                                                          }
+                                                      )
+                                                    : ""}
+                                            </td>
+                                            <td className="px-4 py-2 space-x-3">
+                                                <button
+                                                    className="text-blue-500 hover:text-blue-700"
+                                                    onClick={() =>
+                                                        setIsEditOpen(true)
+                                                    }
+                                                >
+                                                    <FaEdit size={16} />
+                                                </button>
+                                                <button className="text-red-500 hover:text-red-700">
+                                                    <FaTrash size={16} />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
                             </tbody>
                         </table>
                     </div>
 
                     {/* Pagination */}
-                    <div className="flex justify-end items-center mt-4 space-x-2">
+                    {/* <div className="flex justify-end items-center mt-4 space-x-2">
                         <button className="px-3 py-1 border rounded-md text-sm hover:bg-gray-100">
                             Previous
                         </button>
@@ -145,7 +258,7 @@ const AddAdmin = () => {
                         <button className="px-3 py-1 border rounded-md text-sm hover:bg-gray-100">
                             Next
                         </button>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Edit Modal */}

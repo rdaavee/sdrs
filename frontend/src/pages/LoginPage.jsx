@@ -2,10 +2,44 @@ import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import studentImg from "../assets/svgs/login-img.svg";
 import logoImg from "../assets/images/phinma-cservice-logo.png";
+import { cookies, login } from "../services/admin";
 
 const LoginPage = () => {
+    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [dataForm, setDataForm] = useState({
+        user_identifier: "",
+        password: "",
+    });
 
+    const handleInputChange = (key, value) => {
+        setDataForm((prev) => ({ ...prev, [key]: value }));
+    };
+    const loginButton = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        if (!dataForm.password || !dataForm.user_identifier) {
+            setLoading(false);
+            return;
+        }
+        const result = await login(dataForm);
+        if (result.message !== "Success") {
+            setLoading(false);
+            return;
+        }
+        setLoading(false);
+        console.log(result);
+        cookies.set("authorization", result.access_token);
+        cookies.set("role", result.role);
+        cookies.set("user_id", result.user_id);
+        cookies.set("full_name", result.full_name);
+        cookies.set("email_address", result.email_address);
+
+        // navigate("/");
+        window.location.reload();
+    };
+
+    // if (loading) return <div>Loading</div>;
     return (
         <div className="relative min-h-screen font-[TrebuchetMS,sans-serif]">
             <div className="absolute inset-0 bg-gradient-to-r from-[#3A4F24] to-[#E8E4E9] z-0"></div>
@@ -33,13 +67,20 @@ const LoginPage = () => {
                                 Enter the details below
                             </p>
 
-                            <form autoComplete="off" className="space-y-4">
+                            <div className="space-y-4">
                                 <input
                                     type="email"
                                     name="email"
                                     placeholder="Email"
                                     className="w-full rounded-md px-5 py-3 bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-green-400"
                                     required
+                                    onChange={(e) =>
+                                        handleInputChange(
+                                            "user_identifier",
+                                            e.target.value
+                                        )
+                                    }
+                                    value={dataForm.user_identifier}
                                 />
 
                                 <div className="relative">
@@ -51,6 +92,13 @@ const LoginPage = () => {
                                         placeholder="Password"
                                         className="w-full rounded-md px-5 py-3 bg-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-green-400"
                                         required
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                "password",
+                                                e.target.value
+                                            )
+                                        }
+                                        value={dataForm.password}
                                     />
                                     <button
                                         type="button"
@@ -80,10 +128,11 @@ const LoginPage = () => {
                                 <button
                                     type="submit"
                                     className="w-full bg-[#03b335] hover:bg-[#218838] text-white py-3 rounded-md font-semibold transition"
+                                    onClick={loginButton}
                                 >
                                     Login
                                 </button>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>

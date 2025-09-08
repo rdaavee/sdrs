@@ -28,15 +28,7 @@ export const loginUserController = async (req: Request, res: Response) => {
 
                 res
                     .status(200)
-                    .cookie(
-                        "refresh_token",
-                        result.message?.refresh_token,
-                        {
-                            httpOnly: true,
-                            secure: true,
-                            sameSite: 'none',
-                        }
-                    )
+
                     .json({
                         message: "Success", access_token: result.message?.access_token, user_id: user_data._id, role: user_data.role, full_name: user_data.full_name, email_address: user_data.email_address
                     });
@@ -47,7 +39,7 @@ export const loginUserController = async (req: Request, res: Response) => {
         }
         res.status(checker_for_input.httpCode).json({ error: checker_for_input.error });
     } catch (error) {
-        console.log(error)
+        console.log("irror", error)
         res.status(500).json({ 'error': 'Internal Server Error' });
     }
 };
