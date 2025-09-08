@@ -8,7 +8,9 @@ const getStatusStyle = (status) => {
         case "ready":
             return "bg-green-100 text-green-700";
         case "waiting":
-            return "bg-gray-200 text-gray-600";
+            return "bg-gray-100 text-gray-700";
+        case "released":
+            return "bg-blue-100 text-blue-700";
         default:
             return "bg-gray-100 text-gray-600";
     }
@@ -61,7 +63,7 @@ const RequestList = () => {
 
             const get = (item) =>
                 ({
-                    name: item.full_name?.toLowerCase() || "",
+                    name: item.reference_number?.toLowerCase() || "",
                     email: item.email_address?.toLowerCase() || "",
                     document: item.requested_documents?.join(", ") || "",
                     quantity: item.requested_documents?.length || 0,
@@ -144,7 +146,7 @@ const RequestList = () => {
     const filtered = receipts.filter((req) => {
         const query = search.toLowerCase();
         const matchesSearch =
-            req.full_name?.toLowerCase().includes(query) ||
+            req.reference_number?.toLowerCase().includes(query) ||
             req.email_address?.toLowerCase().includes(query) ||
             req.requested_documents?.join(", ").toLowerCase().includes(query) ||
             req.payment_method?.toLowerCase().includes(query) ||
@@ -221,7 +223,7 @@ const RequestList = () => {
                             <thead className="bg-gray-100">
                                 <tr>
                                     {[
-                                        "name",
+                                        "reference #",
                                         "email",
                                         "document",
                                         "quantity",
@@ -252,7 +254,7 @@ const RequestList = () => {
                                         >
                                             <td className="px-4 py-2">
                                                 {highlightMatch(
-                                                    req.full_name,
+                                                    req.reference_number,
                                                     search
                                                 )}
                                             </td>
