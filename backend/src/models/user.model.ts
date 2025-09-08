@@ -6,6 +6,7 @@ export interface UserSchemaInterface extends Document {
     email_address: string,
     password_hash: string,
     role: string,
+    status: boolean,
     refresh_token_version: number,
     createdAt?: Date,
     updatedAt?: Date,
@@ -27,13 +28,17 @@ const UserSchema: Schema = new Schema({
     },
     role: {
         type: String,
-        enum: ["STAFF", "MIDDLE", "MODERATOR", "ADMIN"],
+        enum: ["Super Admin", "Middle Admin", "Staff Admin"],
         required: [true, 'Please enter your role.'],
     },
     refresh_token_version: {
         type: Number,
         default: 0
-    }
+    },
+    status: {
+        type: Boolean,
+        default: true
+    },
 }, {
     timestamps: true,
 });
