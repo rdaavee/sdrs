@@ -14,12 +14,38 @@ const getStatusStyle = (status) => {
     }
 };
 
+const highlightMatch = (text, query) => {
+    const safeText = String(text ?? "");
+    if (!query) return safeText;
+    const regex = new RegExp(`(${query})`, "gi");
+    return safeText.split(regex).map((part, i) =>
+        regex.test(part) ? (
+            <span key={i} className="bg-black/4 font-semibold">
+                {part}
+            </span>
+        ) : (
+            part
+        )
+    );
+};
+
 const RequestList = () => {
     const [expandedRows, setExpandedRows] = useState({});
-
-    //
-
     const [receipts, setReceipts] = useState([]);
+    const [search, setSearch] = useState("");
+    const [sortConfig, setSortConfig] = useState({
+        key: "name",
+        direction: "asc",
+    });
+    const [userRole, setUserRole] = useState("staff");
+
+    //pagination
+    const [page, setPage] = useState(1);
+    const rowsPerPage = 12;
+
+    //filters
+    const [statusFilter, setStatusFilter] = useState("");
+    const [paymentFilter, setPaymentFilter] = useState("");
 
     const toggleExpand = (index) => {
         setExpandedRows((prev) => ({
@@ -28,48 +54,49 @@ const RequestList = () => {
         }));
     };
 
-    const [search, setSearch] = useState("");
-    const [sortConfig, setSortConfig] = useState({
-        key: "name",
-        direction: "asc",
-    });
-    // const [currentPage, setCurrentPage] = useState(1);
-    // const rowsPerPage = 13;
-
-    // const filteredRequests = useMemo(() => {
-    //     return requests.filter(
-    //         (req) =>
-    //             req.name.toLowerCase().includes(search.toLowerCase()) ||
-    //             req.email.toLowerCase().includes(search.toLowerCase()) ||
-    //             req.document.toLowerCase().includes(search.toLowerCase()) ||
-    //             req.payments.toLowerCase().includes(search.toLowerCase())
-    //     );
-    // }, [requests, search]);
-
-    // const sortedRequests = useMemo(() => {
-    //     if (!sortConfig.key) return filteredRequests;
-    //     return [...filteredRequests].sort((a, b) => {
-    //         const valueA = a[sortConfig.key];
-    //         const valueB = b[sortConfig.key];
-    //         if (valueA < valueB) return sortConfig.direction === "asc" ? -1 : 1;
-    //         if (valueA > valueB) return sortConfig.direction === "asc" ? 1 : -1;
-    //         return 0;
-    //     });
-    // }, [filteredRequests, sortConfig]);
-
-    // const totalPages = Math.ceil(sortedRequests.length / rowsPerPage);
-    // const paginatedRequests = sortedRequests.slice(
-    //     (currentPage - 1) * rowsPerPage,
-    //     currentPage * rowsPerPage
-    // );
-
     const handleSort = (key) => {
-        setSortConfig((prev) => ({
-            key,
-            direction:
-                prev.key === key && prev.direction === "asc" ? "desc" : "asc",
-        }));
+        setSortConfig((prev) => {
+            const dir =
+                prev.key === key && prev.direction === "asc" ? "desc" : "asc";
+
+            const get = (item) =>
+                ({
+                    name: item.full_name?.toLowerCase() || "",
+                    email: item.email_address?.toLowerCase() || "",
+                    document: item.requested_documents?.join(", ") || "",
+                    quantity: item.requested_documents?.length || 0,
+                    payments: item.payment_method?.toLowerCase() || "",
+                    status: item.status?.toLowerCase() || "",
+                }[key]);
+
+            setReceipts(
+                [...receipts].sort((a, b) =>
+                    get(a) > get(b)
+                        ? dir === "asc"
+                            ? 1
+                            : -1
+                        : get(a) < get(b)
+                        ? dir === "asc"
+                            ? -1
+                            : 1
+                        : 0
+                )
+            );
+
+            return { key, direction: dir };
+        });
     };
+
+    const handleAction = (id, action) => {
+        console.log(`Request ${id} ${action}ed`);
+        //TODO: API for accept/reject request
+    };
+
+    const handleStatusChange = (id, newStatus) => {
+        console.log(`Request ${id} status updated to: ${newStatus}`);
+        //TODO: API for update status
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             const data = await getAllRequestReceipt();
@@ -112,6 +139,32 @@ const RequestList = () => {
         };
         fetchData();
     }, []);
+
+    //filter n search
+    const filtered = receipts.filter((req) => {
+        const query = search.toLowerCase();
+        const matchesSearch =
+            req.full_name?.toLowerCase().includes(query) ||
+            req.email_address?.toLowerCase().includes(query) ||
+            req.requested_documents?.join(", ").toLowerCase().includes(query) ||
+            req.payment_method?.toLowerCase().includes(query) ||
+            req.status?.toLowerCase().includes(query);
+
+        const matchesStatus =
+            !statusFilter || req.status.toLowerCase() === statusFilter;
+        const matchesPayment =
+            !paymentFilter ||
+            req.payment_method.toLowerCase() === paymentFilter;
+
+        return matchesSearch && matchesStatus && matchesPayment;
+    });
+
+    const totalPages = Math.ceil(filtered.length / rowsPerPage);
+    const paginated = filtered.slice(
+        (page - 1) * rowsPerPage,
+        page * rowsPerPage
+    );
+
     return (
         <div className="w-full flex flex-col gap-4">
             <h2 className="text-3xl font-[500] text-[#244034] py-2">
@@ -120,97 +173,94 @@ const RequestList = () => {
 
             <div className="bg-white rounded-xl shadow-sm w-full flex flex-col">
                 <div className="p-4 flex flex-col h-full">
-                    {/* Search */}
-                    <input
-                        type="text"
-                        placeholder="Search by name, email, document or payment..."
-                        className="border px-3 py-2 rounded-lg w-full mb-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
-                        value={search}
-                        onChange={(e) => {
-                            setSearch(e.target.value);
-                            // setCurrentPage(1);
-                        }}
-                    />
+                    {/* Search + Filters */}
+                    <div className="flex flex-wrap gap-3 mb-4">
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="border px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-400 flex-1"
+                            value={search}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                setPage(1);
+                            }}
+                        />
 
+                        {/* Status filter */}
+                        <select
+                            className="border px-3 py-2 rounded-lg text-sm"
+                            value={statusFilter}
+                            onChange={(e) => {
+                                setStatusFilter(e.target.value);
+                                setPage(1);
+                            }}
+                        >
+                            <option value="">All Status</option>
+                            <option value="processing">Processing</option>
+                            <option value="ready">Ready</option>
+                            <option value="waiting">Waiting</option>
+                        </select>
+
+                        {/* Payment filter */}
+                        <select
+                            className="border px-3 py-2 rounded-lg text-sm"
+                            value={paymentFilter}
+                            onChange={(e) => {
+                                setPaymentFilter(e.target.value);
+                                setPage(1);
+                            }}
+                        >
+                            <option value="">All Payments</option>
+                            <option value="cashier">Cash</option>
+                            <option value="online">Online</option>
+                        </select>
+                    </div>
                     {/* Table */}
                     <div className="flex-1">
                         <table className="min-w-full border border-gray-200 divide-y divide-gray-100 rounded-lg bg-white shadow-xs">
                             <thead className="bg-gray-100">
                                 <tr>
-                                    <th
-                                        className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
-                                        onClick={() => handleSort("name")}
-                                    >
-                                        Name{" "}
-                                        {sortConfig.key === "name" &&
-                                            (sortConfig.direction === "asc"
-                                                ? "▲"
-                                                : "▼")}
-                                    </th>
-                                    <th
-                                        className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
-                                        onClick={() => handleSort("email")}
-                                    >
-                                        Email{" "}
-                                        {sortConfig.key === "email" &&
-                                            (sortConfig.direction === "asc"
-                                                ? "▲"
-                                                : "▼")}
-                                    </th>
-                                    <th
-                                        className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
-                                        onClick={() => handleSort("document")}
-                                    >
-                                        Document{" "}
-                                        {sortConfig.key === "document" &&
-                                            (sortConfig.direction === "asc"
-                                                ? "▲"
-                                                : "▼")}
-                                    </th>
-                                    <th
-                                        className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
-                                        onClick={() => handleSort("quantity")}
-                                    >
-                                        Quantity{" "}
-                                        {sortConfig.key === "quantity" &&
-                                            (sortConfig.direction === "asc"
-                                                ? "▲"
-                                                : "▼")}
-                                    </th>
-                                    <th
-                                        className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
-                                        onClick={() => handleSort("payments")}
-                                    >
-                                        Payment{" "}
-                                        {sortConfig.key === "payments" &&
-                                            (sortConfig.direction === "asc"
-                                                ? "▲"
-                                                : "▼")}
-                                    </th>
-                                    <th
-                                        className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
-                                        onClick={() => handleSort("status")}
-                                    >
-                                        Status{" "}
-                                        {sortConfig.key === "status" &&
-                                            (sortConfig.direction === "asc"
-                                                ? "▲"
-                                                : "▼")}
-                                    </th>
+                                    {[
+                                        "name",
+                                        "email",
+                                        "document",
+                                        "quantity",
+                                        "payments",
+                                        "status",
+                                    ].map((col) => (
+                                        <th
+                                            key={col}
+                                            className="px-4 py-2 text-left text-sm font-medium text-gray-600 cursor-pointer"
+                                            onClick={() => handleSort(col)}
+                                        >
+                                            {col.charAt(0).toUpperCase() +
+                                                col.slice(1)}{" "}
+                                            {sortConfig.key === col &&
+                                                (sortConfig.direction === "asc"
+                                                    ? "▲"
+                                                    : "▼")}
+                                        </th>
+                                    ))}
                                 </tr>
                             </thead>
                             <tbody>
-                                {receipts.length > 0 ? (
-                                    receipts.map((req, idx) => (
+                                {paginated.length > 0 ? (
+                                    paginated.map((req, idx) => (
                                         <tr
                                             key={idx}
                                             className="hover:bg-[#f9fafb] transition duration-300"
                                         >
                                             <td className="px-4 py-2">
-                                                {req.full_name}
+                                                {highlightMatch(
+                                                    req.full_name,
+                                                    search
+                                                )}
                                             </td>
                                             <td className="px-4 py-2">
-                                                {req.email_address}
+                                                {highlightMatch(
+                                                    req.email_address,
+                                                    search
+                                                )}
                                             </td>
                                             <td className="px-4 py-2">
                                                 {Array.isArray(
@@ -228,7 +278,10 @@ const RequestList = () => {
                                                                 key={i}
                                                                 className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
                                                             >
-                                                                {doc}
+                                                                {highlightMatch(
+                                                                    doc,
+                                                                    search
+                                                                )}
                                                             </span>
                                                         ))}
                                                         {req.requested_documents
@@ -255,7 +308,11 @@ const RequestList = () => {
                                                         )}
                                                     </div>
                                                 ) : (
-                                                    req.requested_documents
+                                                    highlightMatch(
+                                                        req.requested_documents ||
+                                                            "",
+                                                        search
+                                                    )
                                                 )}
                                             </td>
 
@@ -263,22 +320,114 @@ const RequestList = () => {
                                                 {req.requested_documents.length}
                                             </td>
                                             <td className="px-4 py-2">
-                                                {req.payment_method
-                                                    .charAt(0)
-                                                    .toUpperCase() +
-                                                    req.payment_method.slice(1)}
-                                            </td>
-                                            <td className="px-4 py-2">
-                                                <span
-                                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
-                                                        req.status
-                                                    )}`}
-                                                >
-                                                    {req.status
+                                                {highlightMatch(
+                                                    req.payment_method
                                                         .charAt(0)
                                                         .toUpperCase() +
-                                                        req.status.slice(1)}
-                                                </span>
+                                                        req.payment_method.slice(
+                                                            1
+                                                        ),
+                                                    search
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-2">
+                                                {userRole === "staff" ? (
+                                                    req.status === "waiting" ? (
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleAction(
+                                                                        req.id,
+                                                                        "accepted"
+                                                                    )
+                                                                }
+                                                                className="px-3 py-1 rounded bg-green-100 text-green-700 text-xs cursor-pointer"
+                                                            >
+                                                                Accept
+                                                            </button>
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleAction(
+                                                                        req.id,
+                                                                        "rejected"
+                                                                    )
+                                                                }
+                                                                className="px-3 py-1 rounded bg-red-100 text-red-700 text-xs cursor-pointer"
+                                                            >
+                                                                Reject
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <span
+                                                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
+                                                                req.status
+                                                            )}`}
+                                                        >
+                                                            {req.status
+                                                                .charAt(0)
+                                                                .toUpperCase() +
+                                                                req.status.slice(
+                                                                    1
+                                                                )}
+                                                        </span>
+                                                    )
+                                                ) : (
+                                                    <select
+                                                        value={req.status}
+                                                        onChange={(e) =>
+                                                            handleStatusChange(
+                                                                req.id,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
+                                                            req.status
+                                                        )}`}
+                                                    >
+                                                        {userRole ===
+                                                            "middle_moderator" && (
+                                                            <>
+                                                                <option value="waiting">
+                                                                    Waiting
+                                                                </option>
+                                                                <option value="processing">
+                                                                    Processing
+                                                                </option>
+                                                            </>
+                                                        )}
+                                                        {userRole ===
+                                                            "moderator" && (
+                                                            <>
+                                                                <option value="processing">
+                                                                    Processing
+                                                                </option>
+                                                                <option value="ready">
+                                                                    Ready
+                                                                </option>
+                                                                <option value="released">
+                                                                    Released
+                                                                </option>
+                                                            </>
+                                                        )}
+                                                        {userRole ===
+                                                            "admin" && (
+                                                            <>
+                                                                <option value="waiting">
+                                                                    Waiting
+                                                                </option>
+                                                                <option value="processing">
+                                                                    Processing
+                                                                </option>
+                                                                <option value="ready">
+                                                                    Ready
+                                                                </option>
+                                                                <option value="released">
+                                                                    Released
+                                                                </option>
+                                                            </>
+                                                        )}
+                                                    </select>
+                                                )}
                                             </td>
                                         </tr>
                                     ))
@@ -295,38 +444,37 @@ const RequestList = () => {
                             </tbody>
                         </table>
                     </div>
-
-                    {/* Pagination */}
-                    {/* <div className="flex justify-between items-center mt-6 text-sm">
-                        <span>
-                            Page {currentPage} of {totalPages || 1}
-                        </span>
-                        <div className="space-x-2">
+                    {totalPages > 1 && (
+                        <div className="flex justify-end mt-4 gap-2">
                             <button
-                                onClick={() =>
-                                    setCurrentPage((p) => Math.max(p - 1, 1))
-                                }
-                                disabled={currentPage === 1}
-                                className="px-3 py-1 border rounded-lg disabled:opacity-50"
+                                disabled={page === 1}
+                                onClick={() => setPage((p) => p - 1)}
+                                className="px-3 py-1 rounded bg-gray-100 disabled:opacity-50"
                             >
                                 Prev
                             </button>
+                            {Array.from({ length: totalPages }, (_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => setPage(i + 1)}
+                                    className={`px-3 py-1 rounded ${
+                                        page === i + 1
+                                            ? "bg-green-500 text-white"
+                                            : "bg-gray-100"
+                                    }`}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
                             <button
-                                onClick={() =>
-                                    setCurrentPage((p) =>
-                                        Math.min(p + 1, totalPages)
-                                    )
-                                }
-                                disabled={
-                                    currentPage === totalPages ||
-                                    totalPages === 0
-                                }
-                                className="px-3 py-1 border rounded-lg disabled:opacity-50"
+                                disabled={page === totalPages}
+                                onClick={() => setPage((p) => p + 1)}
+                                className="px-3 py-1 rounded bg-gray-100 disabled:opacity-50"
                             >
                                 Next
                             </button>
                         </div>
-                    </div> */}
+                    )}
                 </div>
             </div>
         </div>
