@@ -1,3 +1,5 @@
+import { ToastContainer, toast } from "react-toastify";
+import { motion } from 'framer-motion';
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import studentImg from "../assets/svgs/login-img.svg";
@@ -20,14 +22,43 @@ const LoginPage = () => {
         setLoading(true);
         if (!dataForm.password || !dataForm.user_identifier) {
             setLoading(false);
+            toast.error("Please fill in all fields.", {
+                position: "top-right",
+                autoClose: 1700,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            }); 
             return;
         }
+
         const result = await login(dataForm);
+
         if (result.message !== "Success") {
             setLoading(false);
+            toast.error("Invalid credentials, please try again.", {
+                position: "top-right",
+                autoClose: 1700,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
             return;
         }
         setLoading(false);
+
+        toast.success("Login successful!", {
+            position: "top-right",
+            autoClose: 1200,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+
         console.log(result);
         cookies.set("authorization", result.access_token);
         cookies.set("role", result.role);
@@ -36,35 +67,43 @@ const LoginPage = () => {
         cookies.set("email_address", result.email_address);
 
         // navigate("/");
-        window.location.reload();
+        setTimeout(() => {
+            window.location.reload();
+        }, 1200);
     };
 
     // if (loading) return <div>Loading</div>;
     return (
-        <div className="relative min-h-screen font-[TrebuchetMS,sans-serif]">
+        <div className="relative min-h-screen">
             <div className="absolute inset-0 bg-gradient-to-r from-[#3A4F24] to-[#E8E4E9] z-0"></div>
-            <div
+            <motion.div
                 className="hidden md:block absolute top-0 right-0 w-[60%] h-full bg-cover bg-center z-10"
-                style={{ backgroundImage: `url(${studentImg})` }}
-            ></div>
+                initial={{ opacity: .3, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: .7 }}
+                style={{ backgroundImage: `url(${studentImg})` }}>
+            </motion.div>
 
             <div className="relative z-20 container mx-auto px-6">
                 <div className="flex items-center min-h-screen">
-                    <div className="w-full md:w-1/2 lg:w-2/5">
-                        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl p-8">
+                    <motion.div className="w-full md:w-1/2 lg:w-2/5"
+                        initial={{ opacity: .3, x: -50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: .7 }}>
+                        <div className="bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl p-8">
                             <div className="flex flex-col items-center mb-2">
                                 <img
                                     src={logoImg}
                                     alt="UPang Logo"
-                                    className="h-[110px] mb-4"
+                                    className="h-[150px] mb-3"
                                 />
-                                <h2 className="text-white font-semibold text-3xl">
-                                    Admin Login
+                                <h2 className="text-white font-semibold text-3xl tracking-tight">
+                                    Student Document Request System
                                 </h2>
                             </div>
 
-                            <p className="text-white font-light mb-7 text-center">
-                                Enter the details below
+                            <p className="text-white font-light mb-7 text-center tracking-tight">
+                                Login to connect to the dashboard
                             </p>
 
                             <div className="space-y-4">
@@ -127,16 +166,18 @@ const LoginPage = () => {
 
                                 <button
                                     type="submit"
-                                    className="w-full bg-[#03b335] hover:bg-[#218838] text-white py-3 rounded-md font-semibold transition"
+                                    className="w-full bg-[#03b335] hover:bg-[#218838] text-white py-3 rounded-md font-semibold transition cursor-pointer"
                                     onClick={loginButton}
+                                    disabled={loading}
                                 >
-                                    Login
+                                    {loading ? "Loading..." : "Login"}
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
             </div>
+            <ToastContainer />
         </div>
     );
 };
