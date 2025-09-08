@@ -17,7 +17,7 @@ export interface CustomResponse {
 }
 const USER_IDENTIFIER_CONST = { "email_address": "EMAIL_ADDRESS", "phone_number": "PHONE_NUMBER" };
 
-export const checkEveryInputForSignup = async (phone_number: string, email_address: string, password: string, confirmationPassword: string): Promise<CustomResponse> => {
+export const checkEveryInputForSignup = async (email_address: string, password: string): Promise<CustomResponse> => {
     if (!checkEmailValidity(email_address)) {
         return { error: 'Please enter a valid email address', "httpCode": 400 };
     }
@@ -26,9 +26,6 @@ export const checkEveryInputForSignup = async (phone_number: string, email_addre
     }
     if (!(await checkEmailAvailability(email_address))) {
         return { error: 'This email address is being used.', "httpCode": 409 };
-    }
-    if (password !== confirmationPassword) {
-        return { error: "Those password didn't match. Try again.", "httpCode": 400 };
     }
     return { message: 'Success', "httpCode": 200 };
 };
