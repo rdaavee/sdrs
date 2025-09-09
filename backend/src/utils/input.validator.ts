@@ -29,6 +29,12 @@ export const checkEveryInputForSignup = async (email_address: string, password: 
     }
     return { message: 'Success', "httpCode": 200 };
 };
+export const checkEveryEditInputForSignup = async (email_address: string): Promise<CustomResponse> => {
+    if (!checkEmailValidity(email_address)) {
+        return { error: 'Please enter a valid email address', "httpCode": 400 };
+    }
+    return { message: 'Success', "httpCode": 200 };
+};
 
 export const checkEveryInputForLogin = async (user_identifier: string, password: string, user_identifier_type: string) => {
 

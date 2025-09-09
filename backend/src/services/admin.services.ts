@@ -29,6 +29,25 @@ export const loginUsertoDatabase = async (user_identifier: string, password: str
         return { 'error': 'Internal Server Error.', "httpCode": 500 };
     }
 };
+export const editUsertoDatabase = async (
+    user_id: string, full_name: string, email_address: string, role: string, status: boolean
+) => {
+    try {
+        const userCredentialResult = await User.findByIdAndUpdate(user_id, {
+            full_name, email_address, role, status
+        }, { new: true });
+
+
+        if (!userCredentialResult) {
+            return { error: "User not found", httpCode: 404 };
+        }
+
+        return { message: "Success", httpCode: 200 };
+    } catch (error) {
+        console.log(error)
+        return { error: "Internal Server Error", httpCode: 500 };
+    }
+};
 export const signupUsertoDatabase = async (
     full_name: string, email_address: string, password: string, role: string, status: boolean
 ) => {

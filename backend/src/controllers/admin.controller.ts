@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { checkEveryInputForLogin, checkEveryInputForSignup, checkInputType } from '../utils/input.validator';
-import { generateAccessAndRefereshTokens, getAllUsers, getDataByUserIdentifier, loginUsertoDatabase, signupUsertoDatabase } from '../services/admin.services';
+import { checkEveryEditInputForSignup, checkEveryInputForLogin, checkEveryInputForSignup, checkInputType } from '../utils/input.validator';
+import { editUsertoDatabase, generateAccessAndRefereshTokens, getAllUsers, getDataByUserIdentifier, loginUsertoDatabase, signupUsertoDatabase } from '../services/admin.services';
+import { io } from '../socket/socket';
 
 
 export const loginUserController = async (req: Request, res: Response) => {
@@ -90,6 +91,52 @@ export const signupUserController = async (req: Request, res: Response) => {
                     }
                 )
                 .json({ message: "Success", access_token: data.access_token, user_id: data.user_id, role: data.role, full_name: data.full_name, email_address: data.email_address });
+
+            return;
+        }
+
+        res.status(checkerForInput.httpCode).json({ error: checkerForInput.error });
+    } catch (error) {
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+export const editUserController = async (req: Request, res: Response) => {
+    try {
+        const { user_id, full_name, role, status, createdAt } = req.body;
+
+        let email_address: string = req.body.email_address;
+        if (!email_address) {
+            res.status(404).json({ error: "Email address  not found" });
+            return
+        }
+        email_address = email_address.toLowerCase()
+        const requiredFields = {
+            full_name,
+            role
+        };
+
+        const updatedKey: { [key: string]: string } = {
+            full_name: "Full Name",
+            role: "Role",
+        }
+        for (const [key, value] of Object.entries(requiredFields)) {
+            if (!value) {
+                res.status(400).json({ error: `${updatedKey[key]} is required and cannot be null or undefined.` });
+                return;
+            }
+        }
+
+        const checkerForInput = await checkEveryEditInputForSignup(email_address);
+        if (checkerForInput.message === 'Success') {
+            console.log(user_id, full_name, email_address, role, status)
+            const data = await editUsertoDatabase(user_id, full_name, email_address, role, status);
+            if (data.httpCode !== 200) {
+                res.status(500).json({ error: data.error });
+                return;
+            }
+
+            io.emit("updatedUser", { _id: user_id, full_name, email_address, role, status, createdAt });
+            res.json({ message: "Success" });
 
             return;
         }
