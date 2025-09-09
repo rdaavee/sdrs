@@ -10,22 +10,15 @@ import notification from "../assets/svgs/notification-icon.svg";
 import notification1 from "../assets/svgs/notification-icon1.svg";
 import notification2 from "../assets/svgs/notification-icon2.svg";
 import notification3 from "../assets/svgs/notification-icon3.svg";
-import email1 from "../assets/svgs/email-icon-01.svg";
-import email2 from "../assets/svgs/email-icon-02.svg";
 import note1 from "../assets/svgs/note-icon-01.svg";
 import note2 from "../assets/svgs/note-icon-02.svg";
-import pen1 from "../assets/svgs/pen-icon-01.svg";
-import pen2 from "../assets/svgs/pen-icon-02.svg";
-import save1 from "../assets/svgs/save-icon-01.svg";
-import save2 from "../assets/svgs/save-icon-02.svg";
 import setting1 from "../assets/svgs/setting-icon-01.svg";
-import setting2 from "../assets/svgs/setting-icon-02.svg";
 import menuOpen from "../assets/svgs/menu-open.png";
 import menuClose from "../assets/svgs/menu-close.png";
 import deleteIcon from "../assets/svgs/delete-icon-01.svg";
 import logout from "../assets/svgs/logout-icon-01.svg";
-import logoutDelete from "../assets/svgs/logout-delete.svg";
 import ShimmerLoader from "../components/ShimmerLoader";
+import { cookies, logoutMethod } from "../services/admin";
 
 const Dashboard = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -254,7 +247,10 @@ const Dashboard = () => {
                                     <button
                                         onClick={() => {
                                             setShowLogoutModal(false);
-                                            console.log("user logged out");
+                                            logoutMethod();
+                                            setTimeout(() => {
+                                                window.location.reload();
+                                            }, 1200);
                                         }}
                                         className="bg-[#03b335] hover:bg-[#218838] transition-colors duration-300 text-white px-8 py-2 rounded-lg text-lg font-[500]"
                                     >
@@ -390,7 +386,7 @@ const Dashboard = () => {
                                         className="w-[40px] h-[40px] rounded-full"
                                     />
                                     <span className="text-sm font-[500]">
-                                        Super Admin
+                                        {cookies.get("role")}
                                     </span>
                                 </button>
 
