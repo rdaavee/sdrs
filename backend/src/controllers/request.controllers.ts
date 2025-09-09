@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { getAllRequestReceipt, getAllRequestReceiptStats, getRequestReceipt, saveRequestReceipt } from '../services/request.services';
 import { sendEmailRequestReceipt } from '../utils/send_email';
+import { RequestReceipt } from '../models/request.model';
 
 export const saveRequestReceiptController = async (req: Request, res: Response) => {
     const data = req.body;
@@ -91,3 +92,71 @@ export const getAllRequestReceiptStatsController = async (req: Request, res: Res
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+
+export const actionRequestController = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const { action } = req.body;
+
+        if (!["accepted", "rejected"].includes(action)) {
+            return res.status(400).json({ error: "Invalid action" });
+        }
+
+        const updatedRequest = await RequestReceipt.findByIdAndUpdate(
+            id,
+            { status: action },
+            { new: true }
+        );
+
+        if (!updatedRequest) {
+            return res.status(404).json({ error: "Request not found" });
+        }
+
+        req.app.get("io").emit("requestUpdated", updatedRequest);
+
+        return res.json({ message: "Request updated", request: updatedRequest });
+    } catch (err) {
+        console.error("error in actionRequestController:", err);
+        res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+export const updateRequestStatusController = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        let { status } = req.body;
+        const userRole = (req as any).user?.role || "Staff Admin";
+
+        console.log("incoming update request:", { id, status, userRole });
+
+        if (!status) {
+            return res.status(400).json({ error: "Status is required" });
+        }
+
+        //TODO: sana pag na-accept magiging waiting yung status
+        if (userRole === "staff" && status === "accepted") {
+            console.log("staff accepted, overriding status to waiting");
+            status = "waiting";
+        }
+
+        const request = await RequestReceipt.findByIdAndUpdate(
+            id,
+            { status },
+            { new: true }
+        );
+
+        if (!request) {
+            console.log("request not found:", id);
+            return res.status(404).json({ error: "Request not found" });
+        }
+
+        req.app.get("io").emit("requestUpdated", request);
+
+        console.log("request updated successfully:", request);
+
+        return res.status(200).json({ request });
+    } catch (err: any) {
+        console.error("error in updateRequestStatusController:", err.message, err.stack);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};

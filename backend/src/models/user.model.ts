@@ -28,7 +28,7 @@ const UserSchema: Schema = new Schema({
     },
     role: {
         type: String,
-        enum: ["Super Admin", "Middle Admin", "Staff Admin"],
+        enum: ["Super Admin", "Moderator", "Middle Admin", "Staff Admin"],
         required: [true, 'Please enter your role.'],
     },
     refresh_token_version: {

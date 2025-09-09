@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { getAllRequestReceipt } from "../../services/request";
+import socket from '../../../socket'
+
+import { actionRequest, getAllRequestReceipt, updateRequestStatus } from "../../services/request";
 
 const getStatusStyle = (status) => {
     switch (status) {
@@ -39,7 +41,7 @@ const RequestList = () => {
         key: "name",
         direction: "asc",
     });
-    const [userRole, setUserRole] = useState("staff");
+    const [userRole, setUserRole] = useState(null);
 
     //pagination
     const [page, setPage] = useState(1);
@@ -89,15 +91,44 @@ const RequestList = () => {
         });
     };
 
-    const handleAction = (id, action) => {
-        console.log(`Request ${id} ${action}ed`);
-        //TODO: API for accept/reject request
+    const handleAction = async (id, action) => {
+        try {
+            const updatedRequest = await actionRequest(id, action);
+            console.log("Updated request:", updatedRequest);
+        } catch (error) {
+            console.error("Action failed:", error.message);
+        }
     };
 
-    const handleStatusChange = (id, newStatus) => {
-        console.log(`Request ${id} status updated to: ${newStatus}`);
-        //TODO: API for update status
+
+    const handleStatusChange = async (id, newStatus) => {
+        try {
+            const data = await updateRequestStatus(id, newStatus);
+
+            socket.emit("requestUpdated", data.request);
+
+            setReceipts((prev) =>
+                prev.map((req) =>
+                    req._id === id ? data.request : req
+                )
+            );
+        } catch (err) {
+            console.error("Error updating status:", err.message);
+        }
     };
+
+    const rolePermissions = {
+        "Staff Admin": ["accepted", "rejected"],
+        "Moderator": ["waiting", "processing"],
+        "Middle Admin": ["waiting", "processing", "ready"],
+        "Super Admin": ["waiting", "processing", "ready", "released"],
+    };
+
+    useEffect(() => {
+        const user = JSON.parse(localStorage.getItem("user")); 
+        //dito nagb-base yung role and UI, papalitan manually haha, dapat hindi na manually.
+        setUserRole(user?.role || "Moderator");
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -140,6 +171,18 @@ const RequestList = () => {
             setReceipts(normalized);
         };
         fetchData();
+
+        socket.on("requestUpdated", (updatedRequest) => {
+        setReceipts((prev) =>
+            prev.map((req) =>
+                req._id === updatedRequest._id ? updatedRequest : req
+            )
+        );
+    });
+
+    return () => {
+        socket.off("requestUpdated");
+    };
     }, []);
 
     //filter n search
@@ -333,103 +376,46 @@ const RequestList = () => {
                                                 )}
                                             </td>
                                             <td className="px-4 py-2">
-                                                {userRole === "staff" ? (
-                                                    req.status === "waiting" ? (
-                                                        <div className="flex gap-2">
-                                                            <button
-                                                                onClick={() =>
-                                                                    handleAction(
-                                                                        req.id,
-                                                                        "accepted"
-                                                                    )
-                                                                }
-                                                                className="px-3 py-1 rounded bg-green-100 text-green-700 text-xs cursor-pointer"
-                                                            >
-                                                                Accept
-                                                            </button>
-                                                            <button
-                                                                onClick={() =>
-                                                                    handleAction(
-                                                                        req.id,
-                                                                        "rejected"
-                                                                    )
-                                                                }
-                                                                className="px-3 py-1 rounded bg-red-100 text-red-700 text-xs cursor-pointer"
-                                                            >
-                                                                Reject
-                                                            </button>
-                                                        </div>
-                                                    ) : (
-                                                        <span
-                                                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
-                                                                req.status
-                                                            )}`}
+                                                {userRole === "Staff Admin" ? (
+                                                req.status === "waiting" ? (
+                                                    <div className="flex gap-2">
+                                                        <button
+                                                            onClick={() => handleAction(req._id, "accepted")}
+                                                            className="px-3 py-1 rounded bg-green-100 text-green-700 text-xs cursor-pointer"
                                                         >
-                                                            {req.status
-                                                                .charAt(0)
-                                                                .toUpperCase() +
-                                                                req.status.slice(
-                                                                    1
-                                                                )}
-                                                        </span>
-                                                    )
+                                                            Accept
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleAction(req._id, "rejected")}
+                                                            className="px-3 py-1 rounded bg-red-100 text-red-700 text-xs cursor-pointer"
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                    </div>
                                                 ) : (
-                                                    <select
-                                                        value={req.status}
-                                                        onChange={(e) =>
-                                                            handleStatusChange(
-                                                                req.id,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
+                                                    <span
+                                                        className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
                                                             req.status
                                                         )}`}
                                                     >
-                                                        {userRole ===
-                                                            "middle_moderator" && (
-                                                            <>
-                                                                <option value="waiting">
-                                                                    Waiting
-                                                                </option>
-                                                                <option value="processing">
-                                                                    Processing
-                                                                </option>
-                                                            </>
-                                                        )}
-                                                        {userRole ===
-                                                            "moderator" && (
-                                                            <>
-                                                                <option value="processing">
-                                                                    Processing
-                                                                </option>
-                                                                <option value="ready">
-                                                                    Ready
-                                                                </option>
-                                                                <option value="released">
-                                                                    Released
-                                                                </option>
-                                                            </>
-                                                        )}
-                                                        {userRole ===
-                                                            "admin" && (
-                                                            <>
-                                                                <option value="waiting">
-                                                                    Waiting
-                                                                </option>
-                                                                <option value="processing">
-                                                                    Processing
-                                                                </option>
-                                                                <option value="ready">
-                                                                    Ready
-                                                                </option>
-                                                                <option value="released">
-                                                                    Released
-                                                                </option>
-                                                            </>
-                                                        )}
-                                                    </select>
-                                                )}
+                                                        {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+                                                    </span>
+                                                )
+                                            ) : (
+                                                <select
+                                                    value={req.status}
+                                                    onChange={(e) => handleStatusChange(req._id, e.target.value)}
+                                                    className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
+                                                        req.status
+                                                    )}`}
+                                                >
+                                                    {rolePermissions[userRole]?.map((status) => (
+                                                        <option key={status} value={status}>
+                                                            {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            )}
                                             </td>
                                         </tr>
                                     ))

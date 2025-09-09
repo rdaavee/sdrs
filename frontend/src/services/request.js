@@ -77,3 +77,34 @@ export const getAllRequestReceiptStats = async () => {
         return errMsg;
     }
 };
+
+export const updateRequestStatus = async (id, newStatus) => {
+    try {
+        console.log("sending update:", { id, newStatus });
+        const response = await axios.put(
+            `${ROUTE}/update/${id}`,
+            { status: newStatus },
+            {
+                withCredentials: true,
+                headers: { "Content-Type": "application/json" },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        const axiosError = error;
+        console.error("updateRequestStatus error:", axiosError.response?.data || axiosError.message);
+        throw new Error(
+            axiosError.response?.data?.error || "Failed to update status"
+        );
+    }
+};
+
+
+export const actionRequest = async (id, action) => {
+    if (!["accepted", "rejected"].includes(action)) {
+        throw new Error("Invalid action type");
+    }
+
+    return await updateRequestStatus(id, action);
+};
