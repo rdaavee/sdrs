@@ -10,8 +10,7 @@ import cookieParser from 'cookie-parser';
 import RequestRoutes from "./routes/request.routes"
 import VerifyRoutes from "./routes/verify.routes"
 import AdminRoutes from "./routes/admin.routes"
-
-const app = express();
+import { app , server } from './socket/socket' 
 
 const port = Number(process.env.API_PORT);
 
@@ -29,7 +28,7 @@ mongoose
 app.set('trust proxy', 1);
 app.use(
     cors({
-        origin: 'http://localhost:5173',
+        origin: process.env.CLIENT_URL,
         credentials: true,
     })
 );
@@ -49,6 +48,6 @@ app.get('/', (req: Request, res: Response) => {
     res.send('Hello from your Node.js Express server!');
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
