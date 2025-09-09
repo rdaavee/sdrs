@@ -34,6 +34,24 @@ export const createAdminAccount = async (dataForm) => {
     }
 };
 
+export const editAdminAccount = async (dataForm) => {
+    try {
+        const response = await axios.post(`${ROUTE}/edit-user`, dataForm, {
+            withCredentials: true,
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        const data = response.data;
+        return data.message;
+    } catch (error) {
+        const axiosError = error;
+        const errMsg = axiosError.response?.data?.error || "Unknown error";
+        return errMsg;
+    }
+};
+
 export const getAllUsers = async () => {
     try {
         const response = await axios.get(`${ROUTE}/users`, {
@@ -43,6 +61,7 @@ export const getAllUsers = async () => {
             },
         });
         const data = response.data;
+        console.log(data.message);
         return data.message;
     } catch (error) {
         const axiosError = error;
@@ -68,8 +87,11 @@ export const authenticateToken = async () => {
         });
     return response.message === "valid";
 };
-export const logout = () => {
+export const logoutMethod = () => {
+    console.log("rrnign");
     cookies.remove("authorization");
-    cookies.remove("userFullName");
-    cookies.remove("userId");
+    cookies.remove("role");
+    cookies.remove("user_id");
+    cookies.remove("full_name");
+    cookies.remove("email_address");
 };

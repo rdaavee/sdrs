@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { FaEye, FaEyeSlash, FaEdit, FaTrash } from "react-icons/fa";
-import { createAdminAccount, getAllUsers } from "../../../services/admin";
+import {
+    createAdminAccount,
+    editAdminAccount,
+    getAllUsers,
+} from "../../../services/admin";
+import socket from "../../../../socket";
 
 const roles = ["Super Admin", "Middle Admin", "Staff Admin"];
 const statuses = ["Active", "Inactive"];
@@ -14,12 +19,22 @@ const AddAdmin = () => {
         role: "",
         status: true,
     });
+    const [dataFormEdit, setDataFormEdit] = useState({
+        full_name: "",
+        email_address: "",
+        password_hash: "",
+        role: "",
+        status: true,
+    });
     const [showPassword, setShowPassword] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleInputChange = (key, value) => {
         setDataForm((prev) => ({ ...prev, [key]: value }));
+    };
+    const handleEditInputChange = (key, value) => {
+        setDataFormEdit((prev) => ({ ...prev, [key]: value }));
     };
 
     const createAccount = async () => {
@@ -51,6 +66,35 @@ const AddAdmin = () => {
                 email_address: "",
                 password_hash: "",
                 role: "",
+                createdAt: "",
+                status: true,
+            });
+        }
+    };
+    const editAccount = async () => {
+        setLoading(true);
+        if (
+            !dataFormEdit.full_name ||
+            !dataFormEdit.email_address ||
+            !dataFormEdit.role
+        ) {
+            setLoading(false);
+            return;
+        }
+        try {
+            const result = await editAdminAccount(dataFormEdit);
+            if (result.message !== "Success") {
+                return;
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+            setDataFormEdit({
+                user_id: "",
+                full_name: "",
+                email_address: "",
+                role: "",
                 status: true,
             });
         }
@@ -62,9 +106,13 @@ const AddAdmin = () => {
         fetchData();
     }, []);
     useEffect(() => {
-        console.log(users);
-    }, [users]);
-
+        socket.on("updatedUser", (data) => {
+            setUsers((prev) =>
+                prev.map((req) => (req._id === data._id ? data : req))
+            );
+        });
+        // console.log("tahekhjkadsfhkasf", users);
+    }, []);
     if (loading) return <div>Loading</div>;
     return (
         <div className="w-full flex flex-col gap-4">
@@ -231,9 +279,33 @@ const AddAdmin = () => {
                                             <td className="px-4 py-2 space-x-3">
                                                 <button
                                                     className="text-blue-500 hover:text-blue-700"
-                                                    onClick={() =>
-                                                        setIsEditOpen(true)
-                                                    }
+                                                    onClick={() => {
+                                                        setIsEditOpen(true);
+                                                        handleEditInputChange(
+                                                            "full_name",
+                                                            user.full_name
+                                                        );
+                                                        handleEditInputChange(
+                                                            "email_address",
+                                                            user.email_address
+                                                        );
+                                                        handleEditInputChange(
+                                                            "role",
+                                                            user.role
+                                                        );
+                                                        handleEditInputChange(
+                                                            "status",
+                                                            user.status
+                                                        );
+                                                        handleEditInputChange(
+                                                            "user_id",
+                                                            user._id
+                                                        );
+                                                        handleEditInputChange(
+                                                            "createdAt",
+                                                            user.createdAt
+                                                        );
+                                                    }}
                                                 >
                                                     <FaEdit size={16} />
                                                 </button>
@@ -278,6 +350,13 @@ const AddAdmin = () => {
                                         type="text"
                                         defaultValue="John Doe"
                                         className="border px-3 py-2 rounded-lg w-full text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                                        onChange={(e) =>
+                                            handleEditInputChange(
+                                                "full_name",
+                                                e.target.value
+                                            )
+                                        }
+                                        value={dataFormEdit.full_name}
                                     />
                                 </div>
                                 <div>
@@ -288,13 +367,29 @@ const AddAdmin = () => {
                                         type="email"
                                         defaultValue="john@example.com"
                                         className="border px-3 py-2 rounded-lg w-full text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                                        onChange={(e) =>
+                                            handleEditInputChange(
+                                                "email_address",
+                                                e.target.value
+                                            )
+                                        }
+                                        value={dataFormEdit.email_address}
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium mb-1">
                                         Role
                                     </label>
-                                    <select className="border px-3 py-2 rounded-lg w-full text-sm focus:outline-none focus:ring-2 focus:ring-green-400">
+                                    <select
+                                        className="border px-3 py-2 rounded-lg w-full text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                                        value={dataFormEdit.role}
+                                        onChange={(e) =>
+                                            handleEditInputChange(
+                                                "role",
+                                                e.target.value
+                                            )
+                                        }
+                                    >
                                         {roles.map((role, index) => (
                                             <option key={index} value={role}>
                                                 {role}
@@ -306,7 +401,20 @@ const AddAdmin = () => {
                                     <label className="block text-sm font-medium mb-1">
                                         Status
                                     </label>
-                                    <select className="border px-3 py-2 rounded-lg w-full text-sm focus:outline-none focus:ring-2 focus:ring-green-400">
+                                    <select
+                                        className="border px-3 py-2 rounded-lg w-full text-sm focus:outline-none focus:ring-2 focus:ring-green-400"
+                                        value={
+                                            dataFormEdit.status
+                                                ? "Active"
+                                                : "Inactive"
+                                        }
+                                        onChange={(e) =>
+                                            handleEditInputChange(
+                                                "status",
+                                                e.target.value === "Active"
+                                            )
+                                        }
+                                    >
                                         {statuses.map((status, index) => (
                                             <option key={index} value={status}>
                                                 {status}
@@ -323,7 +431,13 @@ const AddAdmin = () => {
                                 >
                                     Cancel
                                 </button>
-                                <button className="bg-[#03b335] hover:bg-[#218838] transition-colors duration-300 text-white px-8 py-2 rounded-lg text-lg font-[500]">
+                                <button
+                                    className="bg-[#03b335] hover:bg-[#218838] transition-colors duration-300 text-white px-8 py-2 rounded-lg text-lg font-[500]"
+                                    onClick={() => {
+                                        editAccount();
+                                        setIsEditOpen(false);
+                                    }}
+                                >
                                     Save Changes
                                 </button>
                             </div>
