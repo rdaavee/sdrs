@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
-import socket from '../../../socket'
+import socket from "../../../socket";
 
-import { actionRequest, getAllRequestReceipt, updateRequestStatus } from "../../services/request";
+import {
+    actionRequest,
+    getAllRequestReceipt,
+    updateRequestStatus,
+} from "../../services/request";
+import { cookies } from "../../services/admin";
 
 const getStatusStyle = (status) => {
     switch (status) {
@@ -100,16 +105,13 @@ const RequestList = () => {
         }
     };
 
-
     const handleStatusChange = async (id, newStatus) => {
         try {
             const data = await updateRequestStatus(id, newStatus);
 
-            socket.emit("requestUpdated", data.request);
-
             setReceipts((prev) =>
                 prev.map((req) =>
-                    req._id === id ? data.request : req
+                    req._id === id ? formatData(data.request) : req
                 )
             );
         } catch (err) {
@@ -119,17 +121,58 @@ const RequestList = () => {
 
     const rolePermissions = {
         "Staff Admin": ["accepted", "rejected"],
-        "Moderator": ["waiting", "processing"],
+        Moderator: ["waiting", "processing"],
         "Middle Admin": ["waiting", "processing", "ready"],
         "Super Admin": ["waiting", "processing", "ready", "released"],
     };
 
     useEffect(() => {
-        const user = JSON.parse(localStorage.getItem("user")); 
-        //dito nagb-base yung role and UI, papalitan manually haha, dapat hindi na manually.
-        setUserRole(user?.role || "Moderator");
-    }, []);
+        setUserRole(cookies.get("role"));
 
+        socket.on("requestUpdated", (data) => {
+            setReceipts((prev) =>
+                prev.map((req) =>
+                    req._id === data._id ? formatData(data) : req
+                )
+            );
+        });
+    }, []);
+    const formatData = (item) => {
+        let documentsArray = [];
+        const documents = item.requested_documents;
+
+        if (Array.isArray(documents)) {
+            documentsArray = documents;
+        } else if (typeof documents === "string") {
+            const str = documents.trim();
+            try {
+                const parsed = JSON.parse(str);
+                if (Array.isArray(parsed)) {
+                    documentsArray = parsed;
+                } else if (typeof parsed === "string") {
+                    documentsArray = [parsed];
+                }
+            } catch {
+                if (str.includes(",")) {
+                    documentsArray = str
+                        .split(",")
+                        .map((s) => s.trim())
+                        .filter(Boolean);
+                } else if (str.length > 0) {
+                    documentsArray = [str];
+                }
+            }
+        }
+
+        console.log("fjhdkfjhaskf", {
+            ...item,
+            requested_documents: documentsArray,
+        });
+        return {
+            ...item,
+            requested_documents: documentsArray,
+        };
+    };
     useEffect(() => {
         const fetchData = async () => {
             const data = await getAllRequestReceipt();
@@ -172,17 +215,17 @@ const RequestList = () => {
         };
         fetchData();
 
-        socket.on("requestUpdated", (updatedRequest) => {
-        setReceipts((prev) =>
-            prev.map((req) =>
-                req._id === updatedRequest._id ? updatedRequest : req
-            )
-        );
-    });
+        // socket.on("requestUpdated", (updatedRequest) => {
+        //     setReceipts((prev) =>
+        //         prev.map((req) =>
+        //             req._id === updatedRequest._id ? updatedRequest : req
+        //         )
+        //     );
+        // });
 
-    return () => {
-        socket.off("requestUpdated");
-    };
+        // return () => {
+        //     socket.off("requestUpdated");
+        // };
     }, []);
 
     //filter n search
@@ -377,45 +420,75 @@ const RequestList = () => {
                                             </td>
                                             <td className="px-4 py-2">
                                                 {userRole === "Staff Admin" ? (
-                                                req.status === "waiting" ? (
-                                                    <div className="flex gap-2">
-                                                        <button
-                                                            onClick={() => handleAction(req._id, "accepted")}
-                                                            className="px-3 py-1 rounded bg-green-100 text-green-700 text-xs cursor-pointer"
+                                                    req.status === "waiting" ? (
+                                                        <div className="flex gap-2">
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleAction(
+                                                                        req._id,
+                                                                        "accepted"
+                                                                    )
+                                                                }
+                                                                className="px-3 py-1 rounded bg-green-100 text-green-700 text-xs cursor-pointer"
+                                                            >
+                                                                Accept
+                                                            </button>
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleAction(
+                                                                        req._id,
+                                                                        "rejected"
+                                                                    )
+                                                                }
+                                                                className="px-3 py-1 rounded bg-red-100 text-red-700 text-xs cursor-pointer"
+                                                            >
+                                                                Reject
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <span
+                                                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
+                                                                req.status
+                                                            )}`}
                                                         >
-                                                            Accept
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleAction(req._id, "rejected")}
-                                                            className="px-3 py-1 rounded bg-red-100 text-red-700 text-xs cursor-pointer"
-                                                        >
-                                                            Reject
-                                                        </button>
-                                                    </div>
+                                                            {req.status
+                                                                .charAt(0)
+                                                                .toUpperCase() +
+                                                                req.status.slice(
+                                                                    1
+                                                                )}
+                                                        </span>
+                                                    )
                                                 ) : (
-                                                    <span
-                                                        className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
+                                                    <select
+                                                        value={req.status}
+                                                        onChange={(e) =>
+                                                            handleStatusChange(
+                                                                req._id,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
                                                             req.status
                                                         )}`}
                                                     >
-                                                        {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
-                                                    </span>
-                                                )
-                                            ) : (
-                                                <select
-                                                    value={req.status}
-                                                    onChange={(e) => handleStatusChange(req._id, e.target.value)}
-                                                    className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
-                                                        req.status
-                                                    )}`}
-                                                >
-                                                    {rolePermissions[userRole]?.map((status) => (
-                                                        <option key={status} value={status}>
-                                                            {status.charAt(0).toUpperCase() + status.slice(1)}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            )}
+                                                        {rolePermissions[
+                                                            userRole
+                                                        ]?.map((status) => (
+                                                            <option
+                                                                key={status}
+                                                                value={status}
+                                                            >
+                                                                {status
+                                                                    .charAt(0)
+                                                                    .toUpperCase() +
+                                                                    status.slice(
+                                                                        1
+                                                                    )}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                )}
                                             </td>
                                         </tr>
                                     ))

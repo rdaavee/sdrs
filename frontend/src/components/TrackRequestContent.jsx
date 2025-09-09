@@ -9,9 +9,11 @@ import {
     IoSchoolOutline,
 } from "react-icons/io5";
 import { getRequestReceipt } from "../services/request";
+import socket from "../../socket";
 
 Modal.setAppElement("#root");
 
+const steps = { waiting: 0, processing: 1, ready: 2, released: 3 };
 const TrackRequestContent = () => {
     const [reference, setReference] = useState("");
     const [code, setCode] = useState("");
@@ -30,7 +32,8 @@ const TrackRequestContent = () => {
             setRequestReceipt(result);
             setIsValid(true);
             setError("");
-            setActiveStep(0);
+            console.log(result.status, steps[result.status]);
+            setActiveStep(steps[result.status]);
             setShowModal(true);
         }
     };
@@ -44,6 +47,13 @@ const TrackRequestContent = () => {
         }
         return () => clearTimeout(timer);
     }, [showModal]);
+    useEffect(() => {
+        socket.on("requestUpdated", (data) => {
+            console.log("updated", data);
+            setActiveStep(steps[data.status]);
+            setRequestReceipt(data);
+        });
+    }, []);
 
     return (
         <div className="space-y-6 m-5">
