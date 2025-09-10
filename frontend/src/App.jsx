@@ -12,6 +12,7 @@ function App() {
         <Router>
             <Routes>
                 {/* ALLOW ONLY IF USER IS AUTHENTICATED */}
+                <Route path="EntryPage" element={<EntryPage />} />
                 <Route path="/" element={<Index />}>
                     <Route index element={<MainContent />} />
                     <Route path="pages/MyProfile" element={<MyProfile />} />
@@ -21,7 +22,6 @@ function App() {
                         element={<AddMembers />}
                     />
                     <Route path="pages/RequestList" element={<RequestList />} />
-                    <Route path="EntryPage" element={<EntryPage />} />
                 </Route>
             </Routes>
         </Router>
