@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { getAllRequestReceipt, getAllRequestReceiptStats, getRequestReceipt, saveRequestReceipt } from '../services/request.services';
-import { sendEmailRequestReceipt } from '../utils/send_email';
+import { sendEmailRequestReceipt, sendStatusUpdateEmail } from '../utils/send_email';
 import { RequestReceipt } from '../models/request.model';
 
 export const saveRequestReceiptController = async (req: Request, res: Response) => {
@@ -148,6 +148,10 @@ export const updateRequestStatusController = async (req: Request, res: Response)
         if (!request) {
             console.log("request not found:", id);
             return res.status(404).json({ error: "Request not found" });
+        }
+
+        if (request.email_address) {
+            sendStatusUpdateEmail(request.email_address, request.reference_number, status)
         }
 
         req.app.get("io").emit("requestUpdated", request);

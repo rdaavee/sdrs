@@ -101,3 +101,53 @@ export const sendEmailRequestReceipt = (
     }
   });
 };
+
+export const sendStatusUpdateEmail = (
+  receiver: string,
+  reference_number: string,
+  status: string
+) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: receiver,
+    subject: `Update on your request: ${reference_number}`,
+    text: `Hello,
+    Your request with Reference Number ${reference_number} has been updated.  
+      
+    Current Status: ${status.toUpperCase()}
+      
+    You can log in or use your tracking code to view more details.  
+      
+    Best regards,  
+    The SDRS Team`,
+
+    html: `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+      <p>Hello,</p>
+      <p>Your request with the following details has been updated:</p>
+
+      <table style="margin-top: 20px; border-collapse: collapse; width: 100%; max-width: 500px; border: 1px solid #ccc; border-radius: 6px; overflow: hidden; background: #f9f9f9;">
+        <tr>
+          <td style="padding: 12px; border-bottom: 1px solid #ccc; font-weight: bold;">Reference Number</td>
+          <td style="padding: 14px; font-size: 18px; font-weight: bold; color: #04882a;">${reference_number}</td>
+        </tr>
+        <tr>
+          <td style="padding: 12px; font-weight: bold;">New Status</td>
+          <td style="padding: 14px; font-size: 18px; font-weight: bold; color: #04882a;">${status}</td>
+        </tr>
+      </table>
+
+      <p>Visit SDRS website and use your tracking code to view more details.</p>
+      <p>Best regards,<br/>The SDRS Team</p>
+    </div>
+    `,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log("Error sending status update email:", error);
+    } else {
+      console.log("Status update email sent:", info.response);
+    }
+  });
+};
