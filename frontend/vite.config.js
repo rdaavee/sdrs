@@ -8,4 +8,7 @@ export default defineConfig({
     optimizeDeps: {
         include: ["chart.js"],
     },
+    build: {
+        chunkSizeWarningLimit: 2000,
+    }
 });
