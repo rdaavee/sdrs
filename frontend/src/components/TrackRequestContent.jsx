@@ -253,16 +253,15 @@ const TrackRequestContent = () => {
                                                         </span>
                                                     </td>
                                                     <td className="px-4 py-2 text-sm text-gray-600">
-                                                        {requestReceipt.status ===
-                                                        "waiting"
-                                                            ? "Pending approval"
-                                                            : requestReceipt.status ===
-                                                              "processing"
-                                                            ? "Expected release: Aug 25, 2025"
-                                                            : requestReceipt.status ===
-                                                              "ready"
-                                                            ? "Please claim at the Registrar’s Office"
-                                                            : "Released"}
+                                                    {requestReceipt.status === "waiting"
+                                                        ? "Pending approval"
+                                                        : requestReceipt.status === "processing"
+                                                        ? "Expected release: Aug 25, 2025"
+                                                        : requestReceipt.status === "ready"
+                                                        ? "Please claim at the Registrar’s Office"
+                                                        : requestReceipt.status === "accepted"
+                                                        ? "Your request is already accepted"
+                                                        : "Released"}
                                                     </td>
                                                 </tr>
                                             ))}
