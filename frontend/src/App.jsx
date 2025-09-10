@@ -21,9 +21,8 @@ function App() {
                         element={<AddMembers />}
                     />
                     <Route path="pages/RequestList" element={<RequestList />} />
+                    <Route path="/entry-page" element={<EntryPage />} />
                 </Route>
-
-                <Route path="/entry-page" element={<EntryPage />} />
             </Routes>
         </Router>
     );
