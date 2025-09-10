@@ -8,7 +8,14 @@ export default defineConfig({
     optimizeDeps: {
         include: ["chart.js"],
     },
-    build: {
+        build: {
         chunkSizeWarningLimit: 2000,
-    }
+        rollupOptions: {
+            onwarn(warning, warn) {
+                if (warning.code === "EVAL") return;
+                warn(warning);
+            },
+        },
+    },
+
 });
