@@ -256,7 +256,15 @@ const TrackRequestContent = () => {
                                                     {requestReceipt.status === "waiting"
                                                         ? "Pending approval"
                                                         : requestReceipt.status === "processing"
-                                                        ? "Expected release: Aug 25, 2025"
+                                                        ? `Expected release: ${new Date(
+                                                            new Date(requestReceipt.createdAt).setDate(
+                                                                new Date(requestReceipt.createdAt).getDate() + 7
+                                                            )
+                                                        ).toLocaleDateString("en-US", {
+                                                            month: "short",
+                                                            day: "numeric",
+                                                            year: "numeric",
+                                                        })}`
                                                         : requestReceipt.status === "ready"
                                                         ? "Please claim at the Registrar’s Office"
                                                         : requestReceipt.status === "accepted"
