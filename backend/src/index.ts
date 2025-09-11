@@ -25,18 +25,31 @@ mongoose
         console.log('Internal Server Error');
     });
 
+    const allowedOrigins = [
+        "http://localhost:5173",
+        process.env.CLIENT_URL as string,
+    ].filter(Boolean);
+
 app.set('trust proxy', 1);
 app.use(
     cors({
-        origin: process.env.CLIENT_URL,
+        origin: function (origin, callback) {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(new Error("Not allowed by CORS"));
+    },
         credentials: true,
     })
 );
+
 app.use(
     bodyParser.urlencoded({
         extended: true,
     }),
 );
+
 app.use(cookieParser());
 app.use(express.json());
 
