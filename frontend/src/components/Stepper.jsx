@@ -6,9 +6,9 @@ const CustomStepper = ({ currentStep, steps }) => {
         <Stepper
             activeStep={currentStep}
             styleConfig={{
-                activeBgColor: "#04882a",
+                activeBgColor: "#03b335",
                 activeTextColor: "#fff",
-                completedBgColor: "#d3ae0a",
+                completedBgColor: "#04882a",
                 completedTextColor: "#fff",
                 inactiveBgColor: "#ccc",
                 inactiveTextColor: "#666",

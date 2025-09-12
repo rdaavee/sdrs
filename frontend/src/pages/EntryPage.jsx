@@ -1,5 +1,4 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRegFile, FaSearch } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
@@ -12,8 +11,10 @@ import StepperNavigation from "../components/StepperNavigation";
 import CustomStepper from "../components/Stepper";
 import RequestDetailsForm from "../components/RequestDetailsForm";
 import TrackRequestContent from "../components/TrackRequestContent";
+import PrivacyModal from "../components/PrivacyModal";
 
 const EntryPage = () => {
+    const [showModal, setShowModal] = useState(true);
     const [dataForm, setDataForm] = useState({
         student_number: "",
         full_name: "",
@@ -44,7 +45,6 @@ const EntryPage = () => {
     const validateForm = () => {
         if (currentStep === 1) {
             const {
-                student_number,
                 full_name,
                 current_address,
                 course,
@@ -56,7 +56,6 @@ const EntryPage = () => {
             } = dataForm;
 
             if (
-                !student_number.trim() ||
                 !full_name.trim() ||
                 !current_address.trim() ||
                 !course.trim() ||
@@ -67,7 +66,7 @@ const EntryPage = () => {
                 !requested_documents ||
                 requested_documents.length === 0
             ) {
-                toast.error("Please fill out all required fields.")
+                toast.error("Please fill out all required fields.");
                 return false;
             }
             return true;
@@ -130,99 +129,122 @@ const EntryPage = () => {
                 return null;
         }
     };
+
     const handleNext = () => {
         const tate = validateForm();
-        console.log(tate);
         if (tate) {
             setCurrentStep((s) => s + 1);
         }
     };
 
+    useEffect(() => {
+        if (showModal) {
+            document.body.classList.add("overflow-hidden");
+        } else {
+            document.body.classList.remove("overflow-hidden");
+        }
+        return () => document.body.classList.remove("overflow-hidden");
+    }, [showModal]);
+
     return (
-        <div className="page-container shadow-lg">
-            <div className="flex flex-column text-white text-center entry-header">
-                <div className="mb-5">
-                    <h1 className="font-bold text-3xl">
-                        PHINMA - University of Pangasinan
-                        <br />
-                        Online Document Request
-                    </h1>
+        <div className="page-container shadow-lg relative">
+            <div className={showModal ? "" : ""}>
+                <div className="flex flex-column text-white text-center entry-header">
+                    <div className="mb-5">
+                        <h1 className="font-bold text-3xl">
+                            PHINMA - University of Pangasinan
+                            <br />
+                            Online Document Request
+                        </h1>
 
-                    <h6 className="mt-3 mx-auto px-2">
-                        Already submitted a request? Click{" "}
-                        <strong>Track Request</strong> below to track its
-                        status.
-                    </h6>
+                        <h6 className="mt-3 mx-auto px-2">
+                            Already submitted a request? Click{" "}
+                            <strong>Track Request</strong> below to track its
+                            status.
+                        </h6>
+                    </div>
                 </div>
-            </div>
 
-            <div className="tabs gap-3 d-flex align-items-center mt-5">
-                <button
-                    data-id="newRequest"
-                    className={`tab-button ${
-                        activeTab === "newRequest" ? "active" : ""
+                <div className="tabs gap-3 d-flex align-items-center mt-5">
+                    <button
+                        data-id="newRequest"
+                        className={`tab-button ${
+                            activeTab === "newRequest" ? "active" : ""
+                        }`}
+                        onClick={() => setActiveTab("newRequest")}
+                    >
+                        <FaRegFile className="icon" /> New Request
+                    </button>
+
+                    <button
+                        data-id="requestTracker"
+                        className={`tab-button ${
+                            activeTab === "requestTracker" ? "active" : ""
+                        }`}
+                        onClick={() => {
+                            setActiveTab("requestTracker");
+                            setCurrentStep(0);
+                        }}
+                    >
+                        <FaSearch className="icon" /> Track Request
+                    </button>
+                </div>
+
+                <hr
+                    className={`tab-divider ${
+                        activeTab === "newRequest"
+                            ? "new-request-divider"
+                            : activeTab === "requestTracker"
+                            ? "tracker-divider"
+                            : ""
                     }`}
-                    onClick={() => setActiveTab("newRequest")}
-                >
-                    <FaRegFile className="icon" /> New Request
-                </button>
+                />
 
-                <button
-                    data-id="requestTracker"
-                    className={`tab-button ${
-                        activeTab === "requestTracker" ? "active" : ""
-                    }`}
-                    onClick={() => {
-                        setActiveTab("requestTracker");
-                        setCurrentStep(0);
-                    }}
-                >
-                    <FaSearch className="icon" /> Track Request
-                </button>
-            </div>
+                <div className="w-full max-w-7xl mx-auto mt-10">
+                    {activeTab === "newRequest" && (
+                        <>
+                            <CustomStepper
+                                currentStep={currentStep}
+                                steps={steps}
+                            />
+                            <hr className="text-gray-300 mr-10 ml-10" />
+                        </>
+                    )}
+                </div>
 
-            <hr
-                className={`tab-divider ${
-                    activeTab === "newRequest"
-                        ? "new-request-divider"
-                        : activeTab === "requestTracker"
-                        ? "tracker-divider"
-                        : ""
-                }`}
-            />
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={activeTab + currentStep}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -50 }}
+                        transition={{ duration: 0.4 }}
+                    >
+                        {renderContent()}
+                    </motion.div>
+                </AnimatePresence>
 
-            <div className="w-full max-w-7xl mx-auto mt-10">
                 {activeTab === "newRequest" && (
-                    <>
-                        <CustomStepper
-                            currentStep={currentStep}
-                            steps={steps}
-                        />
-                        <hr className="text-gray-300 mr-10 ml-10" />
-                    </>
+                    <StepperNavigation
+                        currentStep={currentStep}
+                        handlePrevious={() => setCurrentStep((s) => s - 1)}
+                        handleNext={handleNext}
+                        dataForm={dataForm}
+                    />
                 )}
             </div>
 
-            <AnimatePresence mode="wait">
-                <motion.div
-                    key={activeTab + currentStep}
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -50 }}
-                    transition={{ duration: 0.4 }}
-                >
-                    {renderContent()}
-                </motion.div>
+            <AnimatePresence>
+                {showModal && (
+                    <PrivacyModal
+                        onAgree={() => setShowModal(false)}
+                        onCancel={() => {
+                            setShowModal(false);
+                            setTimeout(() => setShowModal(true), 1500);
+                        }}
+                    />
+                )}
             </AnimatePresence>
-
-            {activeTab === "newRequest" && (
-                <StepperNavigation
-                    currentStep={currentStep}
-                    handlePrevious={() => setCurrentStep((s) => s - 1)}
-                    handleNext={handleNext}
-                    dataForm={dataForm}
-                />
-            )}
         </div>
     );
 };

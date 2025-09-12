@@ -6,7 +6,7 @@ const StepperNavigation = ({ currentStep, handlePrevious, handleNext }) => {
             {currentStep > 0 ? (
                 <button
                     onClick={handlePrevious}
-                    className="mb-5 mt-2 px-5 py-1 border border-gray-300 rounded-xs inline-flex items-center text-xs cursor-pointer hover:bg-green-600 hover:border-green-600 hover:text-white transition-all"
+                    className="mb-5 px-5 py-2 inline-flex items-center text-sm cursor-pointer text-white bg-green-500 hover:bg-green-600 transition-all"
                 >
                     <IoArrowBackOutline className="mr-2 text-md" />
                     Back
@@ -18,7 +18,7 @@ const StepperNavigation = ({ currentStep, handlePrevious, handleNext }) => {
             {currentStep < 2 && (
                 <button
                     onClick={handleNext}
-                    className="mb-5 mt-2 px-5 py-1 border border-gray-300 rounded-xs inline-flex items-center text-xs cursor-pointer hover:bg-green-600 hover:border-green-600 hover:text-white transition-all"
+                    className="mb-5 px-5 py-2 inline-flex items-center text-sm cursor-pointer text-white bg-green-500 hover:bg-green-600 transition-all"
                 >
                     Next
                     <IoArrowForwardOutline className="ml-2 text-md" />
