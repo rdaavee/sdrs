@@ -100,7 +100,7 @@ const TrackRequestContent = () => {
                         className="border border-gray-300 rounded px-3 py-2 flex-1 focus:outline-none focus:border-b-2 focus:border-b-green-500"
                     />
                     <input
-                        type="password"
+                        type="text"
                         placeholder="Enter Code"
                         value={code}
                         onChange={(e) => setCode(e.target.value)}

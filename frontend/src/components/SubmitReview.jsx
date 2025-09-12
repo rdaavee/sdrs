@@ -95,7 +95,6 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
         } finally {
             setLoading(false);
             setDataForm({
-                student_number: "",
                 full_name: "",
                 current_address: "",
                 course: "",

@@ -26,7 +26,7 @@ const RequestReceiptSchema = new Schema({
     },
     student_number: {
         type: String,
-        required: true
+        required: false
     },
     full_name: {
         type: String,

@@ -3,13 +3,12 @@ import { toast } from "react-toastify";
 import { IoEye, IoEyeOff } from "react-icons/io5";
 import { requestCode, verifyCode } from "../services/verify";
 
-import locations from "../constants/locations";
 import courses from "../constants/courses";
 
 const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
     const [error, setError] = useState("");
     const [showCodeField, setShowCodeField] = useState(false);
-    const [showCode, setShowCode] = useState(false);
+    const [cooldown, setCooldown] = useState(0)
 
     const validateEmail = (value) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,11 +20,28 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
             toast.error("Please enter a valid email address.");
             return;
         }
+
+        if (cooldown > 0) {
+            toast.error(`Please wait ${cooldown}s before requesting again.`);
+            return;
+        }
+
         setError("");
         setShowCodeField(true);
         requestCode(dataForm.email_address);
 
         toast.success("Verification code successfully sent to your email.");
+
+        setCooldown(60);
+        const interval = setInterval(() => {
+            setCooldown((prev) => {
+                if (prev <= 1) {
+                    clearInterval(interval);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
     };
 
     const handleVerifyCode = async () => {
@@ -53,11 +69,19 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                 </p>
             </div>
 
+            <div className="px-3 py-2">
+                <p className="font-medium text-gray-500 text-md">
+                    <span className="uppercase">Instructions</span>: Please fill out all required information completely. Incomplete details may cause delays in processing your request.
+                </p>
+            </div>
+
+            <hr />
+
             <div className="p-6 bg-white">
                 <form className="space-y-4">
                     <div>
                         <label className="block text-gray-700 mb-1">
-                            Student No.
+                            Student No. <span className="text-gray-400 text-sm">(optional)</span>
                         </label>
                         <input
                             type="text"
@@ -78,35 +102,32 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                         </label>
                         <input
                             type="text"
-                            onChange={(e) =>
-                                handleInputChange("full_name", e.target.value)
-                            }
+                            onChange={(e) => {
+                                handleInputChange("full_name", e.target.value);
+                            }}
+                            onBlur={(e) => {
+                                const formatted = e.target.value.replace(/\s+/g, " ").trim();
+                                handleInputChange("full_name", formatted);
+                            }}
                             value={dataForm.full_name}
+                            placeholder="Enter full name (Last Name, First Name Middle)"
                             className="w-full border border-gray-300 rounded px-3 py-2"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-gray-700 mb-1">
-                            Current Address
-                        </label>
-                        <select
+                    <label className="block text-gray-700 mb-1">
+                        Current Address
+                    </label>
+                        <input
+                            type="text"
                             onChange={(e) =>
-                                handleInputChange(
-                                    "current_address",
-                                    e.target.value
-                                )
+                                handleInputChange("current_address", e.target.value)
                             }
                             value={dataForm.current_address}
+                            placeholder="Enter your current address"
                             className="w-full border border-gray-300 rounded px-3 py-2"
-                        >
-                            <option value="">Select</option>
-                            {locations.map((address, index) => (
-                                <option key={index} value={address}>
-                                    {address}
-                                </option>
-                            ))}
-                        </select>
+                        />
                     </div>
 
                     <div>
@@ -169,10 +190,10 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                             <button
                                 type="button"
                                 onClick={handleRequestCode}
-                                disabled={!dataForm.email_address}
+                                disabled={!dataForm.email_address || cooldown > 0}
                                 className="bg-[#04882a] text-white text-xs px-1 py-1 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                Request Code
+                                {cooldown > 0 ? `Request again in ${cooldown}s` : "Request Code"}
                             </button>
                         </div>
                         {error && (
@@ -191,9 +212,7 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                                 <div className="flex w-full gap-2">
                                     <div className="relative flex-1">
                                         <input
-                                            type={
-                                                showCode ? "text" : "password"
-                                            }
+                                            type="text"
                                             maxLength={6}
                                             disabled={dataForm.isValidEmail}
                                             inputMode="numeric"
@@ -217,24 +236,13 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                                             value={dataForm.verification_code}
                                             className="w-full border border-gray-300 rounded px-3 py-2"
                                         />
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                setShowCode(!showCode)
-                                            }
-                                            className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
-                                        >
-                                            {showCode ? (
-                                                <IoEyeOff size={20} />
-                                            ) : (
-                                                <IoEye size={20} />
-                                            )}
-                                        </button>
                                     </div>
                                     <button
                                         type="button"
                                         onClick={handleVerifyCode}
-                                        className="bg-[#04882a] text-white text-xs px-3 py-2 rounded cursor-pointer"
+                                        disabled={!dataForm.verification_code}
+                                        className={`bg-[#04882a] text-white text-xs px-3 py-2 rounded 
+                                                ${!dataForm.verification_code ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
                                     >
                                         Verify
                                     </button>
