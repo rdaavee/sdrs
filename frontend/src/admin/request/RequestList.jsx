@@ -48,6 +48,8 @@ const RequestList = () => {
     });
     const [userRole, setUserRole] = useState(null);
 
+    const statusOrder = ["waiting", "processing", "ready", "released"];
+
     //pagination
     const [page, setPage] = useState(1);
     const rowsPerPage = 12;
@@ -107,13 +109,29 @@ const RequestList = () => {
 
     const handleStatusChange = async (id, newStatus) => {
         try {
-            const data = await updateRequestStatus(id, newStatus);
+            setReceipts((prev) => {
+                const currentReq = prev.find((r) => r._id === id);
+                if (!currentReq) return prev;
 
-            setReceipts((prev) =>
-                prev.map((req) =>
-                    req._id === id ? formatData(data.request) : req
-                )
-            );
+                const currentIndex = statusOrder.indexOf(currentReq.status);
+                const newIndex = statusOrder.indexOf(newStatus);
+
+                // Prevent backward status change
+                if (newIndex < currentIndex) {
+                    console.warn("Backward status change is not allowed");
+                    return prev;
+                }
+
+                updateRequestStatus(id, newStatus).then((data) => {
+                    setReceipts((prev2) =>
+                        prev2.map((req) =>
+                            req._id === id ? formatData(data.request) : req
+                        )
+                    );
+                });
+
+                return prev;
+            });
         } catch (err) {
             console.error("Error updating status:", err.message);
         }
@@ -462,31 +480,20 @@ const RequestList = () => {
                                                 ) : (
                                                     <select
                                                         value={req.status}
-                                                        onChange={(e) =>
-                                                            handleStatusChange(
-                                                                req._id,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
-                                                            req.status
-                                                        )}`}
+                                                        onChange={(e) => handleStatusChange(req._id, e.target.value)}
+                                                        className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(req.status)}`}
                                                     >
-                                                        {rolePermissions[
-                                                            userRole
-                                                        ]?.map((status) => (
-                                                            <option
-                                                                key={status}
-                                                                value={status}
-                                                            >
-                                                                {status
-                                                                    .charAt(0)
-                                                                    .toUpperCase() +
-                                                                    status.slice(
-                                                                        1
-                                                                    )}
-                                                            </option>
-                                                        ))}
+                                                        {rolePermissions[userRole]
+                                                            ?.filter(
+                                                                (status) =>
+                                                                    statusOrder.indexOf(status) >=
+                                                                    statusOrder.indexOf(req.status)
+                                                            )
+                                                            .map((status) => (
+                                                                <option key={status} value={status}>
+                                                                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                                </option>
+                                                            ))}
                                                     </select>
                                                 )}
                                             </td>
