@@ -256,10 +256,14 @@ const AddAdmin = () => {
                                                 </span>
                                             </td>
                                             <td className="px-4 py-2">
-                                                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                                                    {user.status
-                                                        ? "Active"
-                                                        : "Inactive"}
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                                    user.status
+                                                        ? "bg-green-100 text-green-700"
+                                                        : "bg-gray-200 text-gray-700"
+                                                    }`}
+                                                >
+                                                    {user.status ? "Active" : "Inactive"}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-2">

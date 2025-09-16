@@ -3,9 +3,9 @@ import { IoNotificationsOutline } from "react-icons/io5";
 const Reminders = () => {
     return (
         <div className="border border-gray-200 m-10 p-5 rounded-xs shadow-xs">
-            <div className="flex items-center gap-2 text-xl text-gray-500">
-                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100">
-                    <IoNotificationsOutline className="text-2xl text-gray-600" />
+            <div className="flex items-center gap-2 text-xl text-[#8dcbd8]">
+                <span className="flex items-center justify-center w-10 h-10 rounded-full bg-[#8dcbd8]/20">
+                    <IoNotificationsOutline className="text-2xl text-[#8dcbd8]" />
                 </span>
                 Reminders
             </div>
@@ -50,7 +50,7 @@ const Reminders = () => {
                 <li>
                     Registrar's Office contact details:{" "}
                     <strong className="fs-4">
-                        (075) 522-5635 local 113; or call Helpline:
+                        call Helpline:
                         0916-921-2125 / 0961-753-7369 / 0995-078-5660
                     </strong>
                 </li>
