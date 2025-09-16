@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { PiExportLight } from "react-icons/pi";
 import socket from "../../../socket";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+
 
 import {
     actionRequest,
@@ -64,6 +68,29 @@ const RequestList = () => {
             [index]: !prev[index],
         }));
     };
+
+    const exportToExcel = () => {
+        if (!receipts.length) return;
+
+        const exportData = receipts.map((req) => ({
+            "Reference #": req.reference_number,
+            "Email": req.email_address,
+            "Documents": req.requested_documents.join(", "),
+            "Quantity": req.requested_documents.length,
+            "Payment": req.payment_method,
+            "Status": req.status,
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(exportData);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Requests");
+
+        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+
+        const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+        saveAs(data, `Request_List_${new Date().toISOString().slice(0,10)}.xlsx`);
+    };
+
 
     const handleSort = (key) => {
         setSortConfig((prev) => {
@@ -320,6 +347,16 @@ const RequestList = () => {
                             <option value="cashier">Cash</option>
                             <option value="online">Online</option>
                         </select>
+
+                        <div className="flex justify-end">
+                            <button
+                                onClick={exportToExcel}
+                                className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 cursor-pointer transition"
+                            >
+                                <PiExportLight className="text-xl"/>
+                            </button>
+                        </div>
+
                     </div>
                     {/* Table */}
                     <div className="flex-1">
