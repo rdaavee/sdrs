@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 
 const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
     const certificateOptions = [
-        "Certificates",
         "Certificate of Transfer Credentials",
         "Certification of Enrollment",
         "Certification of Graduation",
@@ -16,7 +15,6 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
     ];
 
     const certificateFees = {
-        Certificates: 0,
         "Certificate of Transfer Credentials": 120,
         "Certification of Enrollment": 50,
         "Certification of Graduation": 100,
@@ -29,37 +27,34 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
         "Certification - Course Description": 55,
     };
 
-    const [selectedDoc, setSelectedDoc] = useState(certificateOptions[0]);
+    const [selectedCertificates, setSelectedCertificates] = useState([]);
     const [selectedDocuments, setSelectedDocuments] = useState({
-        certification: false,
         diploma: false,
         form137: false,
         registrationForm: false,
         tor: false,
     });
+    const [currentSelect, setCurrentSelect] = useState("");
 
-    const certificationFee =
-        certificateFees[selectedDoc] * copies.certification;
-
+    // Update requested docs
     useEffect(() => {
         const requestedDocs = [];
 
-        if (selectedDocuments.certification && copies.certification > 0) {
-            requestedDocs.push([selectedDoc, copies.certification]);
-        }
+        selectedCertificates.forEach((cert) => {
+            if (copies[cert] && copies[cert] > 0) {
+                requestedDocs.push([cert, copies[cert]]);
+            }
+        });
 
         if (selectedDocuments.diploma && copies.diploma > 0) {
             requestedDocs.push(["Diploma", copies.diploma]);
         }
-
         if (selectedDocuments.form137 && copies.form137 > 0) {
             requestedDocs.push(["Form 137", copies.form137]);
         }
-
         if (selectedDocuments.registrationForm && copies.registrationForm > 0) {
             requestedDocs.push(["Copy of Grades", copies.registrationForm]);
         }
-
         if (selectedDocuments.tor && copies.tor > 0) {
             requestedDocs.push(["Transcript of Records", copies.tor]);
         }
@@ -68,7 +63,16 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
             ...prev,
             requested_documents: requestedDocs,
         }));
-    }, [selectedDocuments, copies, selectedDoc, setDataForm]);
+    }, [selectedCertificates, selectedDocuments, copies, setDataForm]);
+
+    const handleCertificateChange = (e) => {
+        const value = e.target.value;
+        if (value && !selectedCertificates.includes(value)) {
+            setSelectedCertificates([...selectedCertificates, value]);
+            setCopies({ ...copies, [value]: 1 }); // default 1 copy
+            setCurrentSelect(""); // reset dropdown to placeholder
+        }
+    };
 
     const handleCheckboxChange = (documentType) => {
         setSelectedDocuments((prev) => ({
@@ -89,48 +93,73 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {/* Certification Row */}
                     <tr>
-                        <td className="border p-2">
-                            <input
-                                type="checkbox"
-                                checked={selectedDocuments.certification}
-                                onChange={() =>
-                                    handleCheckboxChange("certification")
-                                }
-                            />
-                        </td>
-                        <td className="border p-2">
-                            <input
-                                type="number"
-                                min="0"
-                                value={copies.certification}
-                                onChange={(e) =>
-                                    setCopies({
-                                        ...copies,
-                                        certification: Number(e.target.value),
-                                    })
-                                }
-                                className="w-16 text-center border-none rounded"
-                            />
-                        </td>
+                        <td className="border p-2"></td>
+                        <td className="border p-2"></td>
                         <td className="text-center">
                             <select
-                                value={selectedDoc}
-                                onChange={(e) => setSelectedDoc(e.target.value)}
-                                className="appearance-auto border-0 text-center px-2 py-1 focus:outline-none focus:ring-0"
+                                value={currentSelect}
+                                onChange={handleCertificateChange}
+                                className="appearance-auto border px-2 py-1 text-center"
                             >
-                                {certificateOptions.map((option, index) => (
-                                    <option key={index} value={option}>
-                                        {option}
-                                    </option>
-                                ))}
+                                <option value="" className="text-center">
+                                    Select Certificate
+                                </option>
+                                {certificateOptions
+                                    .filter(
+                                        (opt) =>
+                                            !selectedCertificates.includes(opt)
+                                    )
+                                    .map((option, index) => (
+                                        <option key={index} value={option}>
+                                            {option}
+                                        </option>
+                                    ))}
                             </select>
                         </td>
-                        <td className="border p-2">
-                            {certificationFee.toFixed(2)}
-                        </td>
+                        <td className="border p-2"></td>
                     </tr>
+
+                    {selectedCertificates.map((cert) => (
+                        <tr key={cert}>
+                            <td className="border p-2">
+                                <input
+                                    type="checkbox"
+                                    checked={true} // always checked while it exists
+                                    onChange={() => {
+                                        // remove from selectedCertificates
+                                        setSelectedCertificates((prev) =>
+                                            prev.filter((c) => c !== cert)
+                                        );
+                                        // cleanup copies for that cert
+                                        const updatedCopies = { ...copies };
+                                        delete updatedCopies[cert];
+                                        setCopies(updatedCopies);
+                                    }}
+                                />
+                            </td>
+                            <td className="border p-2">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={copies[cert]}
+                                    onChange={(e) =>
+                                        setCopies({
+                                            ...copies,
+                                            [cert]: Number(e.target.value),
+                                        })
+                                    }
+                                    className="w-16 text-center border-none rounded"
+                                />
+                            </td>
+                            <td className="border p-2 text-center">{cert}</td>
+                            <td className="border p-2">
+                                {(
+                                    certificateFees[cert] * (copies[cert] || 0)
+                                ).toFixed(2)}
+                            </td>
+                        </tr>
+                    ))}
 
                     {/* Diploma Row */}
                     <tr>
