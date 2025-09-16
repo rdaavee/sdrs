@@ -16,7 +16,6 @@ import PrivacyModal from "../components/PrivacyModal";
 const EntryPage = () => {
     const [showModal, setShowModal] = useState(true);
     const [dataForm, setDataForm] = useState({
-        student_number: "",
         full_name: "",
         current_address: "",
         course: "",
