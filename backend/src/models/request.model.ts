@@ -40,13 +40,53 @@ const RequestReceiptSchema = new Schema({
         type: String,
         required: true
     },
+    gender: {
+        type: String,
+        required: true,
+    },
     contact_number: {
         type: String,
         required: true
     },
+    birthday: {
+        type: String,
+        required: true,
+    },
     email_address: {
         type: String,
         required: true
+    },
+    last_school_attended: {
+        type: String,
+        required: false,
+    },
+    semester: {
+        type: String,
+        required: false,
+    },
+    school_year: {
+        type: String,
+        required: false
+    },
+    last_school_year_graduated: {
+        type: String,
+        required: false
+    },
+    elementary_school: {
+        type: String,
+        required: false
+    },
+    elementary_year_graduated: {
+        type: String,
+        required: false
+    },
+    high_school: {
+        type: String,
+        required: false
+    },
+    highschool_year_graduated: {
+        type: String,
+        required: false
     },
     purpose_of_request: {
         type: String,

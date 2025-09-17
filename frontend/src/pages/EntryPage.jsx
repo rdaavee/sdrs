@@ -19,6 +19,8 @@ const EntryPage = () => {
         full_name: "",
         current_address: "",
         course: "",
+        gender: "",
+        birthday: "",
         contact_number: "",
         email_address: "",
         purpose_of_request: "",
@@ -47,6 +49,8 @@ const EntryPage = () => {
                 full_name,
                 current_address,
                 course,
+                gender,
+                birthday,
                 contact_number,
                 email_address,
                 purpose_of_request,
@@ -58,6 +62,8 @@ const EntryPage = () => {
                 !full_name.trim() ||
                 !current_address.trim() ||
                 !course.trim() ||
+                !gender.trim() ||
+                !birthday.trim() ||
                 !contact_number.trim() ||
                 !email_address.trim() ||
                 !purpose_of_request.trim() ||

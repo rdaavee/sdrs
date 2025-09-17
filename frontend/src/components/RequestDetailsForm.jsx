@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import { IoEye, IoEyeOff } from "react-icons/io5";
+import { IoEye, IoEyeOff, IoInformation } from "react-icons/io5";
 import { requestCode, verifyCode } from "../services/verify";
 
 import courses from "../constants/courses";
@@ -8,7 +8,9 @@ import courses from "../constants/courses";
 const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
     const [error, setError] = useState("");
     const [showCodeField, setShowCodeField] = useState(false);
-    const [cooldown, setCooldown] = useState(0)
+    const [cooldown, setCooldown] = useState(0);
+
+    const genders = ["Male", "Female"];
 
     const validateEmail = (value) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -64,14 +66,18 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
     return (
         <div className="border border-gray-300 rounded-md overflow-hidden">
             <div className="bg-[#04882a] text-white px-4 py-2">
-                <p className="font-semibold text-sm uppercase">
+                <p className="font-medium text-lg uppercase">
                     Student Information
                 </p>
             </div>
 
-            <div className="px-3 py-2">
-                <p className="font-medium text-gray-500 text-md">
-                    <span className="uppercase">Instructions</span>: Please fill out all required information completely. Incomplete details may cause delays in processing your request.
+            <div className="inline-flex p-3">
+                <span className="flex items-center justify-center w-7 h-7 rounded-full bg-[#ffc107]/20">
+                    <IoInformation className="text-lg text-[#ffc107]" />
+                </span>
+                <p className="text-md ml-2 text-gray-500 mt-1">
+                    Fill all fields that have asterisk. Incomplete details may
+                    cause delays in processing your request.
                 </p>
             </div>
 
@@ -79,26 +85,72 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
 
             <div className="p-6 bg-white">
                 <form className="space-y-4">
-                    <div>
-                        <label className="block text-gray-700 mb-1">
-                            Student No. <span className="text-gray-400 text-sm">(optional)</span>
-                        </label>
-                        <input
-                            type="text"
-                            onChange={(e) =>
-                                handleInputChange(
-                                    "student_number",
-                                    e.target.value
-                                )
-                            }
-                            value={dataForm.student_number}
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                        />
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="w-full sm:w-auto flex-1">
+                            <label className="block text-gray-700 mb-1">
+                                Student No.{" "}
+                                <span className="text-gray-400 text-sm">
+                                    (optional)
+                                </span>
+                            </label>
+                            <input
+                                type="text"
+                                onChange={(e) =>
+                                    handleInputChange(
+                                        "student_number",
+                                        e.target.value
+                                    )
+                                }
+                                value={dataForm.student_number}
+                                placeholder="03-2425-012345"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                            />
+                        </div>
+
+                        <div className="w-full sm:w-auto flex-1">
+                            <label className="block text-gray-700 mb-1">
+                                Courses <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                onChange={(e) =>
+                                    handleInputChange("course", e.target.value)
+                                }
+                                value={dataForm.course}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                            >
+                                <option value="">Select</option>
+                                {courses.map((course, index) => (
+                                    <option key={index} value={course}>
+                                        {course}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="w-full sm:w-auto">
+                            <label className="block text-gray-700 mb-1">
+                                Gender <span className="text-red-500">*</span>
+                            </label>
+                            <select
+                                onChange={(e) =>
+                                    handleInputChange("gender", e.target.value)
+                                }
+                                value={dataForm.gender}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                            >
+                                <option value="">Select</option>
+                                {genders.map((gender, index) => (
+                                    <option key={index} value={gender}>
+                                        {gender}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     <div>
                         <label className="block text-gray-700 mb-1">
-                            Full Name
+                            Full Name <span className="text-red-500">*</span>
                         </label>
                         <input
                             type="text"
@@ -106,71 +158,82 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                                 handleInputChange("full_name", e.target.value);
                             }}
                             onBlur={(e) => {
-                                const formatted = e.target.value.replace(/\s+/g, " ").trim();
+                                const formatted = e.target.value
+                                    .replace(/\s+/g, " ")
+                                    .trim();
                                 handleInputChange("full_name", formatted);
                             }}
                             value={dataForm.full_name}
-                            placeholder="Enter full name (Last Name, First Name Middle)"
+                            placeholder="Enter full name (e.g., Dela Cruz, Maria Santos — Maiden Name if applicable)"
                             className="w-full border border-gray-300 rounded px-3 py-2"
                         />
                     </div>
 
-                    <div>
-                    <label className="block text-gray-700 mb-1">
-                        Current Address
-                    </label>
-                        <input
-                            type="text"
-                            onChange={(e) =>
-                                handleInputChange("current_address", e.target.value)
-                            }
-                            value={dataForm.current_address}
-                            placeholder="Enter your current address"
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                        />
-                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="w-full sm:w-auto flex-1">
+                            <label className="block text-gray-700 mb-1">
+                                Complete Address{" "}
+                                <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                onChange={(e) =>
+                                    handleInputChange(
+                                        "current_address",
+                                        e.target.value
+                                    )
+                                }
+                                value={dataForm.current_address}
+                                placeholder="Enter your current address"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-gray-700 mb-1">
-                            Courses
-                        </label>
-                        <select
-                            onChange={(e) =>
-                                handleInputChange("course", e.target.value)
-                            }
-                            value={dataForm.course}
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                        >
-                            <option value="">Select</option>
-                            {courses.map((course, index) => (
-                                <option key={index} value={course}>
-                                    {course}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                        <div className="w-full sm:w-auto flex-1">
+                            <label className="block text-gray-700 mb-1">
+                                Contact Number{" "}
+                                <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                pattern="^[0-9]{11}$"
+                                maxLength={11}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(
+                                        /\D/g,
+                                        ""
+                                    );
+                                    handleInputChange("contact_number", value);
+                                }}
+                                value={dataForm.contact_number}
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-gray-700 mb-1">
-                            Contact Number
-                        </label>
-                        <input
-                            type="text"
-                            pattern="^[0-9]{11}$"
-                            maxLength={11}
-                            onChange={(e) => {
-                                const value = e.target.value.replace(/\D/g, "");
-                                handleInputChange("contact_number", value);
-                            }}
-                            value={dataForm.contact_number}
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                        />
+                        <div className="w-full sm:w-auto flex-1">
+                            <label className="block text-gray-700 mb-1">
+                                Birthday <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                onChange={(e) =>
+                                    handleInputChange(
+                                        "birthday",
+                                        e.target.value
+                                    )
+                                }
+                                value={dataForm.birthday}
+                                placeholder="mm/dd/yyyy"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                            />
+                        </div>
                     </div>
 
                     {/* Email with validation */}
                     <div>
                         <label className="block text-gray-700 mb-1">
-                            Email Address
+                            Email Address{" "}
+                            <span className="text-red-500">*</span>
                         </label>
                         <div className="flex gap-2">
                             <input
@@ -190,10 +253,14 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                             <button
                                 type="button"
                                 onClick={handleRequestCode}
-                                disabled={!dataForm.email_address || cooldown > 0}
+                                disabled={
+                                    !dataForm.email_address || cooldown > 0
+                                }
                                 className="bg-[#04882a] text-white text-xs px-1 py-1 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {cooldown > 0 ? `Request again in ${cooldown}s` : "Request Code"}
+                                {cooldown > 0
+                                    ? `Request again in ${cooldown}s`
+                                    : "Request Code"}
                             </button>
                         </div>
                         {error && (
@@ -242,7 +309,11 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                                         onClick={handleVerifyCode}
                                         disabled={!dataForm.verification_code}
                                         className={`bg-[#04882a] text-white text-xs px-3 py-2 rounded 
-                                                ${!dataForm.verification_code ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+												${
+                                                    !dataForm.verification_code
+                                                        ? "opacity-50 cursor-not-allowed"
+                                                        : "cursor-pointer"
+                                                }`}
                                     >
                                         Verify
                                     </button>
@@ -251,9 +322,164 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                         )}
                     </div>
 
+                    <div className="border border-gray-300 rounded p-3">
+                        <div className="flex flex-col md:flex-row md:flex-wrap md:items-center gap-4 text-gray-700">
+                            <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+                                <span className="text-[12.5px] whitespace-nowrap">
+                                    Last School Attended:
+                                </span>
+                                <input
+                                    type="text"
+                                    onChange={(e) =>
+                                        handleInputChange(
+                                            "last_school_attended",
+                                            e.target.value
+                                        )
+                                    }
+                                    value={dataForm.last_school_attended}
+                                    className="w-full border-b border-gray-300 px-2 py-1"
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-2 min-w-[120px]">
+                                <span className="text-[12.5px] whitespace-nowrap">
+                                    Semester:
+                                </span>
+                                <input
+                                    type="text"
+                                    onChange={(e) =>
+                                        handleInputChange(
+                                            "semester",
+                                            e.target.value
+                                        )
+                                    }
+                                    value={dataForm.semester}
+                                    className="w-full border-b border-gray-300 px-2 py-1"
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-2 min-w-[140px]">
+                                <span className="text-[12.5px] whitespace-nowrap">
+                                    S.Y.:
+                                </span>
+                                <input
+                                    type="text"
+                                    onChange={(e) =>
+                                        handleInputChange(
+                                            "school_year",
+                                            e.target.value
+                                        )
+                                    }
+                                    value={dataForm.school_year}
+                                    className="w-full border-b border-gray-300 px-2 py-1"
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+                                <span className="text-[12.5px] whitespace-nowrap">
+                                    If Graduate, Year Graduated:
+                                </span>
+                                <input
+                                    type="text"
+                                    onChange={(e) =>
+                                        handleInputChange(
+                                            "last_school_year_graduated",
+                                            e.target.value
+                                        )
+                                    }
+                                    value={dataForm.last_school_year_graduated}
+                                    className="w-full border-b border-gray-300 px-2 py-1"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row gap-2">
+                        <div className="w-full md:flex-1">
+                            <label className="block text-gray-700 mb-1">
+                                Elementary School{" "}
+                                <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                onChange={(e) =>
+                                    handleInputChange(
+                                        "elementary_school",
+                                        e.target.value
+                                    )
+                                }
+                                value={dataForm.elementary_school}
+                                placeholder="Enter elementary school name"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                            />
+                        </div>
+
+                        <div className="w-full md:w-1/3">
+                            <label className="block text-gray-700 mb-1">
+                                Year Graduated{" "}
+                                <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                onChange={(e) =>
+                                    handleInputChange(
+                                        "elementary_year_graduated",
+                                        e.target.value
+                                    )
+                                }
+                                value={dataForm.elementary_year_graduated}
+                                placeholder="e.g. 2015"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row gap-2">
+                        <div className="w-full md:flex-1">
+                            <label className="block text-gray-700 mb-1">
+                                High School{" "}
+                                <span className="text-gray-400 text-sm">
+                                    (Senior High School if applicable)
+                                </span>{" "}
+                                <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                onChange={(e) =>
+                                    handleInputChange(
+                                        "high_school",
+                                        e.target.value
+                                    )
+                                }
+                                value={dataForm.high_school}
+                                placeholder="Enter high school name"
+                                className="w-full border border-gray-300 rounded px-3 py-2 mb-2"
+                            />
+                        </div>
+                        <div className="w-full md:w-1/3">
+                            <label className="block text-gray-700 mb-1">
+                                Year Graduated{" "}
+                                <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                onChange={(e) =>
+                                    handleInputChange(
+                                        "highschool_year_graduated",
+                                        e.target.value
+                                    )
+                                }
+                                value={dataForm.highschool_year_graduated}
+                                placeholder="e.g. 2021"
+                                className="w-full border border-gray-300 rounded px-3 py-2"
+                            />
+                        </div>
+                    </div>
+
                     <div>
                         <label className="block text-gray-700 mb-1">
-                            Purpose/s of request
+                            Purpose/s of request{" "}
+                            <span className="text-red-500">*</span>
                         </label>
                         <textarea
                             className="w-full border border-gray-300 rounded px-3 py-2"

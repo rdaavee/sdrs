@@ -59,7 +59,7 @@
 
 /* =============== CLIENT STYLE =============== */
 ::-webkit-scrollbar {
-    width: 1px;
+    width: 3px;
     border-radius: 0.5rem;
     background-color: hsl(0, 100%, 0);
 }
