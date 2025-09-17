@@ -58,22 +58,23 @@ const TrackRequestContent = () => {
     return (
         <div className="space-y-6 m-5">
             {/* Info grid */}
-            <div className="grid-item grid-container border border-gray-300 rounded shadow-xs p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid-item grid-container border border-gray-300 rounded shadow-xs p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                    <h3 className="font-semibold mb-2">Office Hours</h3>
+                    <h3 className="font-bold tracking-wider mb-2">Office Hours</h3>
                     <hr className="mb-2" />
                     <p>Monday to Friday</p>
                     <p>8:00 AM - 5:00 PM</p>
                 </div>
                 <div>
-                    <h3 className="font-semibold mb-2">Contact Us</h3>
+                    <h3 className="font-bold tracking-wider mb-2">Contact Us</h3>
                     <hr className="mb-2" />
-                    <p>Arellano Street, Dagupan City, 2400, Pangasinan</p>
-                    <p>+63 995-078-5660</p>
+                    <p>0995-078-5660</p>
+                    <p>0961-753-7369</p>
+                    <p>0916-921-2125</p>
                     <p>registrar.up@phinmaed.com</p>
                 </div>
                 <div>
-                    <h3 className="font-semibold mb-2">Advisory</h3>
+                    <h3 className="font-bold tracking-wider mb-2">Advisory</h3>
                     <hr className="mb-2" />
                     <p>
                         Your document request PIN (6 digit) together with the
@@ -156,10 +157,10 @@ const TrackRequestContent = () => {
                     <Stepper
                         className="mt-10"
                         steps={[
-                            { label: "Waiting" },
-                            { label: "Processing" },
-                            { label: "Ready" },
-                            { label: "Released" },
+                            { label: "Waiting", style: {cursor: "default"} },
+                            { label: "Processing", style: {cursor: "default"} },
+                            { label: "Ready", style: {cursor: "default"} },
+                            { label: "Released", style: {cursor: "default"} },
                         ]}
                         activeStep={activeStep}
                         styleConfig={{
@@ -269,7 +270,7 @@ const TrackRequestContent = () => {
                                                         ? "Please claim at the Registrar’s Office"
                                                         : requestReceipt.status === "accepted"
                                                         ? "Your request is already accepted"
-                                                        : "Released"}
+                                                        : "The document is already released"}
                                                     </td>
                                                 </tr>
                                             ))}

@@ -20,7 +20,7 @@ const CustomStepper = ({ currentStep, steps }) => {
             }}
         >
             {steps.map((label, index) => (
-                <Step key={index} label={label}>
+                <Step key={index} label={label} style={{cursor: "default"}}>
                     {index === 0 ? "" : index}{" "}
                 </Step>
             ))}
