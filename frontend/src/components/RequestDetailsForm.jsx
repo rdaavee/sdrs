@@ -70,19 +70,13 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                     Student Information
                 </p>
             </div>
-
-            <div className="inline-flex p-3">
-                <span className="flex items-center justify-center w-7 h-7 rounded-full bg-[#ffc107]/20">
-                    <IoInformation className="text-lg text-[#ffc107]" />
-                </span>
-                <p className="text-md ml-2 text-gray-500 mt-1">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center p-2 space-y-2 sm:space-y-0 sm:space-x-2">
+                <p className="text-sm text-gray-500 leading-snug">
                     Fill all fields that have asterisk. Incomplete details may
                     cause delays in processing your request.
                 </p>
             </div>
-
             <hr />
-
             <div className="p-6 bg-white">
                 <form className="space-y-4">
                     <div className="flex flex-col sm:flex-row gap-2">
