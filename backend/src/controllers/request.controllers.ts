@@ -46,6 +46,9 @@ export const saveRequestReceiptController = async (req: Request, res: Response) 
                 String(result.message.reference_number),
                 String(result.message.code)
             );
+            
+            req.app.get("io")?.emit("newRequest", result.message);
+
             return res.status(result.httpCode).json({ message: result.message });
         }
         return res.status(result.httpCode).json({ error: result.error });

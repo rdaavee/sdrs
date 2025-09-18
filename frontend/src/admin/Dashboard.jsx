@@ -19,10 +19,12 @@ import deleteIcon from "../assets/svgs/delete-icon-01.svg";
 import logout from "../assets/svgs/logout-icon-01.svg";
 import ShimmerLoader from "../components/ShimmerLoader";
 import { cookies, logoutMethod } from "../services/admin";
+import socket from "../../socket";
 
 const Dashboard = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isNotification, setIsNotification] = useState(false);
+    const [notifications, setNotifications] = useState([]);
 
     const [activeItem, setActiveItem] = useState("Dashboard");
     const [isSidebarActive, setIsSidebarActive] = useState(false);
@@ -45,6 +47,32 @@ const Dashboard = () => {
 
     const closeSidebar = () => {
         setIsSidebarActive(false);
+    };
+
+    useEffect(() => {
+        socket.on("newRequest", (data) => {
+            setNotifications((prev) => [
+                {
+                    id: data._id,
+                    message: `New request received: ${data.reference_number}`,
+                    time: new Date().toLocaleTimeString(),
+                    read: false,
+                },
+                ...prev,
+            ]);
+        });
+
+        return () => socket.off("newRequest");
+    }, []);
+
+    const handleNotificationClick = (notifId) => {
+        setNotifications((prev) =>
+            prev.map((n) => (n.id === notifId ? { ...n, read: true } : n))
+        );
+
+        setActiveItem("Request List");
+        setIsNotification(false);
+        window.location.href = "/pages/RequestList";
     };
 
     const navItems = [
@@ -297,6 +325,15 @@ const Dashboard = () => {
                                         alt="notification-icon"
                                         className="h-[25px] w-[25px] mt-2"
                                     />
+                                    {notifications.some((n) => !n.read) && (
+                                        <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1 animate-pulse">
+                                            {
+                                                notifications.filter(
+                                                    (n) => !n.read
+                                                ).length
+                                            }
+                                        </span>
+                                    )}
                                 </button>
 
                                 <div
@@ -309,67 +346,42 @@ const Dashboard = () => {
                                     <h3 className="font-semibold text-lg">
                                         Notification
                                     </h3>
-                                    <ul className="list-none space-y-3">
-                                        <li
-                                            className="flex items-start gap-2 cursor-pointer"
-                                            onClick={() =>
-                                                setIsNotification(false)
-                                            }
-                                        >
-                                            <img
-                                                src={notification1}
-                                                alt=""
-                                                className="w-10 h-10"
-                                            />
-                                            <div>
-                                                <h6 className="text-sm font-[500] text-black">
-                                                    You have 3 new mails
-                                                </h6>
-                                                <span className="text-xs text-gray-500 font-[300]">
-                                                    1 hour ago
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li
-                                            className="flex items-start gap-2 cursor-pointer"
-                                            onClick={() =>
-                                                setIsNotification(false)
-                                            }
-                                        >
-                                            <img
-                                                src={notification2}
-                                                alt=""
-                                                className="w-10 h-10"
-                                            />
-                                            <div>
-                                                <h6 className="text-sm font-[500] text-black">
-                                                    You have 1 new mail
-                                                </h6>
-                                                <span className="text-xs text-gray-500 font-[300]">
-                                                    3 hours ago
-                                                </span>
-                                            </div>
-                                        </li>
-                                        <li
-                                            className="flex items-start gap-2 cursor-pointer"
-                                            onClick={() =>
-                                                setIsNotification(false)
-                                            }
-                                        >
-                                            <img
-                                                src={notification3}
-                                                alt=""
-                                                className="w-10 h-10"
-                                            />
-                                            <div>
-                                                <h6 className="text-sm font-[500] text-black">
-                                                    You have 2 new mails
-                                                </h6>
-                                                <span className="text-xs text-gray-500 font-[300]">
-                                                    20 hours ago
-                                                </span>
-                                            </div>
-                                        </li>
+                                    <ul className="list-none space-y-3 max-h-80 overflow-y-auto">
+                                        {notifications.length === 0 ? (
+                                            <li className="text-gray-500 text-sm">
+                                                No notifications
+                                            </li>
+                                        ) : (
+                                            notifications.map((notif) => (
+                                                <li
+                                                    key={notif.id}
+                                                    className={`flex items-start gap-2 cursor-pointer ${
+                                                        notif.read
+                                                            ? "opacity-50"
+                                                            : "opacity-100"
+                                                    }`}
+                                                    onClick={() =>
+                                                        handleNotificationClick(
+                                                            notif.id
+                                                        )
+                                                    }
+                                                >
+                                                    <img
+                                                        src={notification1}
+                                                        alt=""
+                                                        className="w-10 h-10"
+                                                    />
+                                                    <div>
+                                                        <h6 className="text-sm font-[500] text-black">
+                                                            {notif.message}
+                                                        </h6>
+                                                        <span className="text-xs text-gray-500 font-[300]">
+                                                            {notif.time}
+                                                        </span>
+                                                    </div>
+                                                </li>
+                                            ))
+                                        )}
                                     </ul>
                                 </div>
                             </div>
