@@ -3,18 +3,18 @@ import { IoInformation } from "react-icons/io5";
 
 const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
     const diplomaOptions = [
-        "Diploma with EDUFIED NEW RATE",
+        "Diploma with EDUFIED",
         "Diploma - Rush",
     ];
 
     const diplomaFees = {
         "Diploma - Rush": 1000,
-        "Diploma with EDUFIED NEW RATE": 2000,
+        "Diploma with EDUFIED": 2000,
     };
 
     const diplomaRemarks = {
         "Diploma - Rush": "Rush processing; available within the day or next day; includes brown envelope",
-        "Diploma with EDUFIED NEW RATE": "Regular processing days; includes brown envelope; 2nd copy",
+        "Diploma with EDUFIED": "Regular processing days; includes brown envelope; 2nd copy",
     };
 
     const form137Options = [

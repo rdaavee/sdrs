@@ -415,12 +415,14 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                             </label>
                             <input
                                 type="text"
-                                onChange={(e) =>
-                                    handleInputChange(
-                                        "elementary_year_graduated",
-                                        e.target.value
-                                    )
-                                }
+                                maxLength={4}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(
+                                        /\D/g,
+                                        ""
+                                    );
+                                    handleInputChange("elementary_year_graduated", value);
+                                }}
                                 value={dataForm.elementary_year_graduated}
                                 placeholder="e.g. 2015"
                                 className="w-full border border-gray-300 rounded px-3 py-2"
@@ -457,12 +459,14 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                             </label>
                             <input
                                 type="text"
-                                onChange={(e) =>
-                                    handleInputChange(
-                                        "highschool_year_graduated",
-                                        e.target.value
-                                    )
-                                }
+                                maxLength={4}
+                                onChange={(e) => {
+                                    const value = e.target.value.replace(
+                                        /\D/g,
+                                        ""
+                                    );
+                                    handleInputChange("highschool_year_graduated", value);
+                                }}
                                 value={dataForm.highschool_year_graduated}
                                 placeholder="e.g. 2021"
                                 className="w-full border border-gray-300 rounded px-3 py-2"
