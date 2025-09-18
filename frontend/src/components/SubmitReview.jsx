@@ -11,6 +11,13 @@ import {
 } from "react-icons/io5";
 import { saveRequestReceipt } from "../services/request";
 
+import {
+    diplomaFees,
+    form137Fees,
+    certificateFees,
+    transcriptFees,
+} from "../constants/fees";
+
 const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
     const [referenceNumber, setReferenceNumber] = useState("");
     const [code, setCode] = useState("");
@@ -22,38 +29,20 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
         dataForm.payment_method || ""
     );
 
-    const prices = {
-        Certificates: 0,
-        "Certificate of Transfer Credentials": 120,
-        "Certification of Enrollment": 50,
-        "Certification of Graduation": 100,
-        "Certification of Units Earned": 70,
-        "Certification of Good Moral": 60,
-        "Certification of Weighted Average": 80,
-        "Certification-Med. of Instruction": 90,
-        "Certification - Letter of Acceptance": 40,
-        "Certification - Letter of Acceptance with SPA": 60,
-        "Certification - Course Description": 55,
-        Diploma: 100,
-        "Form 137": 100,
-        "Copy of Grades": 100,
-        "Transcript of Records": 30,
-    };
-
+    // convert requested_documents to objects with price
     const [documents, setDocuments] = useState(
-        dataForm.requested_documents.map((doc, index) => {
-            return {
-                id: index + 1,
-                name: doc[0],
-                qty: doc[1],
-                price: prices[doc[0]],
-            };
+        dataForm.requested_documents.map(([name, qty], index) => {
+            let price = 0;
+            if (certificateFees[name] !== undefined)
+                price = certificateFees[name];
+            else if (diplomaFees[name] !== undefined) price = diplomaFees[name];
+            else if (form137Fees[name] !== undefined) price = form137Fees[name];
+            else if (transcriptFees[name] !== undefined)
+                price = transcriptFees[name];
+            else if (name === "Copy of Grades") price = 50; // fixed price
+            return { id: index + 1, name, qty, price };
         })
     );
-
-    const handleRemove = (id) => {
-        setDocuments((docs) => docs.filter((doc) => doc.id !== id));
-    };
 
     const updateQuantity = (id, delta) => {
         setDocuments((docs) =>
@@ -63,6 +52,10 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
                     : doc
             )
         );
+    };
+
+    const handleRemove = (id) => {
+        setDocuments((docs) => docs.filter((doc) => doc.id !== id));
     };
 
     const handlePaymentMethodSelect = (method) => {
@@ -109,19 +102,19 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
             });
         }
     };
+
+    // keep syncing with dataForm
     useEffect(() => {
-        const updatedRequestedDocuments = documents.map((doc) => [
-            doc.name,
-            doc.qty,
-        ]);
-        handleInputChange("requested_documents", updatedRequestedDocuments);
+        handleInputChange(
+            "requested_documents",
+            documents.map((doc) => [doc.name, doc.qty])
+        );
     }, [documents]);
 
     return (
         <div className="p-6 m-10 border border-gray-300 rounded-lg bg-white max-w-5xl mx-auto">
             {!submitted ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* left side content */}
                     <div className="border border-gray-200 rounded-lg p-4">
                         <h2 className="text-lg font-semibold text-gray-800 mb-4">
                             Requested Documents
@@ -153,7 +146,6 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
                                         >
                                             <IoAddCircleOutline />
                                         </button>
-
                                         <button
                                             onClick={() => handleRemove(doc.id)}
                                             className="text-gray-500 hover:text-red-600 ml-2 text-xl"
@@ -186,7 +178,6 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
                                     handlePaymentMethodSelect("online");
                                     setLoading(true);
                                     try {
-                                        console.log("Starting fetch...");
                                         const response = await fetch(
                                             "http://localhost:3000/payments/create-invoice",
                                             {
@@ -202,30 +193,16 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
                                                 }),
                                             }
                                         );
-                                        console.log("Fetch done:", response);
-
                                         const invoice = await response.json();
-                                        console.log(
-                                            "invoice response:",
-                                            invoice
-                                        );
-
                                         localStorage.setItem(
                                             "pendingRequest",
                                             JSON.stringify(dataForm)
                                         );
-
-                                        if (invoice?.invoice_url) {
+                                        if (invoice?.invoice_url)
                                             window.open(
                                                 invoice.invoice_url,
                                                 "_self"
                                             );
-                                        } else {
-                                            console.error(
-                                                "No invoice_url in response:",
-                                                invoice
-                                            );
-                                        }
                                     } catch (error) {
                                         console.error("Payment error:", error);
                                     } finally {
@@ -243,6 +220,7 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
                                     Online Pay
                                 </span>
                             </button>
+
                             <button
                                 onClick={() =>
                                     handlePaymentMethodSelect("cashier")
@@ -331,8 +309,10 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
                     <p className="text-sm text-gray-500">
                         You will be notified via email or SMS once your
                         documents are ready. <br />
-                        You can track the status of your request at
-                        <span className="font-semibold"> Track Request </span>
+                        You can track the status of your request at{" "}
+                        <span className="font-semibold">
+                            Track Request
+                        </span>{" "}
                         using the Reference No. and Code above.
                     </p>
                 </div>

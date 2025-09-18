@@ -2,10 +2,7 @@ import { useState, useEffect } from "react";
 import { IoInformation } from "react-icons/io5";
 
 const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
-    const diplomaOptions = [
-        "Diploma with EDUFIED",
-        "Diploma - Rush",
-    ];
+    const diplomaOptions = ["Diploma with EDUFIED", "Diploma - Rush"];
 
     const diplomaFees = {
         "Diploma - Rush": 1000,
@@ -13,14 +10,13 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
     };
 
     const diplomaRemarks = {
-        "Diploma - Rush": "Rush processing; available within the day or next day; includes brown envelope",
-        "Diploma with EDUFIED": "Regular processing days; includes brown envelope; 2nd copy",
+        "Diploma - Rush":
+            "Rush processing; available within the day or next day; includes brown envelope",
+        "Diploma with EDUFIED":
+            "Regular processing days; includes brown envelope; 2nd copy",
     };
 
-    const form137Options = [
-        "Form 137/138/SFIO",
-        "Form 137/138 - Rush",
-    ];
+    const form137Options = ["Form 137/138/SFIO", "Form 137/138 - Rush"];
 
     const form137Fees = {
         "Form 137/138/SFIO": 170,
@@ -29,7 +25,8 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
 
     const form137Remarks = {
         "Form 137/138/SFIO": "max 2 sheets; only BasicEd/SHS",
-        "Form 137/138 - Rush": "Faster processing, may incur additional conditions",
+        "Form 137/138 - Rush":
+            "Faster processing, may incur additional conditions",
     };
 
     const certificateOptions = [
@@ -54,10 +51,13 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
         "Certification of Weighted Average": "includes with envelope",
         "Certification-Med. of Instruction": "includes with envelope",
         "Certificate of Eligibility to Transfer": "includes with envelope",
-        "Certificate of Eligibility to Transfer, 2nd copy": "for those who lost their first copy",
+        "Certificate of Eligibility to Transfer, 2nd copy":
+            "for those who lost their first copy",
         "Certification - Letter of Acceptance": "2 types of letter",
-        "Certification - Letter of Acceptance; with SPA": "with SPA and notarization fee",
-        "Certification - Course Description": "per page charging; previous charging was for every 3-page",
+        "Certification - Letter of Acceptance; with SPA":
+            "with SPA and notarization fee",
+        "Certification - Course Description":
+            "per page charging; previous charging was for every 3-page",
     };
 
     const certificateFees = {
@@ -78,19 +78,20 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
         "Transcript (first page with doc stamp)",
         "Transcript (succeeding page)",
         "Transcript (Rush rate; per page)",
-    ]
+    ];
 
     const transcriptRemarks = {
         "Transcript (first page with doc stamp)": "includes 1 doc stamp",
         "Transcript (succeeding page)": "no doc stamp",
-        "Transcript (Rush rate; per page)": "available within the day or next day; with 1 doc stamp",
-    }
+        "Transcript (Rush rate; per page)":
+            "available within the day or next day; with 1 doc stamp",
+    };
 
     const transcriptFees = {
         "Transcript (first page with doc stamp)": 200,
         "Transcript (succeeding page)": 180,
         "Transcript (Rush rate; per page)": 300,
-    }
+    };
 
     const [selectedCertificates, setSelectedCertificates] = useState([]);
     const [selectedDocuments, setSelectedDocuments] = useState({
@@ -102,7 +103,9 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
     const [currentSelect, setCurrentSelect] = useState("");
     const [selectedDiploma, setSelectedDiploma] = useState(diplomaOptions[0]);
     const [selectedForm137, setSelectedForm137] = useState(form137Options[0]);
-    const [selectedTranscript, setSelectedTranscript] = useState(transcriptOptions[0]);
+    const [selectedTranscript, setSelectedTranscript] = useState(
+        transcriptOptions[0]
+    );
 
     // Update requested docs
     useEffect(() => {
@@ -164,14 +167,17 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                     <p className="text-2xl font-bold tracking-tight">
                         University of Pangasinan
                     </p>
-                    <p className="text-sm font-medium">List of Registrar's Fee</p>
+                    <p className="text-sm font-medium">
+                        List of Registrar's Fee
+                    </p>
                     <hr className="text-gray-300 m-7" />
                 </div>
-            
+
                 <div className="flex flex-col sm:flex-row items-start sm:items-center mb-2 space-y-2 sm:space-y-0 sm:space-x-2">
                     <p className="text-sm text-gray-500 leading-snug text-justify">
-                        Choose the documents and number of copies. Make sure to double-check
-                        the fees and remarks for each item before proceeding.
+                        Choose the documents and number of copies. Make sure to
+                        double-check the fees and remarks for each item before
+                        proceeding.
                     </p>
                 </div>
             </div>
@@ -180,13 +186,22 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                     <thead className="bg-gray-100">
                         <tr>
                             <th className="border px-2 py-1 sm:px-4 sm:py-2"></th>
-                            <th className="border px-2 py-1 sm:px-4 sm:py-2">Copies</th>
-                            <th className="border px-2 py-1 sm:px-4 sm:py-2">Document Request</th>
-                            <th className="border px-2 py-1 sm:px-4 sm:py-2">Fee</th>
-                            <th className="border px-2 py-1 sm:px-4 sm:py-2">Remarks</th>
+                            <th className="border px-2 py-1 sm:px-4 sm:py-2">
+                                Copies
+                            </th>
+                            <th className="border px-2 py-1 sm:px-4 sm:py-2">
+                                Document Request
+                            </th>
+                            <th className="border px-2 py-1 sm:px-4 sm:py-2">
+                                Fee
+                            </th>
+                            <th className="border px-2 py-1 sm:px-4 sm:py-2">
+                                Remarks
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
+                        {/* Dropdown to add new certificate */}
                         <tr>
                             <td className="border p-2"></td>
                             <td className="border p-2"></td>
@@ -196,13 +211,18 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                     onChange={handleCertificateChange}
                                     className="appearance-auto w-full border px-2 py-1 text-center"
                                 >
-                                    <option value="" className="text-center border">
+                                    <option
+                                        value=""
+                                        className="text-center border"
+                                    >
                                         Select Certificate
                                     </option>
                                     {certificateOptions
                                         .filter(
                                             (opt) =>
-                                                !selectedCertificates.includes(opt)
+                                                !selectedCertificates.includes(
+                                                    opt
+                                                )
                                         )
                                         .map((option, index) => (
                                             <option key={index} value={option}>
@@ -212,8 +232,10 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                 </select>
                             </td>
                             <td className="border p-2"></td>
+                            <td className="border p-2"></td>
                         </tr>
 
+                        {/* Selected Certificates */}
                         {selectedCertificates.map((cert) => (
                             <tr key={cert}>
                                 <td className="border p-2">
@@ -244,10 +266,13 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                         className="w-16 text-center border-none rounded"
                                     />
                                 </td>
-                                <td className="border p-2 text-center">{cert}</td>
+                                <td className="border p-2 text-center">
+                                    {cert}
+                                </td>
                                 <td className="border p-2">
                                     {(
-                                        certificateFees[cert] * (copies[cert] || 0)
+                                        (certificateFees[cert] ?? 0) *
+                                        (copies[cert] || 0)
                                     ).toFixed(2)}
                                 </td>
                                 <td className="border p-2 text-sm">
@@ -256,12 +281,15 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                             </tr>
                         ))}
 
+                        {/* Diploma */}
                         <tr>
                             <td className="border p-2">
                                 <input
                                     type="checkbox"
                                     checked={selectedDocuments.diploma}
-                                    onChange={() => handleCheckboxChange("diploma")}
+                                    onChange={() =>
+                                        handleCheckboxChange("diploma")
+                                    }
                                 />
                             </td>
                             <td className="border p-2">
@@ -281,7 +309,9 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                             <td className="text-center border">
                                 <select
                                     value={selectedDiploma}
-                                    onChange={(e) => setSelectedDiploma(e.target.value)}
+                                    onChange={(e) =>
+                                        setSelectedDiploma(e.target.value)
+                                    }
                                     className="appearance-auto w-full border px-2 py-1 text-center"
                                 >
                                     {diplomaOptions.map((opt, idx) => (
@@ -292,19 +322,25 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                 </select>
                             </td>
                             <td className="border p-2">
-                                {diplomaFees[selectedDiploma].toFixed(2)}
+                                {(
+                                    (diplomaFees[selectedDiploma] ?? 0) *
+                                    (copies.diploma || 0)
+                                ).toFixed(2)}
                             </td>
                             <td className="border p-2 text-sm">
                                 {diplomaRemarks[selectedDiploma]}
                             </td>
                         </tr>
 
+                        {/* Form 137 */}
                         <tr>
                             <td className="border p-2">
                                 <input
                                     type="checkbox"
                                     checked={selectedDocuments.form137}
-                                    onChange={() => handleCheckboxChange("form137")}
+                                    onChange={() =>
+                                        handleCheckboxChange("form137")
+                                    }
                                 />
                             </td>
                             <td className="border p-2">
@@ -324,7 +360,9 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                             <td className="text-center border">
                                 <select
                                     value={selectedForm137}
-                                    onChange={(e) => setSelectedForm137(e.target.value)}
+                                    onChange={(e) =>
+                                        setSelectedForm137(e.target.value)
+                                    }
                                     className="appearance-auto w-full border px-2 py-1 text-center"
                                 >
                                     {form137Options.map((opt, idx) => (
@@ -335,13 +373,17 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                 </select>
                             </td>
                             <td className="border p-2">
-                                {form137Fees[selectedForm137].toFixed(2)}
+                                {(
+                                    (form137Fees[selectedForm137] ?? 0) *
+                                    (copies.form137 || 0)
+                                ).toFixed(2)}
                             </td>
                             <td className="border p-2 text-sm">
                                 {form137Remarks[selectedForm137]}
                             </td>
                         </tr>
 
+                        {/* Copy of Grades */}
                         <tr>
                             <td className="border p-2">
                                 <input
@@ -368,11 +410,20 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                     className="w-16 text-center border-none rounded"
                                 />
                             </td>
-                            <td className="border p-2 text-center">Copy of Grades</td>
-                            <td className="border p-2">50.00</td>
-                            <td className="border p-2">per sem, per page</td>
+                            <td className="border p-2 text-center">
+                                Copy of Grades
+                            </td>
+                            <td className="border p-2">
+                                {(50 * (copies.registrationForm || 0)).toFixed(
+                                    2
+                                )}
+                            </td>
+                            <td className="border p-2 text-sm">
+                                per sem, per page
+                            </td>
                         </tr>
 
+                        {/* Transcript of Records */}
                         <tr>
                             <td className="border p-2">
                                 <input
@@ -398,7 +449,9 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                             <td className="text-center border">
                                 <select
                                     value={selectedTranscript}
-                                    onChange={(e) => setSelectedTranscript(e.target.value)}
+                                    onChange={(e) =>
+                                        setSelectedTranscript(e.target.value)
+                                    }
                                     className="appearance-auto w-full border px-2 py-1 text-center"
                                 >
                                     {transcriptOptions.map((opt, idx) => (
@@ -409,7 +462,10 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                 </select>
                             </td>
                             <td className="border p-2">
-                                {transcriptFees[selectedTranscript].toFixed(2)}
+                                {(
+                                    (transcriptFees[selectedTranscript] ?? 0) *
+                                    (copies.tor || 0)
+                                ).toFixed(2)}
                             </td>
                             <td className="border p-2 text-sm">
                                 {transcriptRemarks[selectedTranscript]}
@@ -418,7 +474,6 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                     </tbody>
                 </table>
             </div>
-
         </div>
     );
 };
