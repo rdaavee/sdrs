@@ -46,7 +46,7 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
                 id: index + 1,
                 name: doc[0],
                 qty: doc[1],
-                price: prices[doc[0]] * doc[1],
+                price: prices[doc[0]],
             };
         })
     );
@@ -181,9 +181,57 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
                         </h2>
                         <div className="grid grid-cols-1 gap-3 mb-6">
                             <button
-                                onClick={() =>
-                                    handlePaymentMethodSelect("online")
-                                }
+                                type="button"
+                                onClick={async () => {
+                                    handlePaymentMethodSelect("online");
+                                    setLoading(true);
+                                    try {
+                                        console.log("Starting fetch...");
+                                        const response = await fetch(
+                                            "http://localhost:3000/payments/create-invoice",
+                                            {
+                                                method: "POST",
+                                                headers: {
+                                                    "Content-Type":
+                                                        "application/json",
+                                                },
+                                                body: JSON.stringify({
+                                                    amount: total,
+                                                    description:
+                                                        "Document Request Payment",
+                                                }),
+                                            }
+                                        );
+                                        console.log("Fetch done:", response);
+
+                                        const invoice = await response.json();
+                                        console.log(
+                                            "invoice response:",
+                                            invoice
+                                        );
+
+                                        localStorage.setItem(
+                                            "pendingRequest",
+                                            JSON.stringify(dataForm)
+                                        );
+
+                                        if (invoice?.invoice_url) {
+                                            window.open(
+                                                invoice.invoice_url,
+                                                "_self"
+                                            );
+                                        } else {
+                                            console.error(
+                                                "No invoice_url in response:",
+                                                invoice
+                                            );
+                                        }
+                                    } catch (error) {
+                                        console.error("Payment error:", error);
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }}
                                 className={`w-full px-4 py-3 cursor-pointer rounded-lg border transition-all duration-200 font-medium ${
                                     selectedPaymentMethod === "online"
                                         ? "border-green-600 bg-green-50 text-green-700 shadow-md"

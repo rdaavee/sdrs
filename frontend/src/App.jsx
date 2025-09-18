@@ -7,12 +7,18 @@ import MainContent from "./admin/dashboard/pages/MainContent";
 import RequestList from "./admin/request/RequestList";
 import Index from "./admin";
 
+import PaymentSuccess from "./components/PaymentSuccess";
+import PaymentFailed from "./components/PaymentFailed";
+
 function App() {
     return (
         <Router>
             <Routes>
                 {/* ALLOW ONLY IF USER IS AUTHENTICATED */}
                 <Route path="EntryPage" element={<EntryPage />} />
+                <Route path="/success" element={<PaymentSuccess />} />
+                <Route path="/failed" element={<PaymentFailed />} />
+
                 <Route path="/" element={<Index />}>
                     <Route index element={<MainContent />} />
                     <Route path="pages/MyProfile" element={<MyProfile />} />
