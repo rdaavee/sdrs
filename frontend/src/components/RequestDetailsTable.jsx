@@ -158,261 +158,267 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
     };
 
     return (
-        <div className="overflow-x-auto w-full">
-            <div className="mb-5 text-center space-y-0">
-                <p className="text-2xl font-bold tracking-tight">
-                    University of Pangasinan
-                </p>
-                <p className="text-sm font-medium">List of Registrar's Fee</p>
-                <hr className="text-gray-300 m-7" />
+        <div>
+            <div>
+                <div className="mb-5 text-center space-y-0">
+                    <p className="text-2xl font-bold tracking-tight">
+                        University of Pangasinan
+                    </p>
+                    <p className="text-sm font-medium">List of Registrar's Fee</p>
+                    <hr className="text-gray-300 m-7" />
+                </div>
+            
+                <div className="flex flex-col sm:flex-row items-start sm:items-center mb-2 space-y-2 sm:space-y-0 sm:space-x-2">
+                    <p className="text-sm text-gray-500 leading-snug text-justify">
+                        Choose the documents and number of copies. Make sure to double-check
+                        the fees and remarks for each item before proceeding.
+                    </p>
+                </div>
             </div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center mb-2 space-y-2 sm:space-y-0 sm:space-x-2">
-                <p className="text-sm text-gray-500 leading-snug">
-                    Choose the documents and number of copies. Make sure to double-check
-                    the fees and remarks for each item before proceeding.
-                </p>
-            </div>
-            <table className="min-w-max w-full border-collapse border border-gray-300 text-xs sm:text-sm text-center">
-                <thead className="bg-gray-100">
-                    <tr>
-                        <th className="border px-2 py-1 sm:px-4 sm:py-2"></th>
-                        <th className="border px-2 py-1 sm:px-4 sm:py-2">Copies</th>
-                        <th className="border px-2 py-1 sm:px-4 sm:py-2">Document Request</th>
-                        <th className="border px-2 py-1 sm:px-4 sm:py-2">Fee</th>
-                        <th className="border px-2 py-1 sm:px-4 sm:py-2">Remarks</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td className="border p-2"></td>
-                        <td className="border p-2"></td>
-                        <td className="text-center border">
-                            <select
-                                value={currentSelect}
-                                onChange={handleCertificateChange}
-                                className="appearance-auto w-full border px-2 py-1 text-center"
-                            >
-                                <option value="" className="text-center border">
-                                    Select Certificate
-                                </option>
-                                {certificateOptions
-                                    .filter(
-                                        (opt) =>
-                                            !selectedCertificates.includes(opt)
-                                    )
-                                    .map((option, index) => (
-                                        <option key={index} value={option}>
-                                            {option}
-                                        </option>
-                                    ))}
-                            </select>
-                        </td>
-                        <td className="border p-2"></td>
-                    </tr>
+            <div className="overflow-x-auto w-full text-[10px] sm:text-xs md:text-sm lg:text-base">
+                <table className="min-w-max w-full border-collapse border border-gray-300 text-xs sm:text-sm text-center">
+                    <thead className="bg-gray-100">
+                        <tr>
+                            <th className="border px-2 py-1 sm:px-4 sm:py-2"></th>
+                            <th className="border px-2 py-1 sm:px-4 sm:py-2">Copies</th>
+                            <th className="border px-2 py-1 sm:px-4 sm:py-2">Document Request</th>
+                            <th className="border px-2 py-1 sm:px-4 sm:py-2">Fee</th>
+                            <th className="border px-2 py-1 sm:px-4 sm:py-2">Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td className="border p-2"></td>
+                            <td className="border p-2"></td>
+                            <td className="text-center border">
+                                <select
+                                    value={currentSelect}
+                                    onChange={handleCertificateChange}
+                                    className="appearance-auto w-full border px-2 py-1 text-center"
+                                >
+                                    <option value="" className="text-center border">
+                                        Select Certificate
+                                    </option>
+                                    {certificateOptions
+                                        .filter(
+                                            (opt) =>
+                                                !selectedCertificates.includes(opt)
+                                        )
+                                        .map((option, index) => (
+                                            <option key={index} value={option}>
+                                                {option}
+                                            </option>
+                                        ))}
+                                </select>
+                            </td>
+                            <td className="border p-2"></td>
+                        </tr>
 
-                    {selectedCertificates.map((cert) => (
-                        <tr key={cert}>
+                        {selectedCertificates.map((cert) => (
+                            <tr key={cert}>
+                                <td className="border p-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={true}
+                                        onChange={() => {
+                                            setSelectedCertificates((prev) =>
+                                                prev.filter((c) => c !== cert)
+                                            );
+                                            const updatedCopies = { ...copies };
+                                            delete updatedCopies[cert];
+                                            setCopies(updatedCopies);
+                                        }}
+                                    />
+                                </td>
+                                <td className="border p-2">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={copies[cert]}
+                                        onChange={(e) =>
+                                            setCopies({
+                                                ...copies,
+                                                [cert]: Number(e.target.value),
+                                            })
+                                        }
+                                        className="w-16 text-center border-none rounded"
+                                    />
+                                </td>
+                                <td className="border p-2 text-center">{cert}</td>
+                                <td className="border p-2">
+                                    {(
+                                        certificateFees[cert] * (copies[cert] || 0)
+                                    ).toFixed(2)}
+                                </td>
+                                <td className="border p-2 text-sm">
+                                    {certificateRemarks[cert] ?? ""}
+                                </td>
+                            </tr>
+                        ))}
+
+                        <tr>
                             <td className="border p-2">
                                 <input
                                     type="checkbox"
-                                    checked={true}
-                                    onChange={() => {
-                                        setSelectedCertificates((prev) =>
-                                            prev.filter((c) => c !== cert)
-                                        );
-                                        const updatedCopies = { ...copies };
-                                        delete updatedCopies[cert];
-                                        setCopies(updatedCopies);
-                                    }}
+                                    checked={selectedDocuments.diploma}
+                                    onChange={() => handleCheckboxChange("diploma")}
                                 />
                             </td>
                             <td className="border p-2">
                                 <input
                                     type="number"
                                     min="0"
-                                    value={copies[cert]}
+                                    value={copies.diploma}
                                     onChange={(e) =>
                                         setCopies({
                                             ...copies,
-                                            [cert]: Number(e.target.value),
+                                            diploma: Number(e.target.value),
                                         })
                                     }
                                     className="w-16 text-center border-none rounded"
                                 />
                             </td>
-                            <td className="border p-2 text-center">{cert}</td>
+                            <td className="text-center border">
+                                <select
+                                    value={selectedDiploma}
+                                    onChange={(e) => setSelectedDiploma(e.target.value)}
+                                    className="appearance-auto w-full border px-2 py-1 text-center"
+                                >
+                                    {diplomaOptions.map((opt, idx) => (
+                                        <option key={idx} value={opt}>
+                                            {opt}
+                                        </option>
+                                    ))}
+                                </select>
+                            </td>
                             <td className="border p-2">
-                                {(
-                                    certificateFees[cert] * (copies[cert] || 0)
-                                ).toFixed(2)}
+                                {diplomaFees[selectedDiploma].toFixed(2)}
                             </td>
                             <td className="border p-2 text-sm">
-                                {certificateRemarks[cert] ?? ""}
+                                {diplomaRemarks[selectedDiploma]}
                             </td>
                         </tr>
-                    ))}
 
-                    <tr>
-                        <td className="border p-2">
-                            <input
-                                type="checkbox"
-                                checked={selectedDocuments.diploma}
-                                onChange={() => handleCheckboxChange("diploma")}
-                            />
-                        </td>
-                        <td className="border p-2">
-                            <input
-                                type="number"
-                                min="0"
-                                value={copies.diploma}
-                                onChange={(e) =>
-                                    setCopies({
-                                        ...copies,
-                                        diploma: Number(e.target.value),
-                                    })
-                                }
-                                className="w-16 text-center border-none rounded"
-                            />
-                        </td>
-                        <td className="text-center border">
-                            <select
-                                value={selectedDiploma}
-                                onChange={(e) => setSelectedDiploma(e.target.value)}
-                                className="appearance-auto w-full border px-2 py-1 text-center"
-                            >
-                                {diplomaOptions.map((opt, idx) => (
-                                    <option key={idx} value={opt}>
-                                        {opt}
-                                    </option>
-                                ))}
-                            </select>
-                        </td>
-                        <td className="border p-2">
-                            {diplomaFees[selectedDiploma].toFixed(2)}
-                        </td>
-                        <td className="border p-2 text-sm">
-                            {diplomaRemarks[selectedDiploma]}
-                        </td>
-                    </tr>
+                        <tr>
+                            <td className="border p-2">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedDocuments.form137}
+                                    onChange={() => handleCheckboxChange("form137")}
+                                />
+                            </td>
+                            <td className="border p-2">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={copies.form137}
+                                    onChange={(e) =>
+                                        setCopies({
+                                            ...copies,
+                                            form137: Number(e.target.value),
+                                        })
+                                    }
+                                    className="w-16 text-center border-none rounded"
+                                />
+                            </td>
+                            <td className="text-center border">
+                                <select
+                                    value={selectedForm137}
+                                    onChange={(e) => setSelectedForm137(e.target.value)}
+                                    className="appearance-auto w-full border px-2 py-1 text-center"
+                                >
+                                    {form137Options.map((opt, idx) => (
+                                        <option key={idx} value={opt}>
+                                            {opt}
+                                        </option>
+                                    ))}
+                                </select>
+                            </td>
+                            <td className="border p-2">
+                                {form137Fees[selectedForm137].toFixed(2)}
+                            </td>
+                            <td className="border p-2 text-sm">
+                                {form137Remarks[selectedForm137]}
+                            </td>
+                        </tr>
 
-                    <tr>
-                        <td className="border p-2">
-                            <input
-                                type="checkbox"
-                                checked={selectedDocuments.form137}
-                                onChange={() => handleCheckboxChange("form137")}
-                            />
-                        </td>
-                        <td className="border p-2">
-                            <input
-                                type="number"
-                                min="0"
-                                value={copies.form137}
-                                onChange={(e) =>
-                                    setCopies({
-                                        ...copies,
-                                        form137: Number(e.target.value),
-                                    })
-                                }
-                                className="w-16 text-center border-none rounded"
-                            />
-                        </td>
-                        <td className="text-center border">
-                            <select
-                                value={selectedForm137}
-                                onChange={(e) => setSelectedForm137(e.target.value)}
-                                className="appearance-auto w-full border px-2 py-1 text-center"
-                            >
-                                {form137Options.map((opt, idx) => (
-                                    <option key={idx} value={opt}>
-                                        {opt}
-                                    </option>
-                                ))}
-                            </select>
-                        </td>
-                        <td className="border p-2">
-                            {form137Fees[selectedForm137].toFixed(2)}
-                        </td>
-                        <td className="border p-2 text-sm">
-                            {form137Remarks[selectedForm137]}
-                        </td>
-                    </tr>
+                        <tr>
+                            <td className="border p-2">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedDocuments.registrationForm}
+                                    onChange={() =>
+                                        handleCheckboxChange("registrationForm")
+                                    }
+                                />
+                            </td>
+                            <td className="border p-2">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={copies.registrationForm}
+                                    onChange={(e) =>
+                                        setCopies({
+                                            ...copies,
+                                            registrationForm: Number(
+                                                e.target.value
+                                            ),
+                                        })
+                                    }
+                                    className="w-16 text-center border-none rounded"
+                                />
+                            </td>
+                            <td className="border p-2 text-center">Copy of Grades</td>
+                            <td className="border p-2">50.00</td>
+                            <td className="border p-2">per sem, per page</td>
+                        </tr>
 
-                    <tr>
-                        <td className="border p-2">
-                            <input
-                                type="checkbox"
-                                checked={selectedDocuments.registrationForm}
-                                onChange={() =>
-                                    handleCheckboxChange("registrationForm")
-                                }
-                            />
-                        </td>
-                        <td className="border p-2">
-                            <input
-                                type="number"
-                                min="0"
-                                value={copies.registrationForm}
-                                onChange={(e) =>
-                                    setCopies({
-                                        ...copies,
-                                        registrationForm: Number(
-                                            e.target.value
-                                        ),
-                                    })
-                                }
-                                className="w-16 text-center border-none rounded"
-                            />
-                        </td>
-                        <td className="border p-2 text-center">Copy of Grades</td>
-                        <td className="border p-2">50.00</td>
-                        <td className="border p-2">per sem, per page</td>
-                    </tr>
+                        <tr>
+                            <td className="border p-2">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedDocuments.tor}
+                                    onChange={() => handleCheckboxChange("tor")}
+                                />
+                            </td>
+                            <td className="border p-2">
+                                <input
+                                    type="number"
+                                    min="0"
+                                    value={copies.tor}
+                                    onChange={(e) =>
+                                        setCopies({
+                                            ...copies,
+                                            tor: Number(e.target.value),
+                                        })
+                                    }
+                                    className="w-16 text-center border-none rounded"
+                                />
+                            </td>
+                            <td className="text-center border">
+                                <select
+                                    value={selectedTranscript}
+                                    onChange={(e) => setSelectedTranscript(e.target.value)}
+                                    className="appearance-auto w-full border px-2 py-1 text-center"
+                                >
+                                    {transcriptOptions.map((opt, idx) => (
+                                        <option key={idx} value={opt}>
+                                            {opt}
+                                        </option>
+                                    ))}
+                                </select>
+                            </td>
+                            <td className="border p-2">
+                                {transcriptFees[selectedTranscript].toFixed(2)}
+                            </td>
+                            <td className="border p-2 text-sm">
+                                {transcriptRemarks[selectedTranscript]}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-                    <tr>
-                        <td className="border p-2">
-                            <input
-                                type="checkbox"
-                                checked={selectedDocuments.tor}
-                                onChange={() => handleCheckboxChange("tor")}
-                            />
-                        </td>
-                        <td className="border p-2">
-                            <input
-                                type="number"
-                                min="0"
-                                value={copies.tor}
-                                onChange={(e) =>
-                                    setCopies({
-                                        ...copies,
-                                        tor: Number(e.target.value),
-                                    })
-                                }
-                                className="w-16 text-center border-none rounded"
-                            />
-                        </td>
-                        <td className="text-center border">
-                            <select
-                                value={selectedTranscript}
-                                onChange={(e) => setSelectedTranscript(e.target.value)}
-                                className="appearance-auto w-full border px-2 py-1 text-center"
-                            >
-                                {transcriptOptions.map((opt, idx) => (
-                                    <option key={idx} value={opt}>
-                                        {opt}
-                                    </option>
-                                ))}
-                            </select>
-                        </td>
-                        <td className="border p-2">
-                            {transcriptFees[selectedTranscript].toFixed(2)}
-                        </td>
-                        <td className="border p-2 text-sm">
-                            {transcriptRemarks[selectedTranscript]}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     );
 };

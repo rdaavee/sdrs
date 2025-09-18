@@ -71,7 +71,7 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                 </p>
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center p-2 space-y-2 sm:space-y-0 sm:space-x-2">
-                <p className="text-sm text-gray-500 leading-snug">
+                <p className="text-sm text-gray-500 leading-snug text-justify">
                     Fill all fields that have asterisk. Incomplete details may
                     cause delays in processing your request.
                 </p>
