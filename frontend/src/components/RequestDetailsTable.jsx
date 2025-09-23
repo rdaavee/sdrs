@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { IoInformation } from "react-icons/io5";
 
-const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
+const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
     const diplomaOptions = ["Diploma with EDUFIED", "Diploma - Rush"];
 
     const diplomaFees = {
@@ -107,6 +107,65 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
         transcriptOptions[0]
     );
 
+    // Initialize state from existing dataForm.requested_documents
+    useEffect(() => {
+        if (
+            dataForm.requested_documents &&
+            dataForm.requested_documents.length > 0
+        ) {
+            const newSelectedCertificates = [];
+            const newSelectedDocuments = {
+                diploma: false,
+                form137: false,
+                registrationForm: false,
+                tor: false,
+            };
+            const newCopies = { ...copies };
+
+            dataForm.requested_documents.forEach(([docName, quantity]) => {
+                // Check if it's a certificate
+                if (certificateOptions.includes(docName)) {
+                    newSelectedCertificates.push(docName);
+                    newCopies[docName] = quantity;
+                }
+                // Check if it's a diploma
+                else if (diplomaOptions.includes(docName)) {
+                    newSelectedDocuments.diploma = true;
+                    newCopies.diploma = quantity;
+                    setSelectedDiploma(docName);
+                }
+                // Check if it's a form 137
+                else if (form137Options.includes(docName)) {
+                    newSelectedDocuments.form137 = true;
+                    newCopies.form137 = quantity;
+                    setSelectedForm137(docName);
+                }
+                // Check if it's copy of grades
+                else if (docName === "Copy of Grades") {
+                    newSelectedDocuments.registrationForm = true;
+                    newCopies.registrationForm = quantity;
+                }
+                // Check if it's transcript of records
+                else if (docName === "Transcript of Records") {
+                    newSelectedDocuments.tor = true;
+                    newCopies.tor = quantity;
+                    // Find which transcript option matches based on the fee or default to first
+                    setSelectedTranscript(transcriptOptions[0]);
+                }
+                // Check if it's a transcript option directly
+                else if (transcriptOptions.includes(docName)) {
+                    newSelectedDocuments.tor = true;
+                    newCopies.tor = quantity;
+                    setSelectedTranscript(docName);
+                }
+            });
+
+            setSelectedCertificates(newSelectedCertificates);
+            setSelectedDocuments(newSelectedDocuments);
+            setCopies(newCopies);
+        }
+    }, []); // Run only once when component mounts
+
     // Update requested docs
     useEffect(() => {
         const requestedDocs = [];
@@ -127,7 +186,7 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
             requestedDocs.push(["Copy of Grades", copies.registrationForm]);
         }
         if (selectedDocuments.tor && copies.tor > 0) {
-            requestedDocs.push(["Transcript of Records", copies.tor]);
+            requestedDocs.push([selectedTranscript, copies.tor]);
         }
 
         setDataForm((prev) => ({
@@ -256,7 +315,7 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                     <input
                                         type="number"
                                         min="0"
-                                        value={copies[cert]}
+                                        value={copies[cert] || 0}
                                         onChange={(e) =>
                                             setCopies({
                                                 ...copies,
@@ -296,7 +355,7 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                 <input
                                     type="number"
                                     min="0"
-                                    value={copies.diploma}
+                                    value={copies.diploma || 0}
                                     onChange={(e) =>
                                         setCopies({
                                             ...copies,
@@ -347,7 +406,7 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                 <input
                                     type="number"
                                     min="0"
-                                    value={copies.form137}
+                                    value={copies.form137 || 0}
                                     onChange={(e) =>
                                         setCopies({
                                             ...copies,
@@ -398,7 +457,7 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                 <input
                                     type="number"
                                     min="0"
-                                    value={copies.registrationForm}
+                                    value={copies.registrationForm || 0}
                                     onChange={(e) =>
                                         setCopies({
                                             ...copies,
@@ -436,7 +495,7 @@ const RequestDetailsTable = ({ copies, setCopies, setDataForm }) => {
                                 <input
                                     type="number"
                                     min="0"
-                                    value={copies.tor}
+                                    value={copies.tor || 0}
                                     onChange={(e) =>
                                         setCopies({
                                             ...copies,

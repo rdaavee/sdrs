@@ -105,6 +105,7 @@ const EntryPage = () => {
                         <hr className="m-7 text-gray-300" />
                         <RequestDetailsTable
                             copies={copies}
+                            dataForm={dataForm}
                             setDataForm={setDataForm}
                             setCopies={setCopies}
                         />
