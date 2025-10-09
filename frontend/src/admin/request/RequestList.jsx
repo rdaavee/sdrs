@@ -52,6 +52,9 @@ const RequestList = () => {
     });
     const [userRole, setUserRole] = useState(null);
 
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     const statusOrder = ["waiting", "processing", "ready", "released"];
 
     //pagination
@@ -68,6 +71,17 @@ const RequestList = () => {
             [index]: !prev[index],
         }));
     };
+
+    const openModal = (request) => {
+        setSelectedRequest(request);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedRequest(null);
+    };
+
 
     const exportToExcel = () => {
         if (!receipts.length) return;
@@ -392,6 +406,7 @@ const RequestList = () => {
                                         <tr
                                             key={idx}
                                             className="hover:bg-[#f9fafb] transition duration-300"
+                                            onClick={() => openModal(req)}
                                         >
                                             <td className="px-4 py-2">
                                                 {highlightMatch(
@@ -582,6 +597,99 @@ const RequestList = () => {
                     )}
                 </div>
             </div>
+
+            {isModalOpen && selectedRequest && (
+                <div className="fixed inset-0 backdrop-blur-sm bg-white/40 flex items-center justify-center z-50">
+                    <div className="bg-white border-t-2 border-t-green-500 rounded-2xl shadow-xs p-6 max-w-lg w-full mx-auto outline-none flex flex-col items-center text-center">
+
+                        <h2 className="text-2xl font-semibold text-black mb-1">
+                            Request Details
+                        </h2>
+
+                        <hr className="w-full border-t border-gray-200 my-4" />
+
+                        <div className="text-gray-600 font-[300] text-sm w-full space-y-3">
+                            <div className="flex justify-between">
+                                <strong>Reference #</strong>
+                                <span>{selectedRequest.reference_number}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <strong>Email</strong>
+                                <span>{selectedRequest.email_address}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <strong>Documents</strong>
+                                <span className="text-right">
+                                    {selectedRequest.requested_documents.join(", ")}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <strong>Payment Method</strong>
+                                <span>{selectedRequest.payment_method}</span>
+                            </div>
+                            {/* TODO: fix the status */}
+                            <div className="flex justify-between items-center">
+                                <strong>Payment Status</strong>
+                                <span
+                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                                    selectedRequest.paid ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                                    }`}
+                                >
+                                    {selectedRequest.paid ? "Paid" : "Not yet paid"}
+                                </span>
+                            </div>
+                            <div className="flex justify-between">
+                                <strong>Full Name</strong>
+                                <span>{selectedRequest.full_name}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <strong>Student No</strong>
+                                <span>{selectedRequest.student_number}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <strong>Course</strong>
+                                <span>{selectedRequest.course}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <strong>Current Address</strong>
+                                <span>{selectedRequest.current_address}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <strong>Contact Number</strong>
+                                <span>{selectedRequest.contact_number}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <strong>Purpose</strong>
+                                <span>{selectedRequest.purpose_of_request}</span>
+                            </div>
+                            <div className="flex justify-between">
+                                <strong>Date Requested</strong>
+                                <span>{new Date(selectedRequest.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <strong>Status</strong>
+                                <span
+                                    className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
+                                        selectedRequest.status
+                                    )}`}
+                                >
+                                    {selectedRequest.status.charAt(0).toUpperCase() +
+                                        selectedRequest.status.slice(1)}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-center gap-6 mt-6">
+                            <button
+                                onClick={closeModal}
+                                className="bg-[#03b335] hover:bg-[#218838] transition-colors duration-300 text-white px-5 py-2 rounded-lg text-sm outline-0"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
