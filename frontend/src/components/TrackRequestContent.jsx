@@ -187,7 +187,13 @@ const TrackRequestContent = () => {
                             <p className="text-gray-600 text-sm">
                                 Request Timestamp :
                                 <span className="ml-2 text-gray-900 font-medium">
-                                    {requestReceipt.createdAt}
+                                    {new Date(requestReceipt.createdAt).toLocaleDateString("en-US", {
+                                        year: "numeric",
+                                        month: "long",
+                                        day: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    })}
                                 </span>
                             </p>
                             <p className="text-gray-600 text-sm">
