@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { IoEye, IoEyeOff, IoInformation } from "react-icons/io5";
 import { requestCode, verifyCode } from "../services/verify";
 
-import courses from "../constants/courses";
+import CourseSelect from "./CourseSelect";
 
 const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
     const [error, setError] = useState("");
@@ -105,20 +105,12 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                             <label className="block text-gray-700 mb-1">
                                 Courses <span className="text-red-500">*</span>
                             </label>
-                            <select
-                                onChange={(e) =>
-                                    handleInputChange("course", e.target.value)
-                                }
+                            <CourseSelect
                                 value={dataForm.course}
-                                className="w-full border border-gray-300 rounded px-3 py-2"
-                            >
-                                <option value="">Select</option>
-                                {courses.map((course, index) => (
-                                    <option key={index} value={course}>
-                                        {course}
-                                    </option>
-                                ))}
-                            </select>
+                                onChange={(val) =>
+                                    handleInputChange("course", val)
+                                }
+                            />
                         </div>
 
                         <div className="w-full sm:w-auto">
@@ -421,7 +413,10 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                                         /\D/g,
                                         ""
                                     );
-                                    handleInputChange("elementary_year_graduated", value);
+                                    handleInputChange(
+                                        "elementary_year_graduated",
+                                        value
+                                    );
                                 }}
                                 value={dataForm.elementary_year_graduated}
                                 placeholder="e.g. 2015"
@@ -465,7 +460,10 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                                         /\D/g,
                                         ""
                                     );
-                                    handleInputChange("highschool_year_graduated", value);
+                                    handleInputChange(
+                                        "highschool_year_graduated",
+                                        value
+                                    );
                                 }}
                                 value={dataForm.highschool_year_graduated}
                                 placeholder="e.g. 2021"
