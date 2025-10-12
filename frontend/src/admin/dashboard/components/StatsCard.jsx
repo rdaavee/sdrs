@@ -43,7 +43,7 @@ const StatsCards = () => {
                     <div
                         key={index}
                         onClick={() => navigate("/pages/RequestList")}
-                        className="dashboard-item shadow-[0_6px_6px_rgba(0,0,0,.02)] bg-white rounded-[30px] total-request flex items-start justify-between relative"
+                        className="dashboard-item shadow-[0_6px_6px_rgba(0,0,0,.02)] bg-white rounded-[30px] total-request flex items-start justify-between relative cursor-pointer"
                     >
                         <div className="flex flex-col items-start z-[9]">
                             <div className="text-5xl mb-1 font-semibold text-[#244034]">
@@ -55,10 +55,10 @@ const StatsCards = () => {
                         </div>
                         <div
                             className={`rounded-full w-16 h-16 flex items-center justify-center z-[9] animate-pulse ${
-                                item.label === "Requests" ? "bg-purple-100" :
-                                item.label === "Pending" ? "bg-blue-100" :
-                                item.label === "Processing" ? "bg-purple-100" :
-                                "bg-green-100"
+                                item.label === "Requests" ? "bg-purple-50" :
+                                item.label === "Pending" ? "bg-blue-50" :
+                                item.label === "Processing" ? "bg-purple-50" :
+                                "bg-green-50"
                             }`}
                             >
                             <Icon

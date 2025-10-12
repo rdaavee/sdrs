@@ -20,6 +20,7 @@ import logout from "../assets/svgs/logout-icon-01.svg";
 import ShimmerLoader from "../components/ShimmerLoader";
 import { cookies, logoutMethod } from "../services/admin";
 import socket from "../../socket";
+import { LogOutIcon } from "lucide-react";
 
 const Dashboard = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -133,7 +134,7 @@ const Dashboard = () => {
         <>
             <div className="dashboard-wrapper relative w-full flex items-start justify-between bg-[#f0f5f3] min-h-[100vh]">
                 <div
-                    className={`sidebar bg-white shadow-md pt-[30px] px-[20px] ${
+                    className={`sidebar bg-white flex flex-col min-h-screen shadow-md pt-[30px] px-[20px] ${
                         isSidebarActive ? "active" : ""
                     }`}
                 >
@@ -156,7 +157,7 @@ const Dashboard = () => {
                             <Link
                                 to="/"
                                 onClick={() => setActiveItem("Dashboard")}
-                                className={`flex items-center w-full gap-2 p-5 rounded-2xl ${
+                                className={`flex items-center w-full gap-2 p-5 rounded-2xl duration-300 transition-colors ${
                                     activeItem === "Dashboard" ? "active" : ""
                                 }`}
                             >
@@ -191,7 +192,7 @@ const Dashboard = () => {
                                         ""
                                     )}`}
                                     onClick={() => setActiveItem(item.name)}
-                                    className={`flex items-center w-full gap-2 p-5 rounded-2xl ${
+                                    className={`flex items-center w-full gap-2 p-5 rounded-2xl duration-300 transition-colors ${
                                         activeItem === item.name ? "active" : ""
                                     }`}
                                 >
@@ -224,49 +225,11 @@ const Dashboard = () => {
 
                     <button
                         onClick={() => setShowLogoutModal(true)}
-                        className="flex items-center w-full hover:text-red-500 duration-300 transition-colors gap-2 p-5 rounded-2xl cursor-pointer"
+                        className="mt-auto mb-3 flex items-center w-full duration-300 transition-colors text-white gap-2 p-3 rounded-xl cursor-pointer bg-green-500 hover:bg-green-600"
                     >
-                        <img
-                            src={logout}
-                            alt="logout-icon"
-                            className="w-[18px]"
-                        />
-                        <span className="text-lg ps-2 font-[500]">Logout</span>
+                        <LogOutIcon className="text-white size-4.5"/>
+                        <span className="text-md ps-2 font-[500]">Logout</span>
                     </button>
-
-                    {/* delete modal */}
-                    {showModal && (
-                        <div className="fixed inset-0 backdrop-blur-sm bg-white/40 flex items-center justify-center z-50">
-                            <div className="bg-white border-t-2 border-t-green-500 rounded-2xl shadow-xs p-6 max-w-sm w-full mx-auto outline-none flex flex-col items-center text-center">
-                                <img
-                                    src={deleteIcon}
-                                    alt="delete-icon"
-                                    className="w-[50px] h-[50px] mb-4"
-                                />
-                                <h2 className="text-2xl font-semibold text-black mb-2">
-                                    Are you sure?
-                                </h2>
-                                <p className="text-gray-500 mb-6 font-[300] text-center">
-                                    Are you sure to delete your account? All
-                                    data will be lost.
-                                </p>
-                                <div className="flex justify-center gap-6">
-                                    <button
-                                        onClick={confirmLogout}
-                                        className="bg-[#ff2730] hover:bg-[#92070c] transition-colors duration-300 text-white px-8 py-2 rounded-lg text-lg font-[500]"
-                                    >
-                                        Yes
-                                    </button>
-                                    <button
-                                        onClick={() => setShowModal(false)}
-                                        className="text-[#2c2c50] hover:underline font-[500] text-lg"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
                     {/* logout modal */}
                     {showLogoutModal && (
