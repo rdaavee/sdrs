@@ -367,10 +367,9 @@ const RequestList = () => {
                                 onClick={exportToExcel}
                                 className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 cursor-pointer transition"
                             >
-                                <PiExportLight className="text-xl"/>
+                                <PiExportLight className="text-xl" />
                             </button>
                         </div>
-
                     </div>
                     {/* Table */}
                     <div className="flex-1">
@@ -493,23 +492,29 @@ const RequestList = () => {
                                                     req.status === "waiting" ? (
                                                         <div className="flex gap-2">
                                                             <button
-                                                                onClick={() =>
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    e.stopPropagation();
                                                                     handleAction(
                                                                         req._id,
                                                                         "accepted"
-                                                                    )
-                                                                }
+                                                                    );
+                                                                }}
                                                                 className="px-3 py-1 rounded bg-green-100 text-green-700 text-xs cursor-pointer"
                                                             >
                                                                 Accept
                                                             </button>
                                                             <button
-                                                                onClick={() =>
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    e.stopPropagation();
                                                                     handleAction(
                                                                         req._id,
                                                                         "rejected"
-                                                                    )
-                                                                }
+                                                                    );
+                                                                }}
                                                                 className="px-3 py-1 rounded bg-red-100 text-red-700 text-xs cursor-pointer"
                                                             >
                                                                 Reject
@@ -532,18 +537,46 @@ const RequestList = () => {
                                                 ) : (
                                                     <select
                                                         value={req.status}
-                                                        onChange={(e) => handleStatusChange(req._id, e.target.value)}
-                                                        className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(req.status)}`}
+                                                        onClick={(e) =>
+                                                            e.stopPropagation()
+                                                        }
+                                                        onChange={(e) =>
+                                                            handleStatusChange(
+                                                                req._id,
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
+                                                            req.status
+                                                        )}`}
                                                     >
-                                                        {rolePermissions[userRole]
+                                                        {rolePermissions[
+                                                            userRole
+                                                        ]
                                                             ?.filter(
                                                                 (status) =>
-                                                                    statusOrder.indexOf(status) >=
-                                                                    statusOrder.indexOf(req.status)
+                                                                    statusOrder.indexOf(
+                                                                        status
+                                                                    ) >=
+                                                                    statusOrder.indexOf(
+                                                                        req.status
+                                                                    )
                                                             )
                                                             .map((status) => (
-                                                                <option key={status} value={status}>
-                                                                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                                                                <option
+                                                                    key={status}
+                                                                    value={
+                                                                        status
+                                                                    }
+                                                                >
+                                                                    {status
+                                                                        .charAt(
+                                                                            0
+                                                                        )
+                                                                        .toUpperCase() +
+                                                                        status.slice(
+                                                                            1
+                                                                        )}
                                                                 </option>
                                                             ))}
                                                     </select>
@@ -601,7 +634,6 @@ const RequestList = () => {
             {isModalOpen && selectedRequest && (
                 <div className="fixed inset-0 backdrop-blur-sm bg-white/40 flex items-center justify-center z-50">
                     <div className="bg-white border-t-2 border-t-green-500 rounded-2xl shadow-xs p-6 max-w-lg w-full mx-auto outline-none flex flex-col items-center text-center">
-
                         <h2 className="text-2xl font-semibold text-black mb-1">
                             Request Details
                         </h2>
@@ -620,7 +652,9 @@ const RequestList = () => {
                             <div className="flex justify-between">
                                 <strong>Documents</strong>
                                 <span className="text-right">
-                                    {selectedRequest.requested_documents.join(", ")}
+                                    {selectedRequest.requested_documents.join(
+                                        ", "
+                                    )}
                                 </span>
                             </div>
                             <div className="flex justify-between">
@@ -632,10 +666,14 @@ const RequestList = () => {
                                 <strong>Payment Status</strong>
                                 <span
                                     className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                                    selectedRequest.paid ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                                        selectedRequest.paid
+                                            ? "bg-green-100 text-green-700"
+                                            : "bg-red-100 text-red-700"
                                     }`}
                                 >
-                                    {selectedRequest.paid ? "Paid" : "Not yet paid"}
+                                    {selectedRequest.paid
+                                        ? "Paid"
+                                        : "Not yet paid"}
                                 </span>
                             </div>
                             <div className="flex justify-between">
@@ -660,11 +698,17 @@ const RequestList = () => {
                             </div>
                             <div className="flex justify-between">
                                 <strong>Purpose</strong>
-                                <span>{selectedRequest.purpose_of_request}</span>
+                                <span>
+                                    {selectedRequest.purpose_of_request}
+                                </span>
                             </div>
                             <div className="flex justify-between">
                                 <strong>Date Requested</strong>
-                                <span>{new Date(selectedRequest.createdAt).toLocaleDateString()}</span>
+                                <span>
+                                    {new Date(
+                                        selectedRequest.createdAt
+                                    ).toLocaleDateString()}
+                                </span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <strong>Status</strong>
@@ -673,7 +717,9 @@ const RequestList = () => {
                                         selectedRequest.status
                                     )}`}
                                 >
-                                    {selectedRequest.status.charAt(0).toUpperCase() +
+                                    {selectedRequest.status
+                                        .charAt(0)
+                                        .toUpperCase() +
                                         selectedRequest.status.slice(1)}
                                 </span>
                             </div>
