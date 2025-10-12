@@ -33,6 +33,18 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        if (location.pathname === "/") {
+            setActiveItem("Dashboard");
+        } else if (location.pathname.includes("RequestList")) {
+            setActiveItem("Request List");
+        } else if (location.pathname.includes("StaffManagement")) {
+            setActiveItem("Staff Management");
+        } else if (location.pathname.includes("MyProfile")) {
+            setActiveItem("MyProfile");
+        }
+    }, [location]);
+
+    useEffect(() => {
         setLoading(true);
         const timer = setTimeout(() => {
             setLoading(false);
@@ -423,21 +435,6 @@ const Dashboard = () => {
                                                 Profile
                                             </span>
                                         </Link>
-                                    </li>
-                                    <li onClick={() => setIsOpen(false)}>
-                                        <a
-                                            href="#"
-                                            className="flex items-center gap-2 text-gray-700 hover:text-[#3c8968] transition"
-                                        >
-                                            <img
-                                                src={setting1}
-                                                alt=""
-                                                className="w-[18px]"
-                                            />
-                                            <span className="text-sm">
-                                                Account Settings
-                                            </span>
-                                        </a>
                                     </li>
                                 </ul>
                             </div>
