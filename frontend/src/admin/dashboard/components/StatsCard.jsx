@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getAllRequestReceiptStats } from "../../../services/request";
 import { MdOutlineCallReceived } from "react-icons/md";
 import { FaClock, FaCog, FaCheckCircle } from "react-icons/fa";
 
 const BASE_STATS_ICON = [
-    { value: 0, label: "Requests", icon: MdOutlineCallReceived },
-    { value: 0, label: "Pending", icon: FaClock },
-    { value: 0, label: "Processing", icon: FaCog },
-    { value: 0, label: "Ready", icon: FaCheckCircle },
+    { value: 0, label: "Requests", icon: MdOutlineCallReceived},
+    { value: 0, label: "Pending", icon: FaClock},
+    { value: 0, label: "Processing", icon: FaCog},
+    { value: 0, label: "Ready", icon: FaCheckCircle},
 ];
 
 const StatsCards = () => {
     const [stats, setStats] = useState(BASE_STATS_ICON);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -40,6 +42,7 @@ const StatsCards = () => {
                 return (
                     <div
                         key={index}
+                        onClick={() => navigate("/pages/RequestList")}
                         className="dashboard-item shadow-[0_6px_6px_rgba(0,0,0,.02)] bg-white rounded-[30px] total-request flex items-start justify-between relative"
                     >
                         <div className="flex flex-col items-start z-[9]">
@@ -50,8 +53,22 @@ const StatsCards = () => {
                                 {item.label}
                             </span>
                         </div>
-                        <div className="bg-gray-100 rounded-full w-16 h-16 flex items-center justify-center z-[9]">
-                            <Icon className="w-7 h-7 text-gray-300" />
+                        <div
+                            className={`rounded-full w-16 h-16 flex items-center justify-center z-[9] animate-pulse ${
+                                item.label === "Requests" ? "bg-purple-100" :
+                                item.label === "Pending" ? "bg-blue-100" :
+                                item.label === "Processing" ? "bg-purple-100" :
+                                "bg-green-100"
+                            }`}
+                            >
+                            <Icon
+                                className={`w-7 h-7 ${
+                                item.label === "Requests" ? "text-purple-500" :
+                                item.label === "Pending" ? "text-blue-200" :
+                                item.label === "Processing" ? "text-amber-500" :
+                                "text-green-500"
+                                }`}
+                            />
                         </div>
                     </div>
                 );
