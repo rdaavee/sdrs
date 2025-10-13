@@ -4,6 +4,7 @@ import Modal from "react-modal";
 import Lottie from "lottie-react";
 import successAnimation from "../assets/lottie/found.json";
 import {
+    IoAttachOutline,
     IoDocumentOutline,
     IoInformation,
     IoSchoolOutline,
@@ -285,6 +286,117 @@ const TrackRequestContent = () => {
                             </div>
                         </div>
                     </div>
+
+                    <div className="inline-flex mt-15">
+                        <span className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100">
+                            <IoAttachOutline className="text-2xl text-gray-600" />
+                        </span>
+                        <p className="text-xl ml-2 text-gray-500 mt-1">
+                            Attachment File
+                        </p>
+                    </div>
+                    
+                    <div className="border m-3 border-gray-300 rounded p-6 mb-5">
+                        <h3 className="text-lg font-semibold text-gray-600 mb-3">
+                            Payment Confirmation
+                        </h3>
+                        <p className="text-sm text-gray-500 mb-4">
+                            Attach your official receipt and add comments if needed.
+                        </p>
+
+                        <div className="relative flex items-center">
+                            <textarea
+                                placeholder="Add comments here..."
+                                className="w-full border border-gray-300 rounded px-3 py-2 text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-green-500"
+                                rows={3}
+                                value={requestReceipt.comment || ""}
+                                onChange={(e) =>
+                                    setRequestReceipt((prev) => ({
+                                        ...prev,
+                                        comment: e.target.value,
+                                    }))
+                                }
+                            />
+
+                            <input
+                                type="file"
+                                accept="image/*,.pdf"
+                                id="fileUpload"
+                                className="hidden"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setRequestReceipt((prev) => ({
+                                            ...prev,
+                                            uploadedReceipt: file,
+                                        }));
+                                    }
+                                }}
+                            />
+
+                            <label
+                                htmlFor="fileUpload"
+                                className="absolute right-3 bottom-3 cursor-pointer text-gray-500 hover:text-green-700"
+                                title="Attach receipt"
+                            >
+                                <IoAttachOutline className="size-7 bg-green-100 p-1 text-green-500 rounded-full"/>
+                            </label>
+                        </div>
+
+                        {requestReceipt.uploadedReceipt && (
+                            <div className="mt-3 text-sm text-gray-700">
+                                <p>
+                                    Attached:{" "}
+                                    <span className="font-medium">
+                                        {requestReceipt.uploadedReceipt.name}
+                                    </span>
+                                </p>
+
+                                {requestReceipt.uploadedReceipt.type.startsWith("image/") && (
+                                    <img
+                                        src={URL.createObjectURL(requestReceipt.uploadedReceipt)}
+                                        alt="Preview"
+                                        className="mt-2 max-h-40 rounded border"
+                                    />
+                                )}
+                            </div>
+                        )}
+
+                        {requestReceipt.uploadedReceipt && (
+                            <button
+                                onClick={async () => {
+                                    const formData = new FormData();
+                                    if (requestReceipt.uploadedReceipt) {
+                                        formData.append("receipt", requestReceipt.uploadedReceipt);
+                                    }
+                                    formData.append("reference_number", requestReceipt.reference_number);
+                                    if (requestReceipt.comment) {
+                                        formData.append("comment", requestReceipt.comment);
+                                    }
+
+                                    try {
+                                        const res = await fetch("/api/upload-receipt", {
+                                            method: "POST",
+                                            body: formData,
+                                        });
+                                        if (res.ok) {
+                                            alert("Submitted successfully!");
+                                        } else {
+                                            alert("Failed to submit.");
+                                        }
+                                    } catch (error) {
+                                        console.error(error);
+                                        alert("Error submitting data.");
+                                    }
+                                }}
+                                className="mt-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                            >
+                                Submit
+                            </button>
+                        )}
+
+                    </div>
+
                     <p className="text-gray-400 text-[10px]">
                         * NOTICE: Printing of{" "}
                         <span className="font-bold">CLAIM SLIP</span> will be
