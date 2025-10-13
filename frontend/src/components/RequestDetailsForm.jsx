@@ -489,6 +489,22 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                             value={dataForm.purpose_of_request}
                         />
                     </div>
+
+                    <div className="mt-4">
+                        <label className="flex items-start gap-2 text-sm text-gray-700">
+                            <input
+                                type="checkbox"
+                                checked={dataForm.confirm_information || false}
+                                onChange={(e) =>
+                                    handleInputChange("confirm_information", e.target.checked)
+                                }
+                                className="mt-1"
+                            />
+                            <span>I confirm that all information provided is accurate, and I authorize 
+                                <span className="font-semibold"> SDRS Team</span> to verify my information.
+                            </span>
+                        </label>
+                    </div>
                 </form>
             </div>
         </div>

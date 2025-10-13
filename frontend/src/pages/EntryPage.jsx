@@ -236,6 +236,7 @@ const EntryPage = () => {
                         handlePrevious={() => setCurrentStep((s) => s - 1)}
                         handleNext={handleNext}
                         dataForm={dataForm}
+                        canProceed={dataForm.confirm_information}
                     />
                 )}
             </div>
