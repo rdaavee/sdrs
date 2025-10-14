@@ -28,7 +28,7 @@ mongoose
 
     const allowedOrigins = [
         "http://localhost:5173",
-        process.env.CLIENT_URL as string,
+        "https://student-document-request-system-2.onrender.com"
     ].filter(Boolean);
 
 app.set('trust proxy', 1);
