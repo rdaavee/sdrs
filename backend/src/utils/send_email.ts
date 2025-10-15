@@ -1,7 +1,7 @@
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL = process.env.EMAIL_USER;
+const FROM_EMAIL = "onboarding@resend.dev";
 
 export const sendEmail = async (receiver: string, code: string) => {
   const subject = "Email Verification Code";
@@ -32,7 +32,7 @@ export const sendEmail = async (receiver: string, code: string) => {
 
   try {
     await resend.emails.send({
-      from: FROM_EMAIL as string,
+      from: FROM_EMAIL,
       to: receiver,
       subject,
       html,
@@ -88,7 +88,7 @@ export const sendEmailRequestReceipt = async (
 
   try {
     await resend.emails.send({
-      from: FROM_EMAIL as string,
+      from: FROM_EMAIL,
       to: receiver,
       subject,
       html,
@@ -140,7 +140,7 @@ export const sendStatusUpdateEmail = async (
 
   try {
     await resend.emails.send({
-      from: FROM_EMAIL as string,
+      from: FROM_EMAIL,
       to: receiver,
       subject,
       html,
