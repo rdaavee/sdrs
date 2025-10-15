@@ -1,55 +1,62 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-const FROM_EMAIL = process.env.EMAIL_USER;
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
-export const sendEmail = async (receiver: string, code: string) => {
-  const subject = "Email Verification Code";
-  const text = `Hello,
+export const sendEmail = (receiver: string, code: string) => {
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: receiver,
+    subject: "Email Verification Code",
+    text: `Hello,
 
-      We received a request to verify this email address for your request submission.  
+        We received a request to verify this email address for your request submission.  
 
-      Your 6-digit verification code is: ${code}
+        Your 6-digit verification code is: ${code}
 
-      Please enter this code in the application to confirm your email. Once verified, your reference number and tracking code will be sent to this email address.
+        Please enter this code in the application to confirm your email. Once verified, your reference number and tracking code will be sent to this email address.
 
-      If you did not request this, you can safely ignore this message.
+        If you did not request this, you can safely ignore this message.
 
-      Best regards,  
-      The SDRS Team`;
-  const html = `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-          <p>Hello,</p>
-          <p>We received a request to verify this email address for your request submission.</p>
-          <p style="font-size: 18px; font-weight: bold; color: #04882a;">
-              Your 6-digit verification code is: <span>${code}</span>
-          </p>
-          <p>Please enter this code in the application to confirm your email. Once verified, your reference number and tracking code will be sent to this address.</p>
-          <p>If you did not request this, you can safely ignore this message.</p>
-          <p>Best regards,<br/>The SDRS Team</p>
-      </div>
-  `;
+        Best regards,  
+        The SDRS Team`,
+    html: `
+        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <p>Hello,</p>
+            <p>We received a request to verify this email address for your request submission.</p>
+            <p style="font-size: 18px; font-weight: bold; color: #04882a;">
+                Your 6-digit verification code is: <span>${code}</span>
+            </p>
+            <p>Please enter this code in the application to confirm your email. Once verified, your reference number and tracking code will be sent to this address.</p>
+            <p>If you did not request this, you can safely ignore this message.</p>
+            <p>Best regards,<br/>The SDRS Team</p>
+        </div>
+    `,
+  };
 
-  try {
-    await resend.emails.send({
-      from: FROM_EMAIL as string,
-      to: receiver,
-      subject,
-      html,
-      text,
-    });
-    console.log(`Verification email sent to ${receiver}`);
-  } catch (error) {
-    console.error("Error sending verification email:", error);
-  }
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log("Error:", error);
+    } else {
+      console.log("Email sent:", info.response);
+    }
+  });
 };
-export const sendEmailRequestReceipt = async (
+export const sendEmailRequestReceipt = (
   receiver: string,
   reference_number: string,
   tracking_code: string
 ) => {
-  const subject = "Request Receipt & Tracking Information";
-  const text = `Hello,
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: receiver,
+    subject: "Request Receipt & Tracking Information",
+    text: `Hello,
 
         We received your request submission. Below are your identifiers for tracking:
 
@@ -61,9 +68,9 @@ export const sendEmailRequestReceipt = async (
         If you did not make this request, you can safely ignore this message.
 
         Best regards,  
-        The SDRS Team`;
+        The SDRS Team`,
 
-  const html = `
+    html: `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
         <p>Hello,</p>
         <p>We received your request submission. Below are your identifiers for tracking:</p>
@@ -83,30 +90,28 @@ export const sendEmailRequestReceipt = async (
         <p>If you did not make this request, you can safely ignore this message.</p>
         <p>Best regards,<br/>The SDRS Team</p>
     </div>
-    `;
+    `,
+  };
 
-
-  try {
-    await resend.emails.send({
-      from: FROM_EMAIL as string,
-      to: receiver,
-      subject,
-      html,
-      text,
-    });
-    console.log(`Request receipt email sent to ${receiver}`);
-  } catch (error) {
-    console.error("Error sending request receipt email:", error);
-  }
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log("Error:", error);
+    } else {
+      console.log("Email sent:", info.response);
+    }
+  });
 };
 
-export const sendStatusUpdateEmail = async (
+export const sendStatusUpdateEmail = (
   receiver: string,
   reference_number: string,
   status: string
 ) => {
-  const subject = `Update on your request: ${reference_number}`;
-  const text = `Hello,
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: receiver,
+    subject: `Update on your request: ${reference_number}`,
+    text: `Hello,
     Your request with Reference Number ${reference_number} has been updated.  
       
     Current Status: ${status.toUpperCase()}
@@ -114,9 +119,9 @@ export const sendStatusUpdateEmail = async (
     You can log in or use your tracking code to view more details.  
       
     Best regards,  
-    The SDRS Team`;
+    The SDRS Team`,
 
-  const html = `
+    html: `
     <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
       <p>Hello,</p>
       <p>Your request with the following details has been updated:</p>
@@ -135,19 +140,14 @@ export const sendStatusUpdateEmail = async (
       <p>Visit <a href="https://student-document-request-system-2.onrender.com/EntryPage" target="_blank">SDRS</a> and use your tracking code to view more details.</p>
       <p>Best regards,<br/>The SDRS Team</p>
     </div>
-    `;
+    `,
+  };
 
-
-  try {
-    await resend.emails.send({
-      from: FROM_EMAIL as string,
-      to: receiver,
-      subject,
-      html,
-      text,
-    });
-    console.log(`Status update email sent to ${receiver}`);
-  } catch (error) {
-    console.error("Error sending status update email:", error);
-  }
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log("Error sending status update email:", error);
+    } else {
+      console.log("Status update email sent:", info.response);
+    }
+  });
 };
