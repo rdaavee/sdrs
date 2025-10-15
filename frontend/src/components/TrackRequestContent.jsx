@@ -244,7 +244,17 @@ const TrackRequestContent = ({ reference, code, onTrackingUpdate }) => {
                             </p>
                             <p className="text-gray-600 text-sm">
                                 Request Status :
-                                <span className="ml-2 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                <span
+                                    className={`ml-2 px-3 py-1 rounded-full text-xs font-semibold 
+                                    ${
+                                        requestReceipt.status === "accepted"
+                                            ? "bg-green-100 text-green-700"
+                                            : requestReceipt.status ===
+                                              "rejected"
+                                            ? "bg-red-100 text-red-700"
+                                            : "bg-gray-100 text-gray-700"
+                                    }`}
+                                >
                                     {requestReceipt.status}
                                 </span>
                             </p>
@@ -283,10 +293,22 @@ const TrackRequestContent = ({ reference, code, onTrackingUpdate }) => {
                                                 {req[0]}
                                             </td>
                                             <td className="px-4 py-2">
-                                                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                                                <span
+                                                    className={`px-3 py-1 rounded-full text-xs font-semibold 
+                                                    ${
+                                                        requestReceipt.status ===
+                                                        "accepted"
+                                                            ? "bg-green-100 text-green-700"
+                                                            : requestReceipt.status ===
+                                                              "rejected"
+                                                            ? "bg-red-100 text-red-700"
+                                                            : "bg-gray-100 text-gray-700"
+                                                    }`}
+                                                >
                                                     {requestReceipt.status}
                                                 </span>
                                             </td>
+
                                             <td className="px-4 py-2 text-gray-600 text-sm">
                                                 {requestReceipt.status ===
                                                 "waiting"
@@ -312,6 +334,9 @@ const TrackRequestContent = ({ reference, code, onTrackingUpdate }) => {
                                                     : requestReceipt.status ===
                                                       "ready"
                                                     ? "Please claim at the Registrar’s Office"
+                                                    : requestReceipt.status ===
+                                                      "rejected"
+                                                    ? "Your request has been rejected. For more details, please contact the SDRS team or visit the Registrar’s Office."
                                                     : "The document is already released"}
                                             </td>
                                         </tr>
