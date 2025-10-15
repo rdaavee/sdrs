@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRegFile, FaSearch } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
@@ -14,7 +14,10 @@ import TrackRequestContent from "../components/TrackRequestContent";
 import PrivacyModal from "../components/PrivacyModal";
 
 const EntryPage = () => {
-    const [showModal, setShowModal] = useState(true);
+    const firstLoad = useRef(true);
+
+    const [showModal, setShowModal] = useState(false);
+
     const [dataForm, setDataForm] = useState({
         full_name: "",
         current_address: "",
@@ -30,7 +33,11 @@ const EntryPage = () => {
         payment_method: "",
         paid: false,
     });
-    const [activeTab, setActiveTab] = useState("newRequest");
+
+    const [activeTab, setActiveTab] = useState(() => {
+        return localStorage.getItem("activeTab") || "newRequest";
+    });
+
     const [currentStep, setCurrentStep] = useState(0);
     const steps = ["Welcome", "Request Details", "Submit"];
 
@@ -42,6 +49,27 @@ const EntryPage = () => {
         registrationForm: 1,
         tor: 1,
     });
+
+    const [trackingData, setTrackingData] = useState(() => {
+        return {
+            reference: localStorage.getItem("referenceNumber") || "",
+            code: localStorage.getItem("trackingCode") || "",
+        };
+    });
+
+    const handleTrackingUpdate = (ref, code) => {
+        setTrackingData({ reference: ref, code });
+        localStorage.setItem("referenceNumber", ref);
+        localStorage.setItem("trackingCode", code);
+    };
+
+    const handleTabChange = (tab) => {
+        setActiveTab(tab);
+        localStorage.setItem("activeTab", tab);
+        if (tab === "requestTracker") {
+            setCurrentStep(0);
+        }
+    };
 
     const validateForm = () => {
         if (currentStep === 1) {
@@ -85,7 +113,13 @@ const EntryPage = () => {
 
     const renderContent = () => {
         if (activeTab === "requestTracker") {
-            return <TrackRequestContent />;
+            return (
+                <TrackRequestContent
+                    reference={trackingData.reference}
+                    code={trackingData.code}
+                    onTrackingUpdate={handleTrackingUpdate}
+                />
+            );
         }
 
         switch (currentStep) {
@@ -137,11 +171,41 @@ const EntryPage = () => {
     };
 
     const handleNext = () => {
-        const tate = validateForm();
-        if (tate) {
+        const ok = validateForm();
+        if (ok) {
             setCurrentStep((s) => s + 1);
         }
     };
+
+    useEffect(() => {
+        if (firstLoad.current) {
+            const agreed = localStorage.getItem("privacyAgreed") === "true";
+            const expiry = parseInt(
+                localStorage.getItem("privacyExpiry") || "0",
+                10
+            );
+            const now = Date.now();
+
+            const isExpired = !expiry || now > expiry;
+
+            if (isExpired) {
+                localStorage.removeItem("privacyAgreed");
+                localStorage.removeItem("privacyExpiry");
+                localStorage.removeItem("referenceNumber");
+                localStorage.removeItem("trackingCode");
+                setTrackingData({ reference: "", code: "" });
+                setShowModal(true);
+            } else {
+                if (!agreed) {
+                    setShowModal(true);
+                } else {
+                    setShowModal(false);
+                }
+            }
+
+            firstLoad.current = false;
+        }
+    }, [activeTab]);
 
     useEffect(() => {
         if (showModal) {
@@ -154,7 +218,7 @@ const EntryPage = () => {
 
     return (
         <div className="page-container shadow-lg relative">
-            <div className={showModal ? "" : ""}>
+            <div>
                 <div className="flex flex-column text-white text-center entry-header">
                     <div className="mb-5">
                         <h1 className="font-bold text-3xl">
@@ -177,7 +241,7 @@ const EntryPage = () => {
                         className={`tab-button ${
                             activeTab === "newRequest" ? "active" : ""
                         }`}
-                        onClick={() => setActiveTab("newRequest")}
+                        onClick={() => handleTabChange("newRequest")}
                     >
                         <FaRegFile className="icon" /> New Request
                     </button>
@@ -187,10 +251,7 @@ const EntryPage = () => {
                         className={`tab-button ${
                             activeTab === "requestTracker" ? "active" : ""
                         }`}
-                        onClick={() => {
-                            setActiveTab("requestTracker");
-                            setCurrentStep(0);
-                        }}
+                        onClick={() => handleTabChange("requestTracker")}
                     >
                         <FaSearch className="icon" /> Track Request
                     </button>
@@ -244,11 +305,45 @@ const EntryPage = () => {
             <AnimatePresence>
                 {showModal && (
                     <PrivacyModal
-                        onAgree={() => setShowModal(false)}
+                        onAgree={() => {
+                            const expiry = Date.now() + 15 * 60 * 1000;
+                            localStorage.setItem("privacyAgreed", "true");
+                            localStorage.setItem(
+                                "privacyExpiry",
+                                expiry.toString()
+                            );
+
+                            localStorage.removeItem("referenceNumber");
+                            localStorage.removeItem("trackingCode");
+                            setTrackingData({ reference: "", code: "" });
+                            setShowModal(false);
+
+                            setTimeout(() => {
+                                const savedExpiry = parseInt(
+                                    localStorage.getItem("privacyExpiry") ||
+                                        "0",
+                                    10
+                                );
+                                if (Date.now() > savedExpiry) {
+                                    localStorage.removeItem("privacyAgreed");
+                                    localStorage.removeItem("privacyExpiry");
+                                    localStorage.removeItem("referenceNumber");
+                                    localStorage.removeItem("trackingCode");
+
+                                    setTrackingData({
+                                        reference: "",
+                                        code: "",
+                                    });
+
+                                    setShowModal(true);
+                                }
+                            }, 15 * 60 * 1000);
+                        }}
                         onCancel={() => {
                             setShowModal(false);
                             setTimeout(() => setShowModal(true), 1500);
                         }}
+                        note="⚠️ Your agreement will expire in 15 minutes."
                     />
                 )}
             </AnimatePresence>
