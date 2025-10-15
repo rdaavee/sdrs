@@ -2,31 +2,16 @@ import { useState, useEffect } from "react";
 import { IoInformation } from "react-icons/io5";
 
 const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
-    const diplomaOptions = ["Diploma with EDUFIED", "Diploma - Rush"];
+    const diplomaOptions = ["Diploma with EDUFIED"];
 
     const diplomaFees = {
-        "Diploma - Rush": 1000,
         "Diploma with EDUFIED": 2000,
     };
 
-    const diplomaRemarks = {
-        "Diploma - Rush":
-            "Rush processing; available within the day or next day; includes brown envelope",
-        "Diploma with EDUFIED":
-            "Regular processing days; includes brown envelope; 2nd copy",
-    };
-
-    const form137Options = ["Form 137/138/SFIO", "Form 137/138 - Rush"];
+    const form137Options = ["Form 137/138/SFIO"];
 
     const form137Fees = {
         "Form 137/138/SFIO": 170,
-        "Form 137/138 - Rush": 220,
-    };
-
-    const form137Remarks = {
-        "Form 137/138/SFIO": "max 2 sheets; only BasicEd/SHS",
-        "Form 137/138 - Rush":
-            "Faster processing, may incur additional conditions",
     };
 
     const certificateOptions = [
@@ -42,23 +27,6 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
         "Certification - Letter of Acceptance; with SPA",
         "Certification - Course Description",
     ];
-
-    const certificateRemarks = {
-        "Certification of Enrollment": "includes with envelope",
-        "Certification of Graduation": "includes with envelope",
-        "Certification of Units Earned": "includes with envelope",
-        "Certification of Good Moral": "includes with envelope",
-        "Certification of Weighted Average": "includes with envelope",
-        "Certification-Med. of Instruction": "includes with envelope",
-        "Certificate of Eligibility to Transfer": "includes with envelope",
-        "Certificate of Eligibility to Transfer, 2nd copy":
-            "for those who lost their first copy",
-        "Certification - Letter of Acceptance": "2 types of letter",
-        "Certification - Letter of Acceptance; with SPA":
-            "with SPA and notarization fee",
-        "Certification - Course Description":
-            "per page charging; previous charging was for every 3-page",
-    };
 
     const certificateFees = {
         "Certificate of Eligibility to Transfer": 170,
@@ -79,13 +47,6 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
         "Transcript (succeeding page)",
         "Transcript (Rush rate; per page)",
     ];
-
-    const transcriptRemarks = {
-        "Transcript (first page with doc stamp)": "includes 1 doc stamp",
-        "Transcript (succeeding page)": "no doc stamp",
-        "Transcript (Rush rate; per page)":
-            "available within the day or next day; with 1 doc stamp",
-    };
 
     const transcriptFees = {
         "Transcript (first page with doc stamp)": 200,
@@ -254,9 +215,6 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                             <th className="border px-2 py-1 sm:px-4 sm:py-2">
                                 Fee
                             </th>
-                            <th className="border px-2 py-1 sm:px-4 sm:py-2">
-                                Remarks
-                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -290,7 +248,6 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                                         ))}
                                 </select>
                             </td>
-                            <td className="border p-2"></td>
                             <td className="border p-2"></td>
                         </tr>
 
@@ -333,9 +290,6 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                                         (certificateFees[cert] ?? 0) *
                                         (copies[cert] || 0)
                                     ).toFixed(2)}
-                                </td>
-                                <td className="border p-2 text-sm">
-                                    {certificateRemarks[cert] ?? ""}
                                 </td>
                             </tr>
                         ))}
@@ -386,9 +340,6 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                                     (copies.diploma || 0)
                                 ).toFixed(2)}
                             </td>
-                            <td className="border p-2 text-sm">
-                                {diplomaRemarks[selectedDiploma]}
-                            </td>
                         </tr>
 
                         {/* Form 137 */}
@@ -437,9 +388,6 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                                     (copies.form137 || 0)
                                 ).toFixed(2)}
                             </td>
-                            <td className="border p-2 text-sm">
-                                {form137Remarks[selectedForm137]}
-                            </td>
                         </tr>
 
                         {/* Copy of Grades */}
@@ -476,9 +424,6 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                                 {(50 * (copies.registrationForm || 0)).toFixed(
                                     2
                                 )}
-                            </td>
-                            <td className="border p-2 text-sm">
-                                per sem, per page
                             </td>
                         </tr>
 
@@ -525,9 +470,6 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                                     (transcriptFees[selectedTranscript] ?? 0) *
                                     (copies.tor || 0)
                                 ).toFixed(2)}
-                            </td>
-                            <td className="border p-2 text-sm">
-                                {transcriptRemarks[selectedTranscript]}
                             </td>
                         </tr>
                     </tbody>
