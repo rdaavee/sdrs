@@ -1,9 +1,7 @@
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
@@ -139,7 +137,7 @@ export const sendStatusUpdateEmail = (
         </tr>
       </table>
 
-      <p>Visit SDRS website and use your tracking code to view more details.</p>
+      <p>Visit <a href="https://student-document-request-system-2.onrender.com/EntryPage" target="_blank">SDRS</a> and use your tracking code to view more details.</p>
       <p>Best regards,<br/>The SDRS Team</p>
     </div>
     `,
