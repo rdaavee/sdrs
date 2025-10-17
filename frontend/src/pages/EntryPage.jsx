@@ -306,7 +306,7 @@ const EntryPage = () => {
                 {showModal && (
                     <PrivacyModal
                         onAgree={() => {
-                            const expiry = Date.now() + 15 * 60 * 1000;
+                            const expiry = Date.now() + 15 * 1000;
                             localStorage.setItem("privacyAgreed", "true");
                             localStorage.setItem(
                                 "privacyExpiry",
@@ -337,7 +337,7 @@ const EntryPage = () => {
 
                                     setShowModal(true);
                                 }
-                            }, 15 * 60 * 1000);
+                            }, 15 * 1000);
                         }}
                         onCancel={() => {
                             setShowModal(false);
