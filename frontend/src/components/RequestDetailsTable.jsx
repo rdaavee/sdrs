@@ -2,57 +2,29 @@ import { useState, useEffect } from "react";
 import { IoInformation } from "react-icons/io5";
 
 const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
-    const diplomaOptions = ["Diploma with EDUFIED"];
+    const [documents, setDocuments] = useState([]);
 
-    const diplomaFees = {
-        "Diploma with EDUFIED": 2000,
-    };
+    useEffect(() => {
+        const fetchDocuments = async () => {
+            try {
+                const res = await fetch("http://localhost:3000/documents");
+                const data = await res.json();
+                // only include active documents
+                const activeDocs = data.filter((doc) => doc.active);
+                setDocuments(activeDocs);
+            } catch (error) {
+                console.error("Error fetching documents:", error);
+            }
+        };
 
-    const form137Options = ["Form 137/138/SFIO"];
+        fetchDocuments();
+    }, []);
 
-    const form137Fees = {
-        "Form 137/138/SFIO": 170,
-    };
-
-    const certificateOptions = [
-        "Certification of Enrollment",
-        "Certification of Graduation",
-        "Certification of Units Earned",
-        "Certification of Good Moral",
-        "Certification of Weighted Average",
-        "Certification-Med. of Instruction",
-        "Certificate of Eligibility to Transfer",
-        "Certificate of Eligibility to Transfer, 2nd copy",
-        "Certification - Letter of Acceptance",
-        "Certification - Letter of Acceptance; with SPA",
-        "Certification - Course Description",
-    ];
-
-    const certificateFees = {
-        "Certificate of Eligibility to Transfer": 170,
-        "Certificate of Eligibility to Transfer, 2nd copy": 170,
-        "Certification of Enrollment": 150,
-        "Certification of Graduation": 170,
-        "Certification of Units Earned": 170,
-        "Certification of Good Moral": 170,
-        "Certification of Weighted Average": 170,
-        "Certification-Med. of Instruction": 170,
-        "Certification - Letter of Acceptance": 300,
-        "Certification - Letter of Acceptance; with SPA": 700,
-        "Certification - Course Description": 75,
-    };
-
-    const transcriptOptions = [
-        "Transcript (first page with doc stamp)",
-        "Transcript (succeeding page)",
-        "Transcript (Rush rate; per page)",
-    ];
-
-    const transcriptFees = {
-        "Transcript (first page with doc stamp)": 200,
-        "Transcript (succeeding page)": 180,
-        "Transcript (Rush rate; per page)": 300,
-    };
+    const categories = documents.reduce((acc, doc) => {
+        if (!acc[doc.category]) acc[doc.category] = [];
+        acc[doc.category].push(doc);
+        return acc;
+    }, {});
 
     const [selectedCertificates, setSelectedCertificates] = useState([]);
     const [selectedDocuments, setSelectedDocuments] = useState({
@@ -62,13 +34,10 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
         tor: false,
     });
     const [currentSelect, setCurrentSelect] = useState("");
-    const [selectedDiploma, setSelectedDiploma] = useState(diplomaOptions[0]);
-    const [selectedForm137, setSelectedForm137] = useState(form137Options[0]);
-    const [selectedTranscript, setSelectedTranscript] = useState(
-        transcriptOptions[0]
-    );
+    const [selectedDiploma, setSelectedDiploma] = useState("");
+    const [selectedForm137, setSelectedForm137] = useState("");
+    const [selectedTranscript, setSelectedTranscript] = useState("");
 
-    // Initialize state from existing dataForm.requested_documents
     useEffect(() => {
         if (
             dataForm.requested_documents &&
@@ -84,40 +53,27 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
             const newCopies = { ...copies };
 
             dataForm.requested_documents.forEach(([docName, quantity]) => {
-                // Check if it's a certificate
-                if (certificateOptions.includes(docName)) {
+                const doc = documents.find((d) => d.name === docName);
+                if (!doc) return;
+
+                if (doc.category === "certificate") {
                     newSelectedCertificates.push(docName);
                     newCopies[docName] = quantity;
-                }
-                // Check if it's a diploma
-                else if (diplomaOptions.includes(docName)) {
+                } else if (doc.category === "diploma") {
                     newSelectedDocuments.diploma = true;
                     newCopies.diploma = quantity;
                     setSelectedDiploma(docName);
-                }
-                // Check if it's a form 137
-                else if (form137Options.includes(docName)) {
+                } else if (doc.category === "form137") {
                     newSelectedDocuments.form137 = true;
                     newCopies.form137 = quantity;
                     setSelectedForm137(docName);
-                }
-                // Check if it's copy of grades
-                else if (docName === "Copy of Grades") {
-                    newSelectedDocuments.registrationForm = true;
-                    newCopies.registrationForm = quantity;
-                }
-                // Check if it's transcript of records
-                else if (docName === "Transcript of Records") {
-                    newSelectedDocuments.tor = true;
-                    newCopies.tor = quantity;
-                    // Find which transcript option matches based on the fee or default to first
-                    setSelectedTranscript(transcriptOptions[0]);
-                }
-                // Check if it's a transcript option directly
-                else if (transcriptOptions.includes(docName)) {
+                } else if (doc.category === "transcript") {
                     newSelectedDocuments.tor = true;
                     newCopies.tor = quantity;
                     setSelectedTranscript(docName);
+                } else if (docName === "Copy of Grades") {
+                    newSelectedDocuments.registrationForm = true;
+                    newCopies.registrationForm = quantity;
                 }
             });
 
@@ -125,7 +81,32 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
             setSelectedDocuments(newSelectedDocuments);
             setCopies(newCopies);
         }
-    }, []); // Run only once when component mounts
+    }, [documents]);
+
+    useEffect(() => {
+        if (
+            categories["diploma"] &&
+            categories["diploma"].length > 0 &&
+            !selectedDiploma
+        ) {
+            setSelectedDiploma(categories["diploma"][0].name);
+        }
+        if (
+            categories["form137"] &&
+            categories["form137"].length > 0 &&
+            !selectedForm137
+        ) {
+            setSelectedForm137(categories["form137"][0].name);
+        }
+        if (
+            categories["transcript"] &&
+            categories["transcript"].length > 0 &&
+            !selectedTranscript
+        ) {
+            setSelectedTranscript(categories["transcript"][0].name);
+        }
+    }, [categories]);
+
 
     // Update requested docs
     useEffect(() => {
@@ -168,8 +149,8 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
         const value = e.target.value;
         if (value && !selectedCertificates.includes(value)) {
             setSelectedCertificates([...selectedCertificates, value]);
-            setCopies({ ...copies, [value]: 1 }); // default 1 copy
-            setCurrentSelect(""); // reset dropdown to placeholder
+            setCopies({ ...copies, [value]: 1 });
+            setCurrentSelect("");
         }
     };
 
@@ -179,6 +160,13 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
             [documentType]: !prev[documentType],
         }));
     };
+
+    const getFee = (name) => {
+        if (!name) return 0;
+        const doc = documents.find((d) => d.name === name);
+        return doc ? doc.fee : 0;
+    };
+
 
     return (
         <div>
@@ -201,6 +189,7 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                     </p>
                 </div>
             </div>
+
             <div className="overflow-x-auto w-full text-[10px] sm:text-xs md:text-sm lg:text-base">
                 <table className="min-w-max w-full border-collapse border border-gray-300 text-xs sm:text-sm text-center">
                     <thead className="bg-gray-100">
@@ -218,7 +207,7 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {/* Dropdown to add new certificate */}
+                        {/* Dropdown Certificates */}
                         <tr>
                             <td className="border p-2"></td>
                             <td className="border p-2"></td>
@@ -228,24 +217,45 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                                     onChange={handleCertificateChange}
                                     className="appearance-auto w-full border px-2 py-1 text-center"
                                 >
-                                    <option
-                                        value=""
-                                        className="text-center border"
-                                    >
-                                        Select Certificate
-                                    </option>
-                                    {certificateOptions
-                                        .filter(
-                                            (opt) =>
-                                                !selectedCertificates.includes(
-                                                    opt
-                                                )
-                                        )
-                                        .map((option, index) => (
-                                            <option key={index} value={option}>
-                                                {option}
+                                    {categories["certificate"] &&
+                                    categories["certificate"].length > 0 ? (
+                                        <>
+                                            <option value="">
+                                                Select Certificate
                                             </option>
-                                        ))}
+                                            {categories["certificate"]
+                                                .filter(
+                                                    (opt) =>
+                                                        !selectedCertificates.includes(
+                                                            opt.name
+                                                        )
+                                                )
+                                                .map((opt) => (
+                                                    <option
+                                                        key={opt._id}
+                                                        value={
+                                                            opt.active
+                                                                ? opt.name
+                                                                : ""
+                                                        }
+                                                        disabled={!opt.active}
+                                                        className={
+                                                            !opt.active
+                                                                ? "text-gray-400 italic"
+                                                                : ""
+                                                        }
+                                                    >
+                                                        {opt.name}{" "}
+                                                        {!opt.active &&
+                                                            "(Not Available)"}
+                                                    </option>
+                                                ))}
+                                        </>
+                                    ) : (
+                                        <option value="" disabled>
+                                            No certificates available
+                                        </option>
+                                    )}
                                 </select>
                             </td>
                             <td className="border p-2"></td>
@@ -287,8 +297,7 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                                 </td>
                                 <td className="border p-2">
                                     {(
-                                        (certificateFees[cert] ?? 0) *
-                                        (copies[cert] || 0)
+                                        getFee(cert) * (copies[cert] || 0)
                                     ).toFixed(2)}
                                 </td>
                             </tr>
@@ -326,17 +335,37 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                                         setSelectedDiploma(e.target.value)
                                     }
                                     className="appearance-auto w-full border px-2 py-1 text-center"
+                                    disabled={
+                                        !(
+                                            categories["diploma"] &&
+                                            categories["diploma"].length > 0
+                                        )
+                                    }
                                 >
-                                    {diplomaOptions.map((opt, idx) => (
-                                        <option key={idx} value={opt}>
-                                            {opt}
+                                    {categories["diploma"] &&
+                                    categories["diploma"].length > 0 ? (
+                                        categories["diploma"].map((opt) => (
+                                            <option
+                                                key={opt._id}
+                                                value={opt.name}
+                                            >
+                                                {opt.name}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option
+                                            disabled
+                                            className="text-gray-400 italic"
+                                        >
+                                            Not Available
                                         </option>
-                                    ))}
+                                    )}
                                 </select>
                             </td>
+
                             <td className="border p-2">
                                 {(
-                                    (diplomaFees[selectedDiploma] ?? 0) *
+                                    getFee(selectedDiploma) *
                                     (copies.diploma || 0)
                                 ).toFixed(2)}
                             </td>
@@ -374,23 +403,43 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                                         setSelectedForm137(e.target.value)
                                     }
                                     className="appearance-auto w-full border px-2 py-1 text-center"
+                                    disabled={
+                                        !(
+                                            categories["form137"] &&
+                                            categories["form137"].length > 0
+                                        )
+                                    }
                                 >
-                                    {form137Options.map((opt, idx) => (
-                                        <option key={idx} value={opt}>
-                                            {opt}
+                                    {categories["form137"] &&
+                                    categories["form137"].length > 0 ? (
+                                        categories["form137"].map((opt) => (
+                                            <option
+                                                key={opt._id}
+                                                value={opt.name}
+                                            >
+                                                {opt.name}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option
+                                            disabled
+                                            className="text-gray-400 italic"
+                                        >
+                                            Not Available
                                         </option>
-                                    ))}
+                                    )}
                                 </select>
                             </td>
+
                             <td className="border p-2">
                                 {(
-                                    (form137Fees[selectedForm137] ?? 0) *
+                                    getFee(selectedForm137) *
                                     (copies.form137 || 0)
                                 ).toFixed(2)}
                             </td>
                         </tr>
 
-                        {/* Copy of Grades */}
+                        {/* Copy of Grades (fixed fee) */}
                         <tr>
                             <td className="border p-2">
                                 <input
@@ -427,7 +476,7 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                             </td>
                         </tr>
 
-                        {/* Transcript of Records */}
+                        {/* Transcript */}
                         <tr>
                             <td className="border p-2">
                                 <input
@@ -457,17 +506,37 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
                                         setSelectedTranscript(e.target.value)
                                     }
                                     className="appearance-auto w-full border px-2 py-1 text-center"
+                                    disabled={
+                                        !(
+                                            categories["transcript"] &&
+                                            categories["transcript"].length > 0
+                                        )
+                                    }
                                 >
-                                    {transcriptOptions.map((opt, idx) => (
-                                        <option key={idx} value={opt}>
-                                            {opt}
+                                    {categories["transcript"] &&
+                                    categories["transcript"].length > 0 ? (
+                                        categories["transcript"].map((opt) => (
+                                            <option
+                                                key={opt._id}
+                                                value={opt.name}
+                                            >
+                                                {opt.name}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <option
+                                            disabled
+                                            className="text-gray-400 italic"
+                                        >
+                                            Not Available
                                         </option>
-                                    ))}
+                                    )}
                                 </select>
                             </td>
+
                             <td className="border p-2">
                                 {(
-                                    (transcriptFees[selectedTranscript] ?? 0) *
+                                    getFee(selectedTranscript) *
                                     (copies.tor || 0)
                                 ).toFixed(2)}
                             </td>

@@ -9,6 +9,7 @@ import Index from "./admin";
 
 import PaymentSuccess from "./components/PaymentSuccess";
 import PaymentFailed from "./components/PaymentFailed";
+import DocumentList from "./admin/document-list/DocumentList";
 
 function App() {
     return (
@@ -28,6 +29,7 @@ function App() {
                         element={<AddMembers />}
                     />
                     <Route path="pages/RequestList" element={<RequestList />} />
+                    <Route path="pages/DocumentList" element={<DocumentList />} />
                 </Route>
             </Routes>
         </Router>

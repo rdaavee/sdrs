@@ -38,6 +38,8 @@ const Dashboard = () => {
             setActiveItem("Dashboard");
         } else if (location.pathname.includes("RequestList")) {
             setActiveItem("Request List");
+        } else if (location.pathname.includes("DocumentList")) {
+            setActiveItem("Document List");
         } else if (location.pathname.includes("StaffManagement")) {
             setActiveItem("Staff Management");
         } else if (location.pathname.includes("MyProfile")) {
@@ -92,6 +94,12 @@ const Dashboard = () => {
         {
             name: "Request List",
             path: "/pages/RequestList",
+            icon1: note1,
+            icon2: note2,
+        },
+        {
+            name: "Document List",
+            path: "/pages/DocumentList",
             icon1: note1,
             icon2: note2,
         },
