@@ -18,16 +18,7 @@ const EntryPage = () => {
     const firstLoad = useRef(true);
 
     const [showModal, setShowModal] = useState(false);
-
     const [showHighlight, setShowHighlight] = useState(false);
-
-    useEffect(() => {
-        const hasSeenHighlight = localStorage.getItem("hasSeenHighlight");
-        if (!hasSeenHighlight) {
-            setShowHighlight(true);
-        }
-    }, []);
-
     const [currentHighlightStep, setCurrentHighlightStep] = useState(0);
 
     const highlightSteps = [
@@ -89,9 +80,7 @@ const EntryPage = () => {
     const handleTabChange = (tab) => {
         setActiveTab(tab);
         localStorage.setItem("activeTab", tab);
-        if (tab === "requestTracker") {
-            setCurrentStep(0);
-        }
+        if (tab === "requestTracker") setCurrentStep(0);
     };
 
     const validateForm = () => {
@@ -195,11 +184,10 @@ const EntryPage = () => {
 
     const handleNext = () => {
         const ok = validateForm();
-        if (ok) {
-            setCurrentStep((s) => s + 1);
-        }
+        if (ok) setCurrentStep((s) => s + 1);
     };
 
+    // Show privacy modal on first load
     useEffect(() => {
         if (firstLoad.current) {
             const agreed = localStorage.getItem("privacyAgreed") === "true";
@@ -208,28 +196,17 @@ const EntryPage = () => {
                 10
             );
             const now = Date.now();
-
             const isExpired = !expiry || now > expiry;
 
-            if (isExpired) {
-                localStorage.removeItem("privacyAgreed");
-                localStorage.removeItem("privacyExpiry");
-                localStorage.removeItem("referenceNumber");
-                localStorage.removeItem("trackingCode");
-                setTrackingData({ reference: "", code: "" });
+            if (isExpired || !agreed) {
                 setShowModal(true);
-            } else {
-                if (!agreed) {
-                    setShowModal(true);
-                } else {
-                    setShowModal(false);
-                }
             }
 
             firstLoad.current = false;
         }
     }, [activeTab]);
 
+    // Lock scroll when modal is open
     useEffect(() => {
         if (showModal) {
             document.body.classList.add("overflow-hidden");
@@ -325,6 +302,7 @@ const EntryPage = () => {
                     />
                 )}
 
+                {/* Show highlight only after user agrees */}
                 {showHighlight && (
                     <HighlightOverlay
                         steps={highlightSteps}
@@ -355,6 +333,10 @@ const EntryPage = () => {
                             setTrackingData({ reference: "", code: "" });
                             setShowModal(false);
 
+                            // ✅ Only here we trigger highlights
+                            setShowHighlight(true);
+
+                            // Optional: handle expiry after 15 mins
                             setTimeout(() => {
                                 const savedExpiry = parseInt(
                                     localStorage.getItem("privacyExpiry") ||
@@ -366,18 +348,17 @@ const EntryPage = () => {
                                     localStorage.removeItem("privacyExpiry");
                                     localStorage.removeItem("referenceNumber");
                                     localStorage.removeItem("trackingCode");
-
                                     setTrackingData({
                                         reference: "",
                                         code: "",
                                     });
-
                                     setShowModal(true);
                                 }
                             }, 15 * 60 * 1000);
                         }}
                         onCancel={() => {
                             setShowModal(false);
+                            // Do not trigger highlight on cancel
                             setTimeout(() => setShowModal(true), 1500);
                         }}
                         note="⚠️ Your agreement will expire in 15 minutes."
