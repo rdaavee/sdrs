@@ -12,11 +12,34 @@ import CustomStepper from "../components/Stepper";
 import RequestDetailsForm from "../components/RequestDetailsForm";
 import TrackRequestContent from "../components/TrackRequestContent";
 import PrivacyModal from "../components/PrivacyModal";
+import HighlightOverlay from "../components/HighlightOverlay";
 
 const EntryPage = () => {
     const firstLoad = useRef(true);
 
     const [showModal, setShowModal] = useState(false);
+
+    const [showHighlight, setShowHighlight] = useState(false);
+
+    useEffect(() => {
+        const hasSeenHighlight = localStorage.getItem("hasSeenHighlight");
+        if (!hasSeenHighlight) {
+            setShowHighlight(true);
+        }
+    }, []);
+
+    const [currentHighlightStep, setCurrentHighlightStep] = useState(0);
+
+    const highlightSteps = [
+        {
+            targetId: "newRequest",
+            message: "Click here to start a new document request.",
+        },
+        {
+            targetId: "requestTracker",
+            message: "Click here to track your existing requests.",
+        },
+    ];
 
     const [dataForm, setDataForm] = useState({
         full_name: "",
@@ -298,6 +321,20 @@ const EntryPage = () => {
                         handleNext={handleNext}
                         dataForm={dataForm}
                         canProceed={dataForm.confirm_information}
+                        nextButtonId="nextButton"
+                    />
+                )}
+
+                {showHighlight && (
+                    <HighlightOverlay
+                        steps={highlightSteps}
+                        currentStep={currentHighlightStep}
+                        onNext={setCurrentHighlightStep}
+                        onClose={() => setShowHighlight(false)}
+                        onFinish={() => {
+                            setShowHighlight(false);
+                            localStorage.setItem("hasSeenHighlight", "true");
+                        }}
                     />
                 )}
             </div>
