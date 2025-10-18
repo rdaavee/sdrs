@@ -90,26 +90,35 @@ const Dashboard = () => {
         window.location.href = "/pages/RequestList";
     };
 
+    const userRole = cookies.get("role");
+
     const navItems = [
         {
             name: "Request List",
             path: "/pages/RequestList",
             icon1: note1,
             icon2: note2,
+            roles: ["Super Admin", "Middle Admin", "Staff Admin"],
         },
         {
             name: "Document List",
             path: "/pages/DocumentList",
             icon1: note1,
             icon2: note2,
+            roles: ["Super Admin", "Middle Admin", "Staff Admin"],
         },
         {
             name: "Staff Management",
-            path: "/pages/staff-management",
+            path: "/pages/StaffManagement",
             icon1: profile1,
             icon2: profile2,
+            roles: ["Super Admin"],
         },
     ];
+
+    const filteredNavItems = navItems.filter((item) =>
+        item.roles.includes(userRole)
+    );
 
     const [showModal, setShowModal] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -192,50 +201,51 @@ const Dashboard = () => {
                                 </span>
                             </Link>
                         </li>
-                        {navItems.map((item) => (
-                            <li key={item.name}>
-                                <Link
-                                    to={`/pages/${item.name.replace(
-                                        /\s/g,
-                                        ""
-                                    )}`}
-                                    onClick={() => setActiveItem(item.name)}
-                                    className={`flex items-center w-full gap-2 p-5 rounded-2xl duration-300 transition-colors ${
-                                        activeItem === item.name ? "active" : ""
-                                    }`}
-                                >
-                                    <img
-                                        src={item.icon1}
-                                        alt={`${item.name}-icon1`}
-                                        className={`w-[18px] transition-opacity duration-300 ease-in-out ${
+                        {navItems
+                            .filter((item) =>
+                                item.roles.includes(cookies.get("role"))
+                            )
+                            .map((item) => (
+                                <li key={item.name}>
+                                    <Link
+                                        to={item.path}
+                                        onClick={() => setActiveItem(item.name)}
+                                        className={`flex items-center w-full gap-2 p-5 rounded-2xl duration-300 transition-colors ${
                                             activeItem === item.name
-                                                ? "opacity-0 absolute"
-                                                : "opacity-100 relative"
+                                                ? "active"
+                                                : ""
                                         }`}
-                                    />
-
-                                    <img
-                                        src={item.icon2}
-                                        alt={`${item.name}-icon2`}
-                                        className={`w-[18px] transition-opacity duration-300 ease-in-out ${
-                                            activeItem === item.name
-                                                ? "opacity-100 relative"
-                                                : "opacity-0 absolute"
-                                        }`}
-                                    />
-                                    <span className="text-lg ps-2 font-[500]">
-                                        {item.name}
-                                    </span>
-                                </Link>
-                            </li>
-                        ))}
+                                    >
+                                        <img
+                                            src={item.icon1}
+                                            alt={`${item.name}-icon1`}
+                                            className={`w-[18px] transition-opacity duration-300 ease-in-out ${
+                                                activeItem === item.name
+                                                    ? "opacity-0 absolute"
+                                                    : "opacity-100 relative"
+                                            }`}
+                                        />
+                                        <img
+                                            src={item.icon2}
+                                            alt={`${item.name}-icon2`}
+                                            className={`w-[18px] transition-opacity duration-300 ease-in-out ${
+                                                activeItem === item.name
+                                                    ? "opacity-100 relative"
+                                                    : "opacity-0 absolute"
+                                            }`}
+                                        />
+                                        <span className="text-lg ps-2 font-[500]">
+                                            {item.name}
+                                        </span>
+                                    </Link>
+                                </li>
+                            ))}
                     </ul>
-
                     <button
                         onClick={() => setShowLogoutModal(true)}
                         className="mt-auto mb-3 flex items-center w-full duration-300 transition-colors text-white gap-2 p-3 rounded-xl cursor-pointer bg-green-500 hover:bg-green-600"
                     >
-                        <LogOutIcon className="text-white size-4.5"/>
+                        <LogOutIcon className="text-white size-4.5" />
                         <span className="text-md ps-2 font-[500]">Logout</span>
                     </button>
 
