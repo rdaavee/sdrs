@@ -14,7 +14,7 @@ import socket from "../../socket";
 
 Modal.setAppElement("#root");
 
-const steps = { waiting: 0, processing: 1, ready: 2, released: 3 };
+const steps = { waiting: 0, processing: 1, "for-review": 1, ready: 2, released: 3 };
 
 const TrackRequestContent = ({ reference, code, onTrackingUpdate }) => {
     const [refValue, setRefValue] = useState(reference);
@@ -245,17 +245,18 @@ const TrackRequestContent = ({ reference, code, onTrackingUpdate }) => {
                             <p className="text-gray-600 text-sm">
                                 Request Status :
                                 <span
-                                    className={`ml-2 px-3 py-1 rounded-full text-xs font-semibold 
+                                    className={`px-3 py-1 rounded-full text-xs font-semibold 
                                     ${
                                         requestReceipt.status === "accepted"
                                             ? "bg-green-100 text-green-700"
-                                            : requestReceipt.status ===
-                                              "rejected"
+                                            : requestReceipt.status === "rejected"
                                             ? "bg-red-100 text-red-700"
                                             : "bg-gray-100 text-gray-700"
                                     }`}
                                 >
-                                    {requestReceipt.status}
+                                    {requestReceipt.status === "for-review"
+                                        ? "processing"
+                                        : requestReceipt.status}
                                 </span>
                             </p>
                         </div>
@@ -305,7 +306,10 @@ const TrackRequestContent = ({ reference, code, onTrackingUpdate }) => {
                                                             : "bg-gray-100 text-gray-700"
                                                     }`}
                                                 >
-                                                    {requestReceipt.status}
+                                                    {requestReceipt.status ===
+                                                    "for-review"
+                                                        ? "processing"
+                                                        : requestReceipt.status}
                                                 </span>
                                             </td>
 

@@ -55,7 +55,14 @@ const RequestList = () => {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const statusOrder = ["waiting", "processing", "ready", "released"];
+    const statusOrder = [
+        "waiting",
+        "accepted",
+        "processing",
+        "for-review",
+        "ready",
+        "released",
+    ];
 
     //pagination
     const [page, setPage] = useState(1);
@@ -179,10 +186,10 @@ const RequestList = () => {
     };
 
     const rolePermissions = {
-        "Staff Admin": ["accepted", "rejected"],
-        Moderator: ["waiting", "processing"],
-        "Middle Admin": ["waiting", "processing", "ready"],
-        "Super Admin": ["waiting", "processing", "ready", "released"],
+        "Staff Admin": ["waiting", "accepted", "released"],
+        "Middle Admin": ["waiting", "processing", "for-review"],
+        Moderator: ["ready"],
+        "Super Admin": ["waiting", "processing", "for-review", "ready", "released"],
     };
 
     useEffect(() => {
@@ -287,7 +294,6 @@ const RequestList = () => {
         // };
     }, []);
 
-    //filter n search
     const filtered = receipts.filter((req) => {
         const query = search.toLowerCase();
         const matchesSearch =
@@ -297,14 +303,26 @@ const RequestList = () => {
             req.payment_method?.toLowerCase().includes(query) ||
             req.status?.toLowerCase().includes(query);
 
-        const matchesStatus =
-            !statusFilter || req.status.toLowerCase() === statusFilter;
-        const matchesPayment =
-            !paymentFilter ||
-            req.payment_method.toLowerCase() === paymentFilter;
+        const normalizeStatus = (s = "") =>
+            s.toLowerCase().replace(/[-_]/g, " ").trim();
 
-        return matchesSearch && matchesStatus && matchesPayment;
+        const matchesStatus =
+            !statusFilter ||
+            normalizeStatus(req.status) === normalizeStatus(statusFilter);
+
+        const matchesPayment =
+            !paymentFilter || req.payment_method.toLowerCase() === paymentFilter;
+
+        const allowedStatuses = rolePermissions[userRole] || [];
+        
+        const matchesRole =
+            userRole === "Super Admin"
+                ? true
+                : allowedStatuses.includes(req.status);
+
+        return matchesSearch && matchesStatus && matchesPayment && matchesRole;
     });
+
 
     const totalPages = Math.ceil(filtered.length / rowsPerPage);
     const paginated = filtered.slice(
@@ -343,9 +361,12 @@ const RequestList = () => {
                             }}
                         >
                             <option value="">All Status</option>
-                            <option value="processing">Processing</option>
-                            <option value="ready">Ready</option>
-                            <option value="waiting">Waiting</option>
+                            {rolePermissions[userRole]?.map((status) => (
+                                <option key={status} value={status}>
+                                    {status.charAt(0).toUpperCase() +
+                                        status.slice(1)}
+                                </option>
+                            ))}
                         </select>
 
                         {/* Payment filter */}
