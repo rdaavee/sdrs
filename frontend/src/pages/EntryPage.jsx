@@ -148,7 +148,7 @@ const EntryPage = () => {
                             dataForm={dataForm}
                             handleInputChange={handleInputChange}
                         />
-                        <ToastContainer position="top-right" autoClose={2500} />
+                        <ToastContainer position="top-right" autoClose={1500} />
                     </div>
                 );
             case 2:
