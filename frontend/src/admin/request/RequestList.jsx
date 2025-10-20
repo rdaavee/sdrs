@@ -215,12 +215,7 @@ const RequestList = () => {
         "Staff Admin": ["waiting", "accepted", "ready", "released"],
         "Middle Admin": ["accepted", "processing", "for-review"],
         Moderator: ["for-review", "ready"],
-        "Super Admin": [
-            "waiting",
-            "processing",
-            "for-review",
-            "ready",
-            "released",
+        "Super Admin": ["processing", "for-review", "ready", "released",
         ],
     };
 
