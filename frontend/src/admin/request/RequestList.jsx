@@ -214,9 +214,8 @@ const RequestList = () => {
     const rolePermissions = {
         "Staff Admin": ["waiting", "accepted", "ready", "released"],
         "Middle Admin": ["accepted", "processing", "for-review"],
-        Moderator: ["for-review", "ready"],
-        "Super Admin": ["processing", "for-review", "ready", "released",
-        ],
+        "Moderator": ["processing", "for-review", "ready"],
+        "Super Admin": ["for-review", "ready", "released"],
     };
 
     useEffect(() => {
@@ -330,8 +329,18 @@ const RequestList = () => {
                 ? true
                 : allowedStatuses.includes(req.status);
 
-        return matchesSearch && matchesStatus && matchesPayment && matchesRole;
+        const hideWaiting =
+            req.status === "waiting" && userRole !== "Staff Admin";
+
+        return (
+            matchesSearch &&
+            matchesStatus &&
+            matchesPayment &&
+            matchesRole &&
+            !hideWaiting
+        );
     });
+
 
     const totalPages = Math.ceil(filtered.length / rowsPerPage);
     const paginated = filtered.slice(
