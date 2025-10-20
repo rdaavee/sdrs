@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 
 import user from "../assets/images/user-img.png";
+import logo from '../assets/images/phinma-cservice-logo.png'
 import dashboard1 from "../assets/svgs/dashbord-icon-01.svg";
 import dashboard2 from "../assets/svgs/dashbord-icon-02.svg";
 import profile1 from "../assets/svgs/profile-icon-01.svg";
@@ -163,9 +164,14 @@ const Dashboard = () => {
                     />
                     <div className="logo w-full text-start ml-3 mb-5 pb-5">
                         <a href="#">
-                            <h2 className="text-4xl font-[600] tracking-wide">
-                                SDRS
-                            </h2>
+                            <div className="flex items-center space-x-3">
+                                <img
+                                    src={logo}
+                                    className="size-11"
+                                    alt="logo"
+                                />
+                                <h2 className="text-4xl font-semibold">SDRS</h2>
+                            </div>
                         </a>
                     </div>
 
@@ -241,6 +247,7 @@ const Dashboard = () => {
                                 </li>
                             ))}
                     </ul>
+
                     <button
                         onClick={() => setShowLogoutModal(true)}
                         className="mt-auto mb-3 flex items-center w-full duration-300 transition-colors text-white gap-2 p-3 rounded-xl cursor-pointer bg-green-500 hover:bg-green-600"
@@ -248,6 +255,12 @@ const Dashboard = () => {
                         <LogOutIcon className="text-white size-4.5" />
                         <span className="text-md ps-2 font-[500]">Logout</span>
                     </button>
+
+                    <hr className="h-1 text-gray-300 mt-2 mb-2" />
+
+                    <footer className="text-gray-400 text-sm text-center mb-3">
+                        © 2025 SDRS Team. All Rights Reserved.
+                    </footer>
 
                     {/* logout modal */}
                     {showLogoutModal && (
