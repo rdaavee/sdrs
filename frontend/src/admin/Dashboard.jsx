@@ -98,14 +98,14 @@ const Dashboard = () => {
             path: "/pages/RequestList",
             icon1: note1,
             icon2: note2,
-            roles: ["Super Admin", "Middle Admin", "Staff Admin"],
+            roles: ["Super Admin", "Middle Admin", "Staff Admin", "Moderator"],
         },
         {
             name: "Document List",
             path: "/pages/DocumentList",
             icon1: note1,
             icon2: note2,
-            roles: ["Super Admin", "Middle Admin", "Staff Admin"],
+            roles: ["Super Admin", "Middle Admin", "Staff Admin", "Moderator"],
         },
         {
             name: "Staff Management",
