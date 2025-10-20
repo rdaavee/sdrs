@@ -131,7 +131,7 @@ export const getAllRequestReceiptStats = async () => {
         }
 
         const waiting = counts["waiting"] || 0;
-        const processing = counts["processing"] || 0;
+        const processing = (counts["processing"] || 0) + (counts["for-review"] || 0);
         const ready = counts["ready"] || 0;
         const active = waiting + processing;
 

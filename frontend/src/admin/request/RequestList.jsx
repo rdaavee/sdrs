@@ -16,6 +16,8 @@ const getStatusStyle = (status) => {
     switch (status) {
         case "processing":
             return "bg-yellow-100 text-yellow-700";
+        case "for-review":
+            return "bg-yellow-100 text-yellow-700";
         case "ready":
             return "bg-green-100 text-green-700";
         case "waiting":
@@ -63,7 +65,7 @@ const RequestList = () => {
         "ready",
         "released",
     ];
-
+    
     //pagination
     const [page, setPage] = useState(1);
     const rowsPerPage = 12;
@@ -230,10 +232,6 @@ const RequestList = () => {
             }
         }
 
-        console.log("fjhdkfjhaskf", {
-            ...item,
-            requested_documents: documentsArray,
-        });
         return {
             ...item,
             requested_documents: documentsArray,
@@ -244,54 +242,41 @@ const RequestList = () => {
             const data = await getAllRequestReceipt();
             const normalized = Array.isArray(data)
                 ? data.map((item) => {
-                      let documentsArray = [];
-                      const documents = item.requested_documents;
+                        let documentsArray = [];
+                        const documents = item.requested_documents;
 
-                      if (Array.isArray(documents)) {
-                          documentsArray = documents;
-                      } else if (typeof documents === "string") {
-                          const str = documents.trim();
-                          try {
-                              const parsed = JSON.parse(str);
-                              if (Array.isArray(parsed)) {
-                                  documentsArray = parsed;
-                              } else if (typeof parsed === "string") {
-                                  documentsArray = [parsed];
-                              }
-                          } catch {
-                              if (str.includes(",")) {
-                                  documentsArray = str
-                                      .split(",")
-                                      .map((s) => s.trim())
-                                      .filter(Boolean);
-                              } else if (str.length > 0) {
-                                  documentsArray = [str];
-                              }
-                          }
-                      }
-
-                      return {
-                          ...item,
-                          requested_documents: documentsArray,
-                      };
-                  })
+                        if (Array.isArray(documents)) {
+                            documentsArray = documents;
+                        } else if (typeof documents === "string") {
+                            const str = documents.trim();
+                            try {
+                                const parsed = JSON.parse(str);
+                                if (Array.isArray(parsed)) {
+                                    documentsArray = parsed;
+                                } else if (typeof parsed === "string") {
+                                    documentsArray = [parsed];
+                                }
+                            } catch {
+                                if (str.includes(",")) {
+                                    documentsArray = str
+                                        .split(",")
+                                        .map((s) => s.trim())
+                                        .filter(Boolean);
+                                } else if (str.length > 0) {
+                                    documentsArray = [str];
+                                }
+                            }
+                        }
+                        return {
+                            ...item,
+                            requested_documents: documentsArray,
+                        };
+                    })
                 : [];
 
             setReceipts(normalized);
         };
         fetchData();
-
-        // socket.on("requestUpdated", (updatedRequest) => {
-        //     setReceipts((prev) =>
-        //         prev.map((req) =>
-        //             req._id === updatedRequest._id ? updatedRequest : req
-        //         )
-        //     );
-        // });
-
-        // return () => {
-        //     socket.off("requestUpdated");
-        // };
     }, []);
 
     const filtered = receipts.filter((req) => {
@@ -303,9 +288,7 @@ const RequestList = () => {
             req.payment_method?.toLowerCase().includes(query) ||
             req.status?.toLowerCase().includes(query);
 
-        const normalizeStatus = (s = "") =>
-            s.toLowerCase().replace(/[-_]/g, " ").trim();
-
+        const normalizeStatus = (s = "") => s.toLowerCase().trim();
         const matchesStatus =
             !statusFilter ||
             normalizeStatus(req.status) === normalizeStatus(statusFilter);
