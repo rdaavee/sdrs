@@ -98,9 +98,21 @@ const RequestList = () => {
         const exportData = receipts.map((req) => ({
             "Reference #": req.reference_number,
             "Email": req.email_address,
+            "Full Name": req.full_name,
+            "Student No.": req.student_number,
+            "Course": req.course,
+            "Complete Address": req.current_address,
+            "Contact Number": req.contact_number,
             "Documents": req.requested_documents.join(", "),
             "Quantity": req.requested_documents.length,
             "Payment": req.payment_method,
+            "Payment Status": req.paid ? "Paid" : "Not yet paid",
+            "Date Requested": 
+                new Date(req.createdAt).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                }),
             "Status": req.status,
         }));
 
@@ -665,7 +677,6 @@ const RequestList = () => {
                                 <strong>Payment Method</strong>
                                 <span>{selectedRequest.payment_method}</span>
                             </div>
-                            {/* TODO: fix the status */}
                             <div className="flex justify-between items-center">
                                 <strong>Payment Status</strong>
                                 <span
