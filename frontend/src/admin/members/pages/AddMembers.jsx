@@ -7,7 +7,7 @@ import {
 } from "../../../services/admin";
 import socket from "../../../../socket";
 
-const roles = ["Super Admin", "Middle Admin", "Staff Admin"];
+const roles = ["Super Admin", "Middle Admin", "Staff Admin", "Moderator"];
 const statuses = ["Active", "Inactive"];
 
 const AddAdmin = () => {

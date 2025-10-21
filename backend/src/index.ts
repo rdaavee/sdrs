@@ -11,6 +11,8 @@ import RequestRoutes from "./routes/request.routes"
 import VerifyRoutes from "./routes/verify.routes"
 import AdminRoutes from "./routes/admin.routes"
 import PaymentRoutes from './routes/payment.routes'
+import DocumentRoutes from './routes/document.routes'
+
 import { app , server } from './socket/socket' 
 
 const port = Number(process.env.API_PORT);
@@ -58,6 +60,7 @@ app.use("/request", RequestRoutes)
 app.use("/verify", VerifyRoutes)
 app.use("/admin", AdminRoutes)
 app.use("/payments", PaymentRoutes)
+app.use("/documents", DocumentRoutes)
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello from your Node.js Express server!');

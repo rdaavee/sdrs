@@ -16,6 +16,8 @@ const getStatusStyle = (status) => {
     switch (status) {
         case "processing":
             return "bg-yellow-100 text-yellow-700";
+        case "for-review":
+            return "bg-yellow-100 text-yellow-700";
         case "ready":
             return "bg-green-100 text-green-700";
         case "waiting":
@@ -52,10 +54,21 @@ const RequestList = () => {
     });
     const [userRole, setUserRole] = useState(null);
 
+    const [pendingStatus, setPendingStatus] = useState(null);
+    const [pendingRequestId, setPendingRequestId] = useState(null);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const statusOrder = ["waiting", "processing", "ready", "released"];
+    const statusOrder = [
+        "waiting",
+        "accepted",
+        "processing",
+        "for-review",
+        "ready",
+        "released",
+    ];
 
     //pagination
     const [page, setPage] = useState(1);
@@ -82,29 +95,49 @@ const RequestList = () => {
         setSelectedRequest(null);
     };
 
-
     const exportToExcel = () => {
         if (!receipts.length) return;
 
         const exportData = receipts.map((req) => ({
             "Reference #": req.reference_number,
-            "Email": req.email_address,
-            "Documents": req.requested_documents.join(", "),
-            "Quantity": req.requested_documents.length,
-            "Payment": req.payment_method,
-            "Status": req.status,
+            Email: req.email_address,
+            "Full Name": req.full_name,
+            "Student No.": req.student_number,
+            Course: req.course,
+            "Complete Address": req.current_address,
+            "Contact Number": req.contact_number,
+            Documents: req.requested_documents.join(", "),
+            Quantity: req.requested_documents.length,
+            Payment: req.payment_method,
+            "Payment Status": req.paid ? "Paid" : "Not yet paid",
+            "Date Requested": new Date(req.createdAt).toLocaleDateString(
+                "en-US",
+                {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                }
+            ),
+            Status: req.status,
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(exportData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Requests");
 
-        const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+        const excelBuffer = XLSX.write(workbook, {
+            bookType: "xlsx",
+            type: "array",
+        });
 
-        const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-        saveAs(data, `Request_List_${new Date().toISOString().slice(0,10)}.xlsx`);
+        const data = new Blob([excelBuffer], {
+            type: "application/octet-stream",
+        });
+        saveAs(
+            data,
+            `Request_List_${new Date().toISOString().slice(0, 10)}.xlsx`
+        );
     };
-
 
     const handleSort = (key) => {
         setSortConfig((prev) => {
@@ -179,10 +212,10 @@ const RequestList = () => {
     };
 
     const rolePermissions = {
-        "Staff Admin": ["accepted", "rejected"],
-        Moderator: ["waiting", "processing"],
-        "Middle Admin": ["waiting", "processing", "ready"],
-        "Super Admin": ["waiting", "processing", "ready", "released"],
+        "Staff Admin": ["waiting", "accepted", "ready", "released"],
+        "Middle Admin": ["accepted", "processing", "for-review"],
+        "Moderator": ["processing", "for-review", "ready"],
+        "Super Admin": ["for-review", "ready", "released"],
     };
 
     useEffect(() => {
@@ -223,71 +256,54 @@ const RequestList = () => {
             }
         }
 
-        console.log("fjhdkfjhaskf", {
-            ...item,
-            requested_documents: documentsArray,
-        });
         return {
             ...item,
             requested_documents: documentsArray,
         };
     };
+
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getAllRequestReceipt();
+            if (!userRole) return;
+            const data = await getAllRequestReceipt(userRole);
             const normalized = Array.isArray(data)
                 ? data.map((item) => {
-                      let documentsArray = [];
-                      const documents = item.requested_documents;
+                        let documentsArray = [];
+                        const documents = item.requested_documents;
 
-                      if (Array.isArray(documents)) {
-                          documentsArray = documents;
-                      } else if (typeof documents === "string") {
-                          const str = documents.trim();
-                          try {
-                              const parsed = JSON.parse(str);
-                              if (Array.isArray(parsed)) {
-                                  documentsArray = parsed;
-                              } else if (typeof parsed === "string") {
-                                  documentsArray = [parsed];
-                              }
-                          } catch {
-                              if (str.includes(",")) {
-                                  documentsArray = str
-                                      .split(",")
-                                      .map((s) => s.trim())
-                                      .filter(Boolean);
-                              } else if (str.length > 0) {
-                                  documentsArray = [str];
-                              }
-                          }
-                      }
-
-                      return {
-                          ...item,
-                          requested_documents: documentsArray,
-                      };
-                  })
+                        if (Array.isArray(documents)) {
+                            documentsArray = documents;
+                        } else if (typeof documents === "string") {
+                            const str = documents.trim();
+                            try {
+                                const parsed = JSON.parse(str);
+                                if (Array.isArray(parsed)) {
+                                    documentsArray = parsed;
+                                } else if (typeof parsed === "string") {
+                                    documentsArray = [parsed];
+                                }
+                            } catch {
+                                if (str.includes(",")) {
+                                    documentsArray = str
+                                        .split(",")
+                                        .map((s) => s.trim())
+                                        .filter(Boolean);
+                                } else if (str.length > 0) {
+                                    documentsArray = [str];
+                                }
+                            }
+                        }
+                        return {
+                            ...item,
+                            requested_documents: documentsArray,
+                        };
+                    })
                 : [];
-
             setReceipts(normalized);
         };
         fetchData();
+    }, [userRole]);
 
-        // socket.on("requestUpdated", (updatedRequest) => {
-        //     setReceipts((prev) =>
-        //         prev.map((req) =>
-        //             req._id === updatedRequest._id ? updatedRequest : req
-        //         )
-        //     );
-        // });
-
-        // return () => {
-        //     socket.off("requestUpdated");
-        // };
-    }, []);
-
-    //filter n search
     const filtered = receipts.filter((req) => {
         const query = search.toLowerCase();
         const matchesSearch =
@@ -297,14 +313,34 @@ const RequestList = () => {
             req.payment_method?.toLowerCase().includes(query) ||
             req.status?.toLowerCase().includes(query);
 
+        const normalizeStatus = (s = "") => s.toLowerCase().trim();
         const matchesStatus =
-            !statusFilter || req.status.toLowerCase() === statusFilter;
+            !statusFilter ||
+            normalizeStatus(req.status) === normalizeStatus(statusFilter);
+
         const matchesPayment =
             !paymentFilter ||
             req.payment_method.toLowerCase() === paymentFilter;
 
-        return matchesSearch && matchesStatus && matchesPayment;
+        const allowedStatuses = rolePermissions[userRole] || [];
+
+        const matchesRole =
+            userRole === "Super Admin"
+                ? true
+                : allowedStatuses.includes(req.status);
+
+        const hideWaiting =
+            req.status === "waiting" && userRole !== "Staff Admin";
+
+        return (
+            matchesSearch &&
+            matchesStatus &&
+            matchesPayment &&
+            matchesRole &&
+            !hideWaiting
+        );
     });
+
 
     const totalPages = Math.ceil(filtered.length / rowsPerPage);
     const paginated = filtered.slice(
@@ -343,9 +379,12 @@ const RequestList = () => {
                             }}
                         >
                             <option value="">All Status</option>
-                            <option value="processing">Processing</option>
-                            <option value="ready">Ready</option>
-                            <option value="waiting">Waiting</option>
+                            {rolePermissions[userRole]?.map((status) => (
+                                <option key={status} value={status}>
+                                    {status.charAt(0).toUpperCase() +
+                                        status.slice(1)}
+                                </option>
+                            ))}
                         </select>
 
                         {/* Payment filter */}
@@ -496,9 +535,14 @@ const RequestList = () => {
                                                                     e
                                                                 ) => {
                                                                     e.stopPropagation();
-                                                                    handleAction(
-                                                                        req._id,
+                                                                    setPendingStatus(
                                                                         "accepted"
+                                                                    );
+                                                                    setPendingRequestId(
+                                                                        req._id
+                                                                    );
+                                                                    setIsConfirmModalOpen(
+                                                                        true
                                                                     );
                                                                 }}
                                                                 className="px-3 py-1 rounded bg-green-100 text-green-700 text-xs cursor-pointer"
@@ -510,9 +554,14 @@ const RequestList = () => {
                                                                     e
                                                                 ) => {
                                                                     e.stopPropagation();
-                                                                    handleAction(
-                                                                        req._id,
+                                                                    setPendingStatus(
                                                                         "rejected"
+                                                                    );
+                                                                    setPendingRequestId(
+                                                                        req._id
+                                                                    );
+                                                                    setIsConfirmModalOpen(
+                                                                        true
                                                                     );
                                                                 }}
                                                                 className="px-3 py-1 rounded bg-red-100 text-red-700 text-xs cursor-pointer"
@@ -520,6 +569,37 @@ const RequestList = () => {
                                                                 Reject
                                                             </button>
                                                         </div>
+                                                    ) : req.status ===
+                                                      "ready" ? (
+                                                        <select
+                                                            value={req.status}
+                                                            onClick={(e) =>
+                                                                e.stopPropagation()
+                                                            }
+                                                            onChange={(e) => {
+                                                                e.stopPropagation();
+                                                                setPendingStatus(
+                                                                    e.target
+                                                                        .value
+                                                                );
+                                                                setPendingRequestId(
+                                                                    req._id
+                                                                );
+                                                                setIsConfirmModalOpen(
+                                                                    true
+                                                                );
+                                                            }}
+                                                            className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
+                                                                req.status
+                                                            )}`}
+                                                        >
+                                                            <option value="ready">
+                                                                Ready
+                                                            </option>
+                                                            <option value="released">
+                                                                Released
+                                                            </option>
+                                                        </select>
                                                     ) : (
                                                         <span
                                                             className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusStyle(
@@ -540,12 +620,18 @@ const RequestList = () => {
                                                         onClick={(e) =>
                                                             e.stopPropagation()
                                                         }
-                                                        onChange={(e) =>
-                                                            handleStatusChange(
-                                                                req._id,
+                                                        onChange={(e) => {
+                                                            e.stopPropagation();
+                                                            setPendingStatus(
                                                                 e.target.value
-                                                            )
-                                                        }
+                                                            );
+                                                            setPendingRequestId(
+                                                                req._id
+                                                            );
+                                                            setIsConfirmModalOpen(
+                                                                true
+                                                            );
+                                                        }}
                                                         className={`px-3 py-1 rounded-full text-xs font-semibold cursor-pointer ${getStatusStyle(
                                                             req.status
                                                         )}`}
@@ -661,7 +747,6 @@ const RequestList = () => {
                                 <strong>Payment Method</strong>
                                 <span>{selectedRequest.payment_method}</span>
                             </div>
-                            {/* TODO: fix the status */}
                             <div className="flex justify-between items-center">
                                 <strong>Payment Status</strong>
                                 <span
@@ -731,6 +816,50 @@ const RequestList = () => {
                                 className="bg-[#03b335] hover:bg-[#218838] transition-colors duration-300 text-white px-5 py-2 rounded-lg text-sm outline-0"
                             >
                                 Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isConfirmModalOpen && (
+                <div className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50">
+                    <div className="bg-white border-t-2 border-t-green-500 rounded-2xl shadow-xs p-6 max-w-sm w-full mx-auto outline-none flex flex-col">
+                        <h2 className="text-lg font-semibold text-gray-800">
+                            Confirm Status Change
+                        </h2>
+                        <p className="text-sm text-gray-600 mt-2">
+                            Are you sure you want to change this request’s
+                            status to{" "}
+                            <span className="font-bold capitalize text-green-700">
+                                {pendingStatus}
+                            </span>
+                            ?
+                        </p>
+                        <div className="flex justify-center gap-4 mt-6">
+                            <button
+                                onClick={() => {
+                                    handleStatusChange(
+                                        pendingRequestId,
+                                        pendingStatus
+                                    );
+                                    setIsConfirmModalOpen(false);
+                                    setPendingRequestId(null);
+                                    setPendingStatus(null);
+                                }}
+                                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm"
+                            >
+                                Confirm
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setIsConfirmModalOpen(false);
+                                    setPendingRequestId(null);
+                                    setPendingStatus(null);
+                                }}
+                                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg text-sm"
+                            >
+                                Cancel
                             </button>
                         </div>
                     </div>

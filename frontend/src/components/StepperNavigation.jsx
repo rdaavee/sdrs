@@ -1,8 +1,27 @@
-import { IoArrowBackOutline, IoArrowForwardOutline } from "react-icons/io5";
+import { useState } from "react";
+import {
+    IoArrowBackOutline,
+    IoArrowForwardOutline,
+    IoReload,
+} from "react-icons/io5";
 
-const StepperNavigation = ({ currentStep, handlePrevious, handleNext, canProceed }) => {
-    // only require canProceed starting from step 1 (adjust if yours is step 2)
+const StepperNavigation = ({
+    currentStep,
+    handlePrevious,
+    handleNext,
+    canProceed,
+}) => {
+    const [isProcessing, setIsProcessing] = useState(false);
+
+    
     const requiresConfirmation = currentStep === 1;
+
+    const handleNextClick = async () => {
+        if (isProcessing) return;
+        setIsProcessing(true);
+        await handleNext();
+        setTimeout(() => setIsProcessing(false), 1500);
+    };
 
     return (
         <div className="flex justify-between items-center px-6 mt-4">
@@ -20,16 +39,24 @@ const StepperNavigation = ({ currentStep, handlePrevious, handleNext, canProceed
 
             {currentStep < 2 && (
                 <button
-                    onClick={handleNext}
-                    disabled={requiresConfirmation && !canProceed}
-                    className={`mb-5 px-5 py-2 inline-flex items-center text-sm text-white transition-all ${
-                        requiresConfirmation && !canProceed
+                    onClick={handleNextClick}
+                    disabled={
+                        isProcessing || (requiresConfirmation && !canProceed)
+                    }
+                    className={`mb-5 px-5 py-2 inline-flex items-center justify-center text-sm text-white transition-all min-w-[100px] ${
+                        isProcessing || (requiresConfirmation && !canProceed)
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-green-500 hover:bg-green-600 cursor-pointer"
                     }`}
                 >
-                    Next
-                    <IoArrowForwardOutline className="ml-2 text-md" />
+                    {isProcessing ? (
+                        <IoReload className="animate-spin text-lg" />
+                    ) : (
+                        <>
+                            Next
+                            <IoArrowForwardOutline className="ml-2 text-md" />
+                        </>
+                    )}
                 </button>
             )}
         </div>

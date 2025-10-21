@@ -111,7 +111,7 @@ const RequestReceiptSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ["waiting", "processing", "ready", "released", "accepted", "rejected"],
+        enum: ["waiting", "processing", "ready", "released", "accepted", "rejected", "for-review"],
         default: "waiting"
     },
 }, {
