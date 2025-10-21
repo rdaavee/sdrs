@@ -1,4 +1,4 @@
-import Brevo from "@getbrevo/brevo";
+import * as Brevo from "@getbrevo/brevo";
 
 const apiInstance = new Brevo.TransactionalEmailsApi();
 apiInstance.setApiKey(
@@ -6,7 +6,7 @@ apiInstance.setApiKey(
   process.env.BREVO_API_KEY as string
 );
 
-const FROM_EMAIL = process.env.BREVO_EMAIL;
+const FROM_EMAIL = process.env.BREVO_EMAIL as string;
 
 export const sendEmail = async (receiver: string, code: string) => {
   const subject = "Email Verification Code";
