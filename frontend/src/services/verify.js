@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ROUTE = `${import.meta.env.VITE_API_URL}/verify`;
+const ROUTE = `/api/verify`;
 export const requestCode = async (email_address) => {
     try {
         const response = await axios.get(`${ROUTE}/request-code`, {

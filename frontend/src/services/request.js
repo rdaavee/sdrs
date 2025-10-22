@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ROUTE = `${import.meta.env.VITE_API_URL}/request`;
+const ROUTE = `/api/request`;
 export const getRequestReceipt = async (reference_number, code) => {
     try {
         const response = await axios.get(`${ROUTE}/get-request-receipt`, {
@@ -93,13 +93,15 @@ export const updateRequestStatus = async (id, newStatus) => {
         return response.data;
     } catch (error) {
         const axiosError = error;
-        console.error("updateRequestStatus error:", axiosError.response?.data || axiosError.message);
+        console.error(
+            "updateRequestStatus error:",
+            axiosError.response?.data || axiosError.message
+        );
         throw new Error(
             axiosError.response?.data?.error || "Failed to update status"
         );
     }
 };
-
 
 export const actionRequest = async (id, action) => {
     if (!["accepted", "rejected"].includes(action)) {

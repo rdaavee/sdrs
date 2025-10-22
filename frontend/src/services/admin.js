@@ -3,7 +3,7 @@ import Cookies from "universal-cookie";
 
 export const cookies = new Cookies();
 
-const ROUTE = `${import.meta.env.VITE_API_URL}/admin`;
+const ROUTE = `/api/admin`;
 
 export const login = async (dataForm) => {
     const response = await axios.post(`${ROUTE}/login`, dataForm, {

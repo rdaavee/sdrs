@@ -8,7 +8,7 @@ export default defineConfig({
     optimizeDeps: {
         include: ["chart.js"],
     },
-        build: {
+    build: {
         chunkSizeWarningLimit: 2000,
         rollupOptions: {
             onwarn(warning, warn) {
@@ -17,5 +17,13 @@ export default defineConfig({
             },
         },
     },
-
+    server: {
+        proxy: {
+            "/api": {
+                target: "http://13.214.216.27:3000",
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, ""),
+            },
+        },
+    },
 });
