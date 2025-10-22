@@ -9,7 +9,10 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
   cors: {
-    origin: CLIENT_URL,
+    origin: [
+      "http://localhost:5173",
+      "https://student-document-request-system-2.onrender.com",
+    ],
   },
 });
 
