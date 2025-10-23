@@ -18,7 +18,7 @@ const DocumentList = () => {
     //fetch all docs
     const fetchDocuments = async () => {
         try {
-            const res = await fetch("http://localhost:3000/documents");
+            const res = await fetch("/api/documents");
             const data = await res.json();
             setDocuments(Array.isArray(data) ? data : data?.documents || []);
         } catch (error) {
@@ -33,7 +33,7 @@ const DocumentList = () => {
     const createDocument = async () => {
         if (!newDoc.name || !newDoc.category || !newDoc.fee) return;
         try {
-            const res = await fetch("http://localhost:3000/documents", {
+            const res = await fetch("/api/documents", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newDoc),
@@ -49,14 +49,11 @@ const DocumentList = () => {
     //update
     const updateDocument = async (updatedDoc) => {
         try {
-            const res = await fetch(
-                `http://localhost:3000/documents/${updatedDoc._id}`,
-                {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(updatedDoc),
-                }
-            );
+            const res = await fetch(`/api/documents/${updatedDoc._id}`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedDoc),
+            });
             if (!res.ok) throw new Error("Failed to update");
             await fetchDocuments();
             setIsEditOpen(false);
@@ -68,7 +65,7 @@ const DocumentList = () => {
     //delete
     const deleteDocument = async (id) => {
         try {
-            const res = await fetch(`http://localhost:3000/documents/${id}`, {
+            const res = await fetch(`/api/documents/${id}`, {
                 method: "DELETE",
             });
             if (!res.ok) throw new Error("Failed to delete");

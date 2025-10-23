@@ -179,7 +179,7 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
                                     setLoading(true);
                                     try {
                                         const response = await fetch(
-                                            "http://localhost:3000/payments/create-invoice",
+                                            "/api/payments/create-invoice",
                                             {
                                                 method: "POST",
                                                 headers: {

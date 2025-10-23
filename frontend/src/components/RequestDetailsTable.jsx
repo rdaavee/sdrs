@@ -7,7 +7,7 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
     useEffect(() => {
         const fetchDocuments = async () => {
             try {
-                const res = await fetch("http://localhost:3000/documents");
+                const res = await fetch("/api/documents");
                 const data = await res.json();
                 // only include active documents
                 const activeDocs = data.filter((doc) => doc.active);
@@ -107,7 +107,6 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
         }
     }, [categories]);
 
-
     // Update requested docs
     useEffect(() => {
         const requestedDocs = [];
@@ -166,7 +165,6 @@ const RequestDetailsTable = ({ copies, setCopies, dataForm, setDataForm }) => {
         const doc = documents.find((d) => d.name === name);
         return doc ? doc.fee : 0;
     };
-
 
     return (
         <div>
