@@ -1,15 +1,19 @@
-FROM node:24-alpine3.21
+FROM node:24-alpine3.21 AS builder
 
 WORKDIR /app
 
 COPY package*.json ./
-
 RUN npm ci --prefer-offline --no-audit
 
 COPY . .
+RUN npm run build
 
-EXPOSE 3000
+FROM nginx:alpine
 
-ENV CHOKIDAR_USEPOLLING=true
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
