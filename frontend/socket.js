@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-const socket = io("/api", {
+const socket = io("http://localhost:3000", {
     withCredentials: true,
     transports: ["websocket"],
 });

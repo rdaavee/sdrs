@@ -12,6 +12,8 @@ const io = new Server(server, {
     origin: [
       "http://localhost:5173",
       "https://student-document-request-system-2.onrender.com",
+      "http://47.129.128.196",
+      "http://47.129.128.196:80",
     ],
   },
 });
