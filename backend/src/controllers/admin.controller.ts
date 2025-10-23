@@ -86,8 +86,8 @@ export const signupUserController = async (req: Request, res: Response) => {
                     data.refresh_token,
                     {
                         httpOnly: true,
-                        secure: true,
-                        sameSite: 'none',
+                        secure: false,
+                        sameSite: "lax",
                     }
                 )
                 .json({ message: "Success", access_token: data.access_token, user_id: data.user_id, role: data.role, full_name: data.full_name, email_address: data.email_address });

@@ -13,8 +13,8 @@ export const requestCodeController = async (req: Request, res: Response) => {
                     result.message,
                     {
                         httpOnly: true,
-                        secure: true,
-                        sameSite: 'none',
+                        secure: false,
+                        sameSite: "lax",
                     }
                 ).json({ message: result.message });
             return;
@@ -40,8 +40,8 @@ export const verifyCodeController = async (req: Request, res: Response) => {
         if (result.httpCode === 200) {
             res.clearCookie("identifier", {
                 httpOnly: true,
-                secure: true,
-                sameSite: 'none',
+                secure: false,
+                sameSite: "lax",
             });
 
             res.status(result.httpCode).json({ message: result.message });
