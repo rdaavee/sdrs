@@ -14,8 +14,8 @@ export const createInvoiceController = async (req: Request, res: Response) => {
 				amount,
 				description,
 				currency: "PHP",
-				success_redirect_url: "http://localhost:5173/success",
-				failure_redirect_url: "http://localhost:5173/failed",
+				success_redirect_url: "http://47.129.128.196/success",
+				failure_redirect_url: "http://47.129.128.196/failed",
 			},
 			{
 				auth: {
