@@ -15,6 +15,7 @@ export const requestCodeController = async (req: Request, res: Response) => {
                         httpOnly: true,
                         secure: false,
                         sameSite: "lax",
+                        path: "/",
                     }
                 ).json({ message: result.message });
             return;
@@ -42,6 +43,7 @@ export const verifyCodeController = async (req: Request, res: Response) => {
                 httpOnly: true,
                 secure: false,
                 sameSite: "lax",
+                path: "/",
             });
 
             res.status(result.httpCode).json({ message: result.message });

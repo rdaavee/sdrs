@@ -88,6 +88,7 @@ export const signupUserController = async (req: Request, res: Response) => {
                         httpOnly: true,
                         secure: false,
                         sameSite: "lax",
+                        path: "/",
                     }
                 )
                 .json({ message: "Success", access_token: data.access_token, user_id: data.user_id, role: data.role, full_name: data.full_name, email_address: data.email_address });
