@@ -6,9 +6,9 @@ const CustomStepper = ({ currentStep, steps }) => {
         <Stepper
             activeStep={currentStep}
             styleConfig={{
-                activeBgColor: "#03b335",
+                activeBgColor: "#496B24FF",
                 activeTextColor: "#fff",
-                completedBgColor: "#04882a",
+                completedBgColor: "#496B24FF",
                 completedTextColor: "#fff",
                 inactiveBgColor: "#ccc",
                 inactiveTextColor: "#666",
@@ -20,7 +20,7 @@ const CustomStepper = ({ currentStep, steps }) => {
             }}
         >
             {steps.map((label, index) => (
-                <Step key={index} label={label} style={{cursor: "default"}}>
+                <Step key={index} label={label} style={{ cursor: "default" }}>
                     {index === 0 ? "" : index}{" "}
                 </Step>
             ))}
