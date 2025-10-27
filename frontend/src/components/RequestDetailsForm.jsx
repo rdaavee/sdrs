@@ -63,7 +63,7 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
 
     return (
         <div className="border border-gray-300 rounded-md overflow-hidden">
-            <div className="bg-[#04882a] text-white px-4 py-2">
+            <div className="bg-[#496B24FF] text-white px-4 py-2">
                 <p className="font-medium text-lg uppercase">
                     Student Information
                 </p>
@@ -106,7 +106,7 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                                 disabled={
                                     !dataForm.email_address || cooldown > 0
                                 }
-                                className="bg-[#04882a] text-white text-xs px-2 py-2 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="bg-[#496B24FF] text-white text-xs px-2 py-2 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {cooldown > 0
                                     ? `Request again in ${cooldown}s`
@@ -157,7 +157,7 @@ const RequestDetailsForm = ({ dataForm, handleInputChange }) => {
                                         type="button"
                                         onClick={handleVerifyCode}
                                         disabled={!dataForm.verification_code}
-                                        className={`bg-[#04882a] text-white text-xs px-3 py-2 rounded ${
+                                        className={`bg-[#496B24FF] text-white text-xs px-3 py-2 rounded ${
                                             !dataForm.verification_code
                                                 ? "opacity-50 cursor-not-allowed"
                                                 : "cursor-pointer"

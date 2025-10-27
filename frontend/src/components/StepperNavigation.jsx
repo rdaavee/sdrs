@@ -28,7 +28,7 @@ const StepperNavigation = ({
             {currentStep > 0 ? (
                 <button
                     onClick={handlePrevious}
-                    className="mb-5 px-5 py-2 inline-flex items-center text-sm cursor-pointer text-white bg-green-500 hover:bg-green-600 transition-all"
+                    className="mb-5 px-5 py-2 inline-flex items-center text-sm cursor-pointer text-white bg-[#496B24FF] hover:bg-[#3e5c1f] transition-all"
                 >
                     <IoArrowBackOutline className="mr-2 text-md" />
                     Back
@@ -46,7 +46,7 @@ const StepperNavigation = ({
                     className={`mb-5 px-5 py-2 inline-flex items-center justify-center text-sm text-white transition-all min-w-[100px] ${
                         isProcessing || (requiresConfirmation && !canProceed)
                             ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-green-500 hover:bg-green-600 cursor-pointer"
+                            : "bg-[#496B24FF] hover:bg-[#3e5c1f] cursor-pointer"
                     }`}
                 >
                     {isProcessing ? (

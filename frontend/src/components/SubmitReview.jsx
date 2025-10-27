@@ -267,7 +267,7 @@ const SubmitReview = ({ dataForm, setDataForm, handleInputChange }) => {
                                 documents.length > 0 &&
                                 selectedPaymentMethod &&
                                 !loading
-                                    ? "bg-green-600 hover:bg-green-700 text-white"
+                                    ? "bg-[#496B24FF] hover:bg-[#3e5c1f] text-white"
                                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                             }`}
                             onClick={submitRequest}

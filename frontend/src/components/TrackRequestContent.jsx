@@ -118,18 +118,18 @@ const TrackRequestContent = ({ reference, code, onTrackingUpdate }) => {
                         placeholder="Reference Number"
                         value={refValue}
                         onChange={(e) => setRefValue(e.target.value)}
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-b-2 focus:border-b-green-500"
+                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-b-2 focus:border-b-[#496B24FF]"
                     />
                     <input
                         type="text"
                         placeholder="Enter Code"
                         value={codeValue}
                         onChange={(e) => setCodeValue(e.target.value)}
-                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-b-2 focus:border-b-green-500"
+                        className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-b-2 focus:border-b-[#496B24FF]"
                     />
                     <button
                         onClick={handleTrack}
-                        className="w-full md:w-auto bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                        className="w-full md:w-auto bg-[#496B24FF] text-white px-4 py-2 rounded hover:bg-[#3e5c1f]"
                     >
                         Track
                     </button>
@@ -197,8 +197,8 @@ const TrackRequestContent = ({ reference, code, onTrackingUpdate }) => {
                             ]}
                             activeStep={activeStep}
                             styleConfig={{
-                                activeBgColor: "#16A34A",
-                                completedBgColor: "#22C55E",
+                                activeBgColor: "#496B24FF",
+                                completedBgColor: "#496B24FF",
                                 inactiveBgColor: "#D1D5DB",
                                 labelFontSize: "14px",
                             }}
@@ -307,12 +307,12 @@ const TrackRequestContent = ({ reference, code, onTrackingUpdate }) => {
                                                         "accepted"
                                                             ? "bg-green-100 text-green-700"
                                                             : requestReceipt.status ===
-                                                                "rejected"
+                                                              "rejected"
                                                             ? "bg-red-100 text-red-700"
                                                             : requestReceipt.status ===
-                                                                "processing" ||
-                                                            requestReceipt.status ===
-                                                                "for-review"
+                                                                  "processing" ||
+                                                              requestReceipt.status ===
+                                                                  "for-review"
                                                             ? "bg-amber-100 text-amber-700"
                                                             : "bg-gray-100 text-gray-700"
                                                     }`}
@@ -327,38 +327,38 @@ const TrackRequestContent = ({ reference, code, onTrackingUpdate }) => {
                                             <td className="px-4 py-2 text-gray-600 text-sm">
                                                 {requestReceipt.status ===
                                                 "waiting"
-                                                ? "Pending approval"
-                                                : requestReceipt.status ===
-                                                    "processing"
-                                                ? `Expected release: ${new Date(
-                                                        new Date(
-                                                            requestReceipt.createdAt
-                                                        ).setDate(
-                                                            new Date(
-                                                                requestReceipt.createdAt
-                                                            ).getDate() + 7
-                                                        )
-                                                    ).toLocaleDateString(
-                                                        "en-US",
-                                                        {
-                                                            month: "short",
-                                                            day: "numeric",
-                                                            year: "numeric",
-                                                        }
-                                                    )}`
-                                                : requestReceipt.status ===
-                                                    "for-review"
-                                                ? "Your request is currently under review by the SDRS Team."
-                                                : requestReceipt.status ===
-                                                    "accepted"
-                                                ? "Your request has been accepted and is awaiting processing."
-                                                : requestReceipt.status ===
-                                                    "ready"
-                                                ? "Please claim your requested document at the Registrar’s Office."
-                                                : requestReceipt.status ===
-                                                    "rejected"
-                                                ? "Your request has been rejected. For more details, please contact the SDRS Team or visit the Registrar’s Office."
-                                                : "The document has already been released"}
+                                                    ? "Pending approval"
+                                                    : requestReceipt.status ===
+                                                      "processing"
+                                                    ? `Expected release: ${new Date(
+                                                          new Date(
+                                                              requestReceipt.createdAt
+                                                          ).setDate(
+                                                              new Date(
+                                                                  requestReceipt.createdAt
+                                                              ).getDate() + 7
+                                                          )
+                                                      ).toLocaleDateString(
+                                                          "en-US",
+                                                          {
+                                                              month: "short",
+                                                              day: "numeric",
+                                                              year: "numeric",
+                                                          }
+                                                      )}`
+                                                    : requestReceipt.status ===
+                                                      "for-review"
+                                                    ? "Your request is currently under review by the SDRS Team."
+                                                    : requestReceipt.status ===
+                                                      "accepted"
+                                                    ? "Your request has been accepted and is awaiting processing."
+                                                    : requestReceipt.status ===
+                                                      "ready"
+                                                    ? "Please claim your requested document at the Registrar’s Office."
+                                                    : requestReceipt.status ===
+                                                      "rejected"
+                                                    ? "Your request has been rejected. For more details, please contact the SDRS Team or visit the Registrar’s Office."
+                                                    : "The document has already been released"}
                                             </td>
                                         </tr>
                                     ))}
