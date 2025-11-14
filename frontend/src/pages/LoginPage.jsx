@@ -103,7 +103,7 @@ const LoginPage = () => {
                             </div>
 
                             <p className="text-white font-light mb-7 text-center tracking-tight">
-                                Login to connect to the dashboard
+                                login to connect to the dashboard
                             </p>
 
                             <div className="space-y-4">
